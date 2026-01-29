@@ -1,0 +1,448 @@
+/* Image Reveal Game Styles */
+
+.image-reveal-game {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 1rem;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Screens */
+.screen {
+    display: none;
+    flex: 1;
+    flex-direction: column;
+}
+
+.screen.active {
+    display: flex;
+}
+
+/* Join Screen */
+#join-screen {
+    justify-content: flex-start;
+    padding-top: 2rem;
+}
+
+#join-screen h1 {
+    text-align: center;
+    margin-bottom: 0.5rem;
+}
+
+.game-description {
+    text-align: center;
+    color: var(--color-text-muted);
+    margin-bottom: 2rem;
+    max-width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Game Header */
+.game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    background: var(--color-bg-light);
+    border-radius: var(--radius);
+    margin-bottom: 1rem;
+}
+
+.player-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    opacity: 0.6;
+    transition: opacity var(--transition);
+}
+
+.player-info.current-player {
+    opacity: 1;
+}
+
+.role-badge {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.role-badge.picker {
+    background: rgba(249, 199, 79, 0.2);
+    color: var(--color-accent);
+}
+
+.role-badge.guesser {
+    background: rgba(77, 171, 247, 0.2);
+    color: #4dabf7;
+}
+
+.player-name {
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.round-info {
+    font-weight: 600;
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+}
+
+/* Scores Section */
+.scores-section {
+    text-align: center;
+    margin-bottom: 1rem;
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+}
+
+.score-item {
+    display: inline-block;
+}
+
+/* Sections */
+.section {
+    margin-bottom: 1rem;
+}
+
+.section.hidden {
+    display: none;
+}
+
+/* Upload Section */
+#upload-section {
+    text-align: center;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#upload-section h2 {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+}
+
+#upload-section > p {
+    color: var(--color-text-muted);
+    margin-bottom: 1.5rem;
+}
+
+.upload-area {
+    border: 2px dashed var(--color-secondary);
+    border-radius: var(--radius);
+    padding: 3rem 2rem;
+    cursor: pointer;
+    transition: border-color var(--transition), background var(--transition);
+}
+
+.upload-area:hover {
+    border-color: var(--color-primary);
+    background: rgba(233, 69, 96, 0.05);
+}
+
+.upload-area.hidden {
+    display: none;
+}
+
+.upload-area input {
+    display: none;
+}
+
+.upload-area label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    color: var(--color-text-muted);
+}
+
+.upload-icon {
+    font-size: 2.5rem;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--color-secondary);
+    border-radius: 50%;
+    transition: border-color var(--transition), color var(--transition);
+}
+
+.upload-area:hover .upload-icon {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
+#image-preview {
+    max-width: 100%;
+    max-height: 250px;
+    border-radius: var(--radius);
+    margin: 0 auto 1rem;
+    display: block;
+}
+
+#image-preview.hidden {
+    display: none;
+}
+
+#confirm-image-btn {
+    margin: 0 auto;
+}
+
+#confirm-image-btn.hidden {
+    display: none;
+}
+
+.settings-toggle {
+    margin-top: 2rem;
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+}
+
+.settings-toggle label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    cursor: pointer;
+}
+
+.settings-toggle input {
+    width: 1rem;
+    height: 1rem;
+}
+
+/* Waiting for image section */
+#waiting-for-image-section {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    flex: 1;
+    color: var(--color-text-muted);
+}
+
+/* Board Section */
+#board-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.image-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#game-canvas {
+    max-width: 100%;
+    border-radius: var(--radius-sm);
+    border: 2px solid var(--color-secondary);
+}
+
+.hint-display {
+    margin-top: 1rem;
+    padding: 0.75rem 1rem;
+    background: rgba(249, 199, 79, 0.15);
+    border-radius: var(--radius-sm);
+    text-align: center;
+    width: 100%;
+}
+
+.hint-display.hidden {
+    display: none;
+}
+
+.hint-label {
+    font-weight: 600;
+    color: var(--color-accent);
+}
+
+/* Input Sections */
+#hint-form,
+#guess-form,
+#chat-form {
+    display: flex;
+    gap: 0.5rem;
+}
+
+#hint-form input,
+#guess-form input,
+#chat-form input {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    border: 2px solid var(--color-secondary);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg-light);
+    color: var(--color-text);
+}
+
+#hint-form input:focus,
+#guess-form input:focus,
+#chat-form input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+}
+
+/* Judging Section */
+#judging-section {
+    text-align: center;
+}
+
+.guess-display {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+}
+
+.judge-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.btn-success {
+    background: var(--color-success);
+    color: #000;
+}
+
+.btn-success:hover {
+    box-shadow: 0 4px 15px rgba(74, 222, 128, 0.4);
+}
+
+.btn-danger {
+    background: var(--color-error);
+    color: #fff;
+}
+
+.btn-danger:hover {
+    box-shadow: 0 4px 15px rgba(248, 113, 113, 0.4);
+}
+
+/* Waiting judgment */
+#waiting-judgment-section {
+    text-align: center;
+    padding: 1rem;
+    color: var(--color-text-muted);
+}
+
+/* Round Complete */
+#round-complete-section {
+    text-align: center;
+}
+
+#result-message {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: var(--color-accent);
+}
+
+/* Chat Panel */
+.chat-panel {
+    margin-top: auto;
+    border-top: 1px solid var(--color-secondary);
+    padding-top: 1rem;
+}
+
+.chat-panel.hidden {
+    display: none;
+}
+
+#chat-messages {
+    max-height: 120px;
+    overflow-y: auto;
+    margin-bottom: 0.5rem;
+    padding: 0.5rem;
+    background: var(--color-bg-light);
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+}
+
+.chat-message {
+    padding: 0.2rem 0;
+    word-break: break-word;
+}
+
+.hint-message {
+    color: var(--color-accent);
+    font-weight: 500;
+}
+
+.guess-message {
+    color: #4dabf7;
+    font-weight: 500;
+}
+
+.system-message {
+    color: var(--color-text-muted);
+    font-style: italic;
+    text-align: center;
+}
+
+.picker-message {
+    color: var(--color-accent);
+}
+
+.guesser-message {
+    color: #4dabf7;
+}
+
+/* Give Up Button */
+.give-up-btn {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+    background: transparent;
+    color: var(--color-text-muted);
+    border: 1px solid var(--color-secondary);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: border-color var(--transition), color var(--transition);
+}
+
+.give-up-btn:hover {
+    border-color: var(--color-error);
+    color: var(--color-error);
+}
+
+.give-up-btn.hidden {
+    display: none;
+}
+
+/* Mobile adjustments */
+@media (max-width: 400px) {
+    .game-header {
+        padding: 0.5rem;
+    }
+
+    .role-badge {
+        font-size: 0.6rem;
+        padding: 0.15rem 0.4rem;
+    }
+
+    .player-name {
+        font-size: 0.75rem;
+    }
+
+    .judge-buttons {
+        flex-direction: column;
+    }
+
+    .judge-buttons .btn {
+        width: 100%;
+    }
+}

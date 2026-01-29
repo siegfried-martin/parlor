@@ -71,13 +71,32 @@ python main.py
 - Each round: both choose -> reveal -> show result -> 3 second delay -> next round
 - Running score tracks total rounds won per player
 
-## Adding a New Multiplayer Game
+## New Game Development Workflow
+
+New games are designed in a companion Claude project and documented in `documentation/games/{game_id}.md`. These design docs contain:
+- Game rules and state machine
+- Complete Python backend implementation
+- Complete HTML/JS/CSS frontend
+- WebSocket message formats
+- Registration instructions
+- Testing checklist
+
+**To implement a new game:**
+1. Read the design doc in `documentation/games/`
+2. Ask clarifying questions if anything is unclear
+3. Create the files as specified in the design doc
+4. Register in `main.py` and add to index page
+5. Test against the testing checklist
+6. Commit and push
+
+## Adding a New Multiplayer Game (Quick Reference)
 
 1. Create `games/{game_id}.py` with class inheriting from `BaseGame`
 2. Implement required methods: `handle_move`, `get_game_state`, `reset_for_rematch`
 3. Add to `GAME_REGISTRY` in `main.py`
 4. Create `templates/games/{game_id}.html`
-5. Add to index page game list
+5. Optionally add `static/css/games/{game_id}.css`
+6. Add to index page game list
 
 ## Adding a Solo Game
 
