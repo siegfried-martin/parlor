@@ -16,6 +16,7 @@ from fastapi.responses import HTMLResponse
 
 from games.base import BaseGame, Player
 from games.rps import RockPaperScissors
+from games.image_reveal import ImageReveal
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -24,6 +25,7 @@ logger = logging.getLogger(__name__)
 # Game registry - add new games here
 GAME_REGISTRY: dict[str, type[BaseGame]] = {
     "rps": RockPaperScissors,
+    "image-reveal": ImageReveal,
 }
 
 # Active game instances: instance_id -> BaseGame
@@ -230,9 +232,6 @@ async def try_matchmaking(game_id: str, player: Player) -> Optional[BaseGame]:
         game_class = GAME_REGISTRY[game_id]
         game = game_class(instance_id)
         game.players = [opponent, player]
-
-        # Initialize scores for both players
-        game.state["scores"] = {opponent.name: 0, player.name: 0}
 
         game_instances[instance_id] = game
 

@@ -1,0 +1,662 @@
+{% extends "base.html" %}
+
+{% block title %}{{ game_name }} - Parlor{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="/static/css/games/image-reveal.css">
+{% endblock %}
+
+{% block content %}
+<div id="game-container" class="image-reveal-game">
+    <!-- Join Screen -->
+    <div id="join-screen" class="screen active">
+        <a href="/" class="back-link">&larr; Back to Lobby</a>
+        <h1>Image Reveal</h1>
+        <p class="game-description">
+            One player picks an image and gives hints while it's slowly revealed.
+            The other player tries to guess what it is!
+        </p>
+        <form id="join-form" class="join-form">
+            <input
+                type="text"
+                id="name-input"
+                placeholder="Enter your name"
+                maxlength="20"
+                required
+                autocomplete="off"
+            >
+            <button type="submit" class="btn btn-primary">Play</button>
+        </form>
+    </div>
+
+    <!-- Waiting Screen -->
+    <div id="waiting-screen" class="screen">
+        <div class="waiting-content">
+            <div class="spinner"></div>
+            <p id="waiting-message">Waiting for opponent...</p>
+        </div>
+    </div>
+
+    <!-- Main Game Screen -->
+    <div id="game-screen" class="screen">
+        <!-- Header with roles and round -->
+        <header class="game-header">
+            <div class="player-info picker-info">
+                <span class="role-badge picker">Picker</span>
+                <span class="player-name" id="picker-name"></span>
+            </div>
+            <div class="round-info">
+                Round <span id="game-round">1</span>
+            </div>
+            <div class="player-info guesser-info">
+                <span class="role-badge guesser">Guesser</span>
+                <span class="player-name" id="guesser-name"></span>
+            </div>
+        </header>
+
+        <!-- Scores Display -->
+        <div id="scores-section" class="scores-section">
+            <div id="scores-display"></div>
+        </div>
+
+        <!-- Image Upload (Picker, waiting_for_image phase) -->
+        <div id="upload-section" class="section hidden">
+            <h2>Choose an Image</h2>
+            <p>Select an image for your opponent to guess</p>
+            <div class="upload-area" id="upload-area">
+                <input type="file" id="image-input" accept="image/*">
+                <label for="image-input">
+                    <span class="upload-icon">+</span>
+                    <span>Tap to upload image</span>
+                </label>
+            </div>
+            <img id="image-preview" class="hidden">
+            <button id="confirm-image-btn" class="btn btn-primary hidden">Use This Image</button>
+
+            <div class="settings-toggle">
+                <label>
+                    <input type="checkbox" id="swap-roles-toggle" checked>
+                    Swap roles each round
+                </label>
+            </div>
+        </div>
+
+        <!-- Waiting for Image (Guesser) -->
+        <div id="waiting-for-image-section" class="section hidden">
+            <div class="spinner"></div>
+            <p>Waiting for <span id="picker-name-waiting"></span> to choose an image...</p>
+        </div>
+
+        <!-- Game Board -->
+        <div id="board-section" class="section hidden">
+            <div class="image-container" id="image-container">
+                <canvas id="game-canvas"></canvas>
+            </div>
+
+            <div class="hint-display hidden" id="hint-display">
+                <span class="hint-label">Hint #<span id="hint-number">1</span>:</span>
+                <span id="hint-text"></span>
+            </div>
+        </div>
+
+        <!-- Hint Input (Picker, writing_hint phase) -->
+        <div id="hint-input-section" class="section hidden">
+            <form id="hint-form">
+                <input
+                    type="text"
+                    id="hint-input"
+                    placeholder="Write a hint..."
+                    maxlength="200"
+                    required
+                    autocomplete="off"
+                >
+                <button type="submit" class="btn btn-primary">Send Hint</button>
+            </form>
+        </div>
+
+        <!-- Guess Input (Guesser, guessing phase) -->
+        <div id="guess-input-section" class="section hidden">
+            <form id="guess-form">
+                <input
+                    type="text"
+                    id="guess-input"
+                    placeholder="What is it?"
+                    maxlength="100"
+                    required
+                    autocomplete="off"
+                >
+                <button type="submit" class="btn btn-primary">Guess</button>
+            </form>
+        </div>
+
+        <!-- Judging Section (Picker, judging phase) -->
+        <div id="judging-section" class="section hidden">
+            <p class="guess-display">
+                They guessed: <strong id="guess-display-text"></strong>
+            </p>
+            <div class="judge-buttons">
+                <button id="correct-btn" class="btn btn-success">Correct!</button>
+                <button id="incorrect-btn" class="btn btn-danger">Incorrect</button>
+            </div>
+        </div>
+
+        <!-- Waiting for judgment (Guesser) -->
+        <div id="waiting-judgment-section" class="section hidden">
+            <p>Waiting for <span id="picker-name-judging"></span> to judge your guess...</p>
+        </div>
+
+        <!-- Round Complete Section -->
+        <div id="round-complete-section" class="section hidden">
+            <div id="result-message"></div>
+            <button id="next-round-btn" class="btn btn-primary">Next Round</button>
+        </div>
+
+        <!-- Chat Panel -->
+        <div id="chat-panel" class="chat-panel hidden">
+            <div id="chat-messages"></div>
+            <form id="chat-form">
+                <input
+                    type="text"
+                    id="chat-input"
+                    placeholder="Send a message..."
+                    maxlength="200"
+                    autocomplete="off"
+                >
+                <button type="submit" class="btn btn-primary">Send</button>
+            </form>
+        </div>
+
+        <!-- Give Up Button -->
+        <button id="give-up-btn" class="give-up-btn hidden">Give Up</button>
+    </div>
+
+    <!-- Disconnection Overlay -->
+    <div id="disconnect-overlay" class="overlay hidden">
+        <div class="overlay-content">
+            <p>Opponent disconnected</p>
+            <p class="subtext">Waiting for them to reconnect...</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/game-client.js"></script>
+<script src="/static/js/game-utils.js"></script>
+<script>
+(function() {
+    // DOM Elements
+    const screens = {
+        join: document.getElementById('join-screen'),
+        waiting: document.getElementById('waiting-screen'),
+        game: document.getElementById('game-screen')
+    };
+
+    const elements = {
+        joinForm: document.getElementById('join-form'),
+        nameInput: document.getElementById('name-input'),
+        waitingMessage: document.getElementById('waiting-message'),
+
+        // Header
+        pickerName: document.getElementById('picker-name'),
+        guesserName: document.getElementById('guesser-name'),
+        gameRound: document.getElementById('game-round'),
+
+        // Scores
+        scoresSection: document.getElementById('scores-section'),
+        scoresDisplay: document.getElementById('scores-display'),
+
+        // Upload
+        uploadSection: document.getElementById('upload-section'),
+        uploadArea: document.getElementById('upload-area'),
+        imageInput: document.getElementById('image-input'),
+        imagePreview: document.getElementById('image-preview'),
+        confirmImageBtn: document.getElementById('confirm-image-btn'),
+        swapRolesToggle: document.getElementById('swap-roles-toggle'),
+
+        // Waiting for image
+        waitingForImageSection: document.getElementById('waiting-for-image-section'),
+        pickerNameWaiting: document.getElementById('picker-name-waiting'),
+
+        // Board
+        boardSection: document.getElementById('board-section'),
+        imageContainer: document.getElementById('image-container'),
+        canvas: document.getElementById('game-canvas'),
+        hintDisplay: document.getElementById('hint-display'),
+        hintNumber: document.getElementById('hint-number'),
+        hintText: document.getElementById('hint-text'),
+
+        // Hint input
+        hintInputSection: document.getElementById('hint-input-section'),
+        hintForm: document.getElementById('hint-form'),
+        hintInput: document.getElementById('hint-input'),
+
+        // Guess input
+        guessInputSection: document.getElementById('guess-input-section'),
+        guessForm: document.getElementById('guess-form'),
+        guessInput: document.getElementById('guess-input'),
+
+        // Judging
+        judgingSection: document.getElementById('judging-section'),
+        guessDisplayText: document.getElementById('guess-display-text'),
+        correctBtn: document.getElementById('correct-btn'),
+        incorrectBtn: document.getElementById('incorrect-btn'),
+
+        // Waiting judgment
+        waitingJudgmentSection: document.getElementById('waiting-judgment-section'),
+        pickerNameJudging: document.getElementById('picker-name-judging'),
+
+        // Round complete
+        roundCompleteSection: document.getElementById('round-complete-section'),
+        resultMessage: document.getElementById('result-message'),
+        nextRoundBtn: document.getElementById('next-round-btn'),
+
+        // Chat
+        chatPanel: document.getElementById('chat-panel'),
+        chatMessages: document.getElementById('chat-messages'),
+        chatForm: document.getElementById('chat-form'),
+        chatInput: document.getElementById('chat-input'),
+
+        // Other
+        giveUpBtn: document.getElementById('give-up-btn'),
+        disconnectOverlay: document.getElementById('disconnect-overlay')
+    };
+
+    // State
+    let currentState = null;
+    let loadedImage = null;
+    let pendingImageData = null;
+
+    // Canvas context
+    const ctx = elements.canvas.getContext('2d');
+    const MAX_CANVAS_SIZE = 400; // Max dimension for canvas
+
+    // Initialize game client
+    const pathParts = window.location.pathname.split('/');
+    const instanceId = pathParts.length > 3 ? pathParts[3] : null;
+
+    const client = new GameClient('image-reveal', {
+        onWaiting: (msg) => {
+            showScreen('waiting');
+            elements.waitingMessage.textContent = msg.message || 'Waiting for opponent...';
+        },
+
+        onMatched: (msg) => {
+            showScreen('game');
+        },
+
+        onRejoined: (msg) => {
+            showScreen('game');
+        },
+
+        onGameState: (data) => {
+            currentState = data;
+            renderGameState(data);
+        },
+
+        onRoundResult: (msg) => {
+            // Handled in game state render
+        },
+
+        onNewRound: (msg) => {
+            elements.hintInput.value = '';
+            elements.guessInput.value = '';
+            pendingImageData = null;
+            loadedImage = null;
+        },
+
+        onOpponentDisconnected: () => {
+            elements.disconnectOverlay.classList.remove('hidden');
+        },
+
+        onOpponentReconnected: () => {
+            elements.disconnectOverlay.classList.add('hidden');
+        },
+
+        onError: (msg) => {
+            alert(msg.message || 'An error occurred');
+        },
+
+        onDisconnected: () => {
+            showScreen('join');
+            alert('Connection lost. Please rejoin.');
+        }
+    });
+
+    // Screen management
+    function showScreen(name) {
+        Object.entries(screens).forEach(([key, screen]) => {
+            screen.classList.toggle('active', key === name);
+        });
+    }
+
+    // Hide all game sections
+    function hideAllSections() {
+        const sections = [
+            elements.uploadSection,
+            elements.waitingForImageSection,
+            elements.boardSection,
+            elements.hintInputSection,
+            elements.guessInputSection,
+            elements.judgingSection,
+            elements.waitingJudgmentSection,
+            elements.roundCompleteSection
+        ];
+        sections.forEach(s => s.classList.add('hidden'));
+        elements.giveUpBtn.classList.add('hidden');
+    }
+
+    // Render game state
+    function renderGameState(state) {
+        // Update header
+        elements.pickerName.textContent = state.picker_name || '';
+        elements.guesserName.textContent = state.guesser_name || '';
+        elements.gameRound.textContent = state.game_round;
+
+        // Highlight current player's role
+        document.querySelectorAll('.player-info').forEach(el => el.classList.remove('current-player'));
+        if (state.my_role === 'picker') {
+            document.querySelector('.picker-info').classList.add('current-player');
+        } else {
+            document.querySelector('.guesser-info').classList.add('current-player');
+        }
+
+        // Update swap roles toggle
+        elements.swapRolesToggle.checked = state.swap_roles;
+
+        // Update scores
+        renderScores(state.scores);
+
+        hideAllSections();
+
+        const isPicker = state.my_role === 'picker';
+        const phase = state.phase;
+
+        // Phase-specific rendering
+        if (phase === 'waiting_for_image') {
+            if (isPicker) {
+                elements.uploadSection.classList.remove('hidden');
+                // Reset upload UI
+                elements.uploadArea.classList.remove('hidden');
+                elements.imagePreview.classList.add('hidden');
+                elements.confirmImageBtn.classList.add('hidden');
+            } else {
+                elements.waitingForImageSection.classList.remove('hidden');
+                elements.pickerNameWaiting.textContent = state.picker_name;
+            }
+        } else if (phase === 'writing_hint') {
+            elements.boardSection.classList.remove('hidden');
+            renderCanvas(state);
+            if (isPicker) {
+                elements.hintInputSection.classList.remove('hidden');
+                elements.giveUpBtn.classList.remove('hidden');
+            } else {
+                elements.giveUpBtn.classList.remove('hidden');
+            }
+            updateHintDisplay(state);
+        } else if (phase === 'guessing') {
+            elements.boardSection.classList.remove('hidden');
+            renderCanvas(state);
+            updateHintDisplay(state);
+            if (isPicker) {
+                elements.giveUpBtn.classList.remove('hidden');
+            } else {
+                elements.guessInputSection.classList.remove('hidden');
+                elements.giveUpBtn.classList.remove('hidden');
+            }
+        } else if (phase === 'judging') {
+            elements.boardSection.classList.remove('hidden');
+            renderCanvas(state);
+            updateHintDisplay(state);
+            if (isPicker) {
+                elements.judgingSection.classList.remove('hidden');
+                elements.guessDisplayText.textContent = state.current_guess;
+            } else {
+                elements.waitingJudgmentSection.classList.remove('hidden');
+                elements.pickerNameJudging.textContent = state.picker_name;
+            }
+            elements.giveUpBtn.classList.remove('hidden');
+        } else if (phase === 'round_complete') {
+            elements.boardSection.classList.remove('hidden');
+            renderCanvas(state);
+            elements.roundCompleteSection.classList.remove('hidden');
+
+            let resultText = '';
+            if (state.gave_up) {
+                resultText = `${state.gave_up} gave up!`;
+            } else {
+                resultText = `${state.guesser_name} guessed it in ${state.hint_round} hint(s)!`;
+            }
+            elements.resultMessage.textContent = resultText;
+        }
+
+        // Update chat
+        renderChat(state.chat);
+
+        // Show/hide chat based on phase
+        if (phase === 'waiting_for_image') {
+            elements.chatPanel.classList.add('hidden');
+        } else {
+            elements.chatPanel.classList.remove('hidden');
+        }
+    }
+
+    function renderScores(scores) {
+        if (!scores || Object.keys(scores).length === 0) {
+            elements.scoresDisplay.innerHTML = '';
+            return;
+        }
+
+        const scoreHtml = Object.entries(scores).map(([name, rounds]) => {
+            const total = rounds.length;
+            const avg = rounds.length > 0 ? (rounds.reduce((a, b) => a + b, 0) / rounds.length).toFixed(1) : '-';
+            return `<span class="score-item">${escapeHtml(name)}: ${total} wins (avg ${avg} hints)</span>`;
+        }).join(' | ');
+
+        elements.scoresDisplay.innerHTML = scoreHtml;
+    }
+
+    function updateHintDisplay(state) {
+        if (state.current_hint) {
+            elements.hintDisplay.classList.remove('hidden');
+            elements.hintNumber.textContent = state.hint_round;
+            elements.hintText.textContent = state.current_hint;
+        } else {
+            elements.hintDisplay.classList.add('hidden');
+        }
+    }
+
+    // Canvas rendering with dynamic aspect ratio
+    function renderCanvas(state) {
+        if (!state.image_data) return;
+
+        // Load image if needed
+        if (!loadedImage || loadedImage.src !== state.image_data) {
+            loadedImage = new Image();
+            loadedImage.onload = () => drawCanvas(state);
+            loadedImage.src = state.image_data;
+        } else {
+            drawCanvas(state);
+        }
+    }
+
+    function drawCanvas(state) {
+        const gridSize = state.grid_size;
+        const imgWidth = loadedImage.naturalWidth;
+        const imgHeight = loadedImage.naturalHeight;
+
+        // Calculate canvas size maintaining aspect ratio
+        let canvasWidth, canvasHeight;
+        const aspectRatio = imgWidth / imgHeight;
+
+        if (aspectRatio >= 1) {
+            // Landscape or square
+            canvasWidth = Math.min(MAX_CANVAS_SIZE, elements.imageContainer.clientWidth || MAX_CANVAS_SIZE);
+            canvasHeight = canvasWidth / aspectRatio;
+        } else {
+            // Portrait
+            canvasHeight = Math.min(MAX_CANVAS_SIZE, elements.imageContainer.clientWidth || MAX_CANVAS_SIZE);
+            canvasWidth = canvasHeight * aspectRatio;
+        }
+
+        // Set canvas dimensions
+        elements.canvas.width = canvasWidth;
+        elements.canvas.height = canvasHeight;
+
+        // Draw image scaled to canvas
+        ctx.drawImage(loadedImage, 0, 0, canvasWidth, canvasHeight);
+
+        // Create set of revealed tiles for fast lookup
+        const revealedSet = new Set(
+            state.revealed_tiles.map(t => `${t[0]},${t[1]}`)
+        );
+
+        // Calculate tile dimensions
+        const tileWidth = canvasWidth / gridSize;
+        const tileHeight = canvasHeight / gridSize;
+
+        // Draw tiles over unrevealed areas
+        ctx.fillStyle = '#1a1a2e';
+        for (let r = 0; r < gridSize; r++) {
+            for (let c = 0; c < gridSize; c++) {
+                if (!revealedSet.has(`${r},${c}`)) {
+                    ctx.fillRect(c * tileWidth, r * tileHeight, tileWidth, tileHeight);
+                }
+            }
+        }
+
+        // Draw grid lines
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+        ctx.lineWidth = 1;
+        for (let i = 0; i <= gridSize; i++) {
+            ctx.beginPath();
+            ctx.moveTo(i * tileWidth, 0);
+            ctx.lineTo(i * tileWidth, canvasHeight);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(0, i * tileHeight);
+            ctx.lineTo(canvasWidth, i * tileHeight);
+            ctx.stroke();
+        }
+    }
+
+    // Chat rendering
+    function renderChat(messages) {
+        elements.chatMessages.innerHTML = messages.map(msg => {
+            let className = 'chat-message';
+            if (msg.is_hint) className += ' hint-message';
+            else if (msg.is_guess) className += ' guess-message';
+            else if (msg.is_system) className += ' system-message';
+            else className += ` ${msg.from}-message`;
+
+            const prefix = msg.player_name ? `${escapeHtml(msg.player_name)}: ` : '';
+            return `<div class="${className}">${prefix}${escapeHtml(msg.text)}</div>`;
+        }).join('');
+
+        elements.chatMessages.scrollTop = elements.chatMessages.scrollHeight;
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // Event handlers
+    elements.joinForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = elements.nameInput.value.trim();
+        if (name) {
+            client.connect(name, instanceId);
+        }
+    });
+
+    // Image upload
+    elements.imageInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            pendingImageData = event.target.result;
+            elements.imagePreview.src = pendingImageData;
+            elements.imagePreview.classList.remove('hidden');
+            elements.uploadArea.classList.add('hidden');
+            elements.confirmImageBtn.classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+    });
+
+    elements.confirmImageBtn.addEventListener('click', () => {
+        if (pendingImageData) {
+            client.sendMove({
+                action: 'upload_image',
+                image_data: pendingImageData
+            });
+        }
+    });
+
+    elements.swapRolesToggle.addEventListener('change', (e) => {
+        client.sendMove({
+            action: 'set_swap_roles',
+            swap_roles: e.target.checked
+        });
+    });
+
+    // Hint submission
+    elements.hintForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const hint = elements.hintInput.value.trim();
+        if (hint) {
+            client.sendMove({ action: 'submit_hint', hint });
+            elements.hintInput.value = '';
+        }
+    });
+
+    // Guess submission
+    elements.guessForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const guess = elements.guessInput.value.trim();
+        if (guess) {
+            client.sendMove({ action: 'submit_guess', guess });
+            elements.guessInput.value = '';
+        }
+    });
+
+    // Judging
+    elements.correctBtn.addEventListener('click', () => {
+        client.sendMove({ action: 'judge_guess', correct: true });
+    });
+
+    elements.incorrectBtn.addEventListener('click', () => {
+        client.sendMove({ action: 'judge_guess', correct: false });
+    });
+
+    // Chat
+    elements.chatForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const text = elements.chatInput.value.trim();
+        if (text) {
+            client.sendMove({ action: 'chat', text });
+            elements.chatInput.value = '';
+        }
+    });
+
+    // Give up
+    elements.giveUpBtn.addEventListener('click', () => {
+        if (confirm('Are you sure you want to give up and reveal the image?')) {
+            client.sendMove({ action: 'give_up' });
+        }
+    });
+
+    // Next round
+    elements.nextRoundBtn.addEventListener('click', () => {
+        client.sendMove({ action: 'next_round' });
+    });
+
+    // Auto-focus name input
+    elements.nameInput.focus();
+})();
+</script>
+{% endblock %}
