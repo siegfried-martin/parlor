@@ -7,6 +7,7 @@ Deployed at `parlor.marstol.com`.
 ## Architecture Overview
 
 ### Tech Stack
+
 - **Backend:** FastAPI (Python 3.11+) with Jinja2 templates
 - **Frontend:** Vanilla JavaScript with shared utility library
 - **WebSockets:** Native FastAPI/Starlette WebSocket support
@@ -14,6 +15,7 @@ Deployed at `parlor.marstol.com`.
 - **Deployment:** Single process, no external dependencies
 
 ### Design Philosophy
+
 This platform is intentionally simple. With only two concurrent users expected, there's no need for horizontal scaling, Redis, worker processes, or any distributed systems complexity. Games exist as Python objects in a dictionary. When both players disconnect, the game eventually evaporates.
 
 ## Project Structure
@@ -45,11 +47,13 @@ This platform is intentionally simple. With only two concurrent users expected, 
 ## URL Structure
 
 **Multiplayer:**
+
 - `/` - Landing page with game selection (multiplayer and single-player sections)
 - `/game/{game_id}` - Game lobby (SSR page with name entry, then WebSocket connection)
 - `/game/{game_id}/{instance_id}` - Active game instance (URL updates via pushState after matchmaking)
 
 **Single-player:**
+
 - `/solo/{game_id}` - Single-player game (pure static, no WebSocket)
 
 ## HTTP vs WebSocket Responsibilities
@@ -65,70 +69,101 @@ All messages are JSON with a `type` field and additional fields depending on mes
 ### Client → Server Messages
 
 ```json
-{"type": "join", "player_name": "Ziggy"}
+{ "type": "join", "player_name": "Ziggy" }
 ```
+
 Sent when player connects and enters their name.
 
 ```json
 {"type": "move", "data": {...}}
 ```
+
 Game-specific move data. Structure depends on the game.
 
 ```json
-{"type": "rematch_request"}
+{ "type": "rematch_request" }
 ```
+
 Player wants to play again.
 
 ```json
-{"type": "rematch_accept"}
+{ "type": "rematch_accept" }
 ```
+
 Player accepts rematch request.
 
 ### Server → Client Messages
 
 ```json
-{"type": "waiting", "message": "Waiting for opponent..."}
+{ "type": "waiting", "message": "Waiting for opponent..." }
 ```
+
 Player is in queue, no opponent yet.
 
 ```json
-{"type": "matched", "instance_id": "abc123", "opponent_name": "Partner"}
+{ "type": "matched", "instance_id": "abc123", "opponent_name": "Partner" }
 ```
+
 Opponent found, game starting. Client should update URL.
 
 ```json
-{"type": "game_state", "data": {...}}
+{ "type": "rejoined", "instance_id": "abc123", "opponent_name": "Partner" }
 ```
-Game-specific state update. Structure depends on the game.
+
+Successfully rejoined an existing game instance.
 
 ```json
-{"type": "game_over", "winner": "Ziggy", "reason": "..."}
+{ "type": "game_state", "data": {...} }
 ```
+
+Game-specific state update. Structure depends on the game. Always includes `my_name`, `opponent_name`, and `opponent_connected` for UI convenience.
+
+```json
+{ "type": "round_result", "winner": "Ziggy", "reason": "Rock beats scissors", "choices": {...}, "scores": {...} }
+```
+
+Round ended (for games with multiple rounds). Winner is null for ties.
+
+```json
+{ "type": "new_round", "round": 2 }
+```
+
+New round starting (for games with multiple rounds).
+
+```json
+{ "type": "game_over", "winner": "Ziggy", "reason": "..." }
+```
+
 Game ended. Winner is null for draws.
 
 ```json
-{"type": "opponent_disconnected"}
+{ "type": "opponent_disconnected" }
 ```
+
 Opponent's WebSocket closed. Game paused pending reconnection.
 
 ```json
-{"type": "opponent_reconnected"}
+{ "type": "opponent_reconnected" }
 ```
+
 Opponent reconnected. Game resumes.
 
 ```json
-{"type": "rematch_requested", "by": "Partner"}
+{ "type": "rematch_requested", "by": "Partner" }
 ```
+
 Opponent wants a rematch.
 
 ```json
-{"type": "rematch_starting"}
+{ "type": "rematch_starting" }
 ```
+
 Both players agreed, new game beginning.
 
 ```json
-{"type": "error", "message": "..."}
+{ "type": "error", "message": "..." }
 ```
+
 Something went wrong.
 
 ## Game Implementation Contract
@@ -138,11 +173,12 @@ Each game is a Python class inheriting from `BaseGame`:
 ```python
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from typing import Optional
 
 @dataclass
 class Player:
     name: str
-    websocket: WebSocket
+    websocket: Optional[WebSocket] = None
     connected: bool = True
 
 class BaseGame(ABC):
@@ -150,46 +186,52 @@ class BaseGame(ABC):
     display_name: str  # e.g., "Rock Paper Scissors"
     min_players = 2
     max_players = 2
-    
+
     def __init__(self, instance_id: str):
         self.instance_id = instance_id
         self.players: list[Player] = []
         self.state: dict = {}
-    
+
     @abstractmethod
     async def handle_move(self, player: Player, data: dict) -> None:
         """Process a player's move. Should update state and broadcast as needed."""
         pass
-    
+
     @abstractmethod
     def get_game_state(self, for_player: Player) -> dict:
-        """Return game state from this player's perspective (hide opponent's hidden info)."""
+        """Return game state from this player's perspective (hide opponent's hidden info).
+        Should include: my_name, opponent_name, opponent_connected for UI convenience."""
         pass
-    
+
     @abstractmethod
-    def is_game_over(self) -> bool:
-        """Check if game has ended."""
+    def reset_for_rematch(self) -> None:
+        """Reset game state for a new round/rematch."""
         pass
-    
-    @abstractmethod
-    def get_winner(self) -> Player | None:
-        """Return winner or None for draw. Only valid if is_game_over()."""
-        pass
-    
+
+    def get_opponent(self, player: Player) -> Optional[Player]:
+        """Get the opponent of the given player."""
+        for p in self.players:
+            if p != player:
+                return p
+        return None
+
     async def broadcast(self, message: dict, exclude: Player = None) -> None:
         """Send message to all connected players except excluded one."""
         for player in self.players:
-            if player.connected and player != exclude:
+            if player.connected and player.websocket and player != exclude:
                 await player.websocket.send_json(message)
-    
+
     async def send_to(self, player: Player, message: dict) -> None:
         """Send message to specific player."""
-        if player.connected:
+        if player.connected and player.websocket:
             await player.websocket.send_json(message)
-    
-    def reset_for_rematch(self) -> None:
-        """Reset game state for a new round. Override if needed."""
-        self.state = {}
+
+    async def broadcast_game_state(self) -> None:
+        """Send personalized game state to each player."""
+        for player in self.players:
+            if player.connected:
+                state = self.get_game_state(player)
+                await self.send_to(player, {"type": "game_state", "data": state})
 ```
 
 ## Frontend Game Client
@@ -198,66 +240,71 @@ class BaseGame(ABC):
 
 ```javascript
 class GameClient {
-    constructor(gameId, handlers) {
-        this.gameId = gameId;
-        this.handlers = handlers; // {onWaiting, onMatched, onGameState, onGameOver, ...}
-        this.ws = null;
-        this.instanceId = null;
-        this.playerName = null;
-    }
-    
-    connect(playerName) {
-        this.playerName = playerName;
-        const wsUrl = `ws://${window.location.host}/ws/game/${this.gameId}`;
-        this.ws = new WebSocket(wsUrl);
-        this.ws.onmessage = (e) => this.handleMessage(JSON.parse(e.data));
-        this.ws.onopen = () => this.send({type: 'join', player_name: playerName});
-        this.ws.onclose = () => this.handlers.onDisconnected?.();
-    }
-    
-    send(message) {
-        this.ws.send(JSON.stringify(message));
-    }
-    
-    sendMove(data) {
-        this.send({type: 'move', data});
-    }
-    
-    handleMessage(msg) {
-        switch(msg.type) {
-            case 'waiting':
-                this.handlers.onWaiting?.(msg);
-                break;
-            case 'matched':
-                this.instanceId = msg.instance_id;
-                history.pushState({}, '', `/game/${this.gameId}/${msg.instance_id}`);
-                this.handlers.onMatched?.(msg);
-                break;
-            case 'game_state':
-                this.handlers.onGameState?.(msg.data);
-                break;
-            case 'game_over':
-                this.handlers.onGameOver?.(msg);
-                break;
-            // ... other message types
-        }
-    }
+  constructor(gameId, handlers) {
+    this.gameId = gameId;
+    this.handlers = handlers;
+    this.ws = null;
+    this.instanceId = null;
+    this.playerName = null;
+  }
+
+  connect(playerName, instanceId = null) {
+    this.playerName = playerName;
+    this.instanceId = instanceId;
+    const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+    const wsUrl = `${protocol}//${window.location.host}/ws/game/${this.gameId}`;
+    this.ws = new WebSocket(wsUrl);
+    this.ws.onmessage = (e) => this.handleMessage(JSON.parse(e.data));
+    this.ws.onopen = () => {
+      if (instanceId) {
+        // Rejoin existing game
+        this.send({ type: "rejoin", instance_id: instanceId, player_name: playerName });
+      } else {
+        this.send({ type: "join", player_name: playerName });
+      }
+    };
+    this.ws.onclose = () => this.handlers.onDisconnected?.();
+  }
+
+  send(message) {
+    this.ws.send(JSON.stringify(message));
+  }
+
+  sendMove(data) {
+    this.send({ type: "move", data });
+  }
 }
 ```
+
+### Available Handlers
+
+Games provide handlers for message types they care about:
+
+- `onWaiting(msg)` - Player added to matchmaking queue
+- `onMatched(msg)` - Opponent found, game starting
+- `onRejoined(msg)` - Successfully rejoined existing game
+- `onGameState(data)` - Game state update (personalized per player)
+- `onRoundResult(msg)` - Round ended (for multi-round games)
+- `onNewRound(msg)` - New round starting
+- `onGameOver(msg)` - Game ended
+- `onOpponentDisconnected()` - Opponent's connection dropped
+- `onOpponentReconnected()` - Opponent reconnected
+- `onError(msg)` - Error occurred
+- `onDisconnected()` - Own connection dropped
 
 Each game's HTML template initializes this with game-specific handlers:
 
 ```javascript
-const client = new GameClient('rps', {
-    onWaiting: (msg) => showWaitingScreen(msg.message),
-    onMatched: (msg) => initializeGame(msg.opponent_name),
-    onGameState: (state) => renderRPSState(state),
-    onGameOver: (msg) => showResults(msg.winner, msg.reason)
+const client = new GameClient("rps", {
+  onWaiting: (msg) => showWaitingScreen(msg.message),
+  onMatched: (msg) => initializeGame(msg.opponent_name),
+  onGameState: (state) => renderRPSState(state),
+  onGameOver: (msg) => showResults(msg.winner, msg.reason),
 });
 
-document.getElementById('join-form').onsubmit = (e) => {
-    e.preventDefault();
-    client.connect(document.getElementById('name-input').value);
+document.getElementById("join-form").onsubmit = (e) => {
+  e.preventDefault();
+  client.connect(document.getElementById("name-input").value);
 };
 ```
 
@@ -291,11 +338,17 @@ function showError(container, message) { ... }
 
 When a player disconnects and reconnects:
 
-1. Client reconnects WebSocket, sends `{type: "join", player_name: "A"}` with same name
-2. If URL contains instance_id (`/game/rps/xxx`), also send `{type: "rejoin", instance_id: "xxx"}`
+1. Client checks URL for instance_id (e.g., `/game/rps/abc123`)
+2. If instance_id present, client sends `{type: "rejoin", instance_id: "abc123", player_name: "A"}`
 3. Server checks if instance exists and has a disconnected player with that name
-4. If match: restore player to game, send current `game_state`, notify opponent of reconnection
-5. If no match: treat as new player, enter matchmaking queue
+4. If match: restore player to game, send `rejoined` message, send current `game_state`, notify opponent with `opponent_reconnected`
+5. If no match: treat as new player, enter matchmaking queue with normal `join` flow
+
+The template extracts instance_id from the URL path:
+```javascript
+const pathParts = window.location.pathname.split('/');
+const instanceId = pathParts.length > 3 ? pathParts[3] : null;
+```
 
 ## Rock Paper Scissors Specifics
 
@@ -313,24 +366,47 @@ state = {
 ### Move Data
 
 ```json
-{"choice": "rock" | "paper" | "scissors"}
+{ "choice": "rock" | "paper" | "scissors" }
 ```
+
+### Client Game State
+
+The `get_game_state()` method returns personalized state:
+
+```python
+{
+    "phase": "choosing",
+    "round": 1,
+    "scores": {"Alice": 2, "Bob": 1},
+    "choices": {
+        "Alice": "rock",       # Own choice visible
+        "Bob": "chosen"        # Opponent's choice hidden (or null if not yet chosen)
+    },
+    "my_name": "Alice",
+    "opponent_name": "Bob",
+    "opponent_connected": True
+}
+```
+
+During reveal phase, both actual choices are shown.
 
 ### Game Flow
 
 1. Both players in "choosing" phase
 2. Player submits choice, server records it (hidden from opponent)
-3. Server sends `game_state` with own choice visible, opponent's as `null`
+3. Server sends `game_state` with own choice visible, opponent's as `"chosen"` or `null`
 4. When both chosen, phase becomes "reveal"
 5. Server sends `game_state` with both choices visible
-6. After brief delay, server determines winner, sends `game_over` or advances round
-7. First to 3 wins (best of 5)
+6. Server sends `round_result` with winner, reason, choices, and updated scores
+7. After 3-second delay, server sends `new_round` and resets to choosing phase
+8. Rounds continue indefinitely - no ultimate winner, just running score
 
 ### Client State Display
 
 - Choosing phase: Show three buttons (rock/paper/scissors), disable after selection
-- Reveal phase: Show both choices with animation, then result
-- Between rounds: Show scores, brief countdown, then reset to choosing
+- Waiting: Show "Waiting for opponent..." or "Both chosen! Revealing..."
+- Reveal phase: Show both choices with animation, display result message
+- After 3 seconds: Auto-advance to next round
 
 ## CSS Conventions
 
@@ -346,21 +422,104 @@ state = {
 pip install -r requirements.txt
 
 # Run development server
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
+python main.py
+```
 
-# Run with specific host for LAN testing
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
+## Production Deployment
+
+**Server:** DigitalOcean droplet at `138.197.71.191`
+
+**Domain:** `parlor.marstol.com` (A record pointing to droplet IP)
+
+**Paths:**
+
+- Repository: `/root/parlor`
+- Virtual environment: `/root/parlor/venv`
+
+**Port:** 8500 (configured via `.env` file)
+
+**Running the app:**
+
+```bash
+cd /root/parlor
+source venv/bin/activate
+python main.py
+```
+
+**Nginx:** Config at `/etc/nginx/sites-available/parlor`
+
+- HTTP redirects to HTTPS
+- HTTPS proxies to `127.0.0.1:8500`
+- WebSocket location `/ws/` with upgrade headers and extended timeout
+
+**SSL:** Let's Encrypt certificate via certbot
+
+- Certificate: `/etc/letsencrypt/live/parlor.marstol.com/fullchain.pem`
+- Key: `/etc/letsencrypt/live/parlor.marstol.com/privkey.pem`
+
+**Systemd service:** `/etc/systemd/system/parlor.service`
+
+```ini
+[Unit]
+Description=Parlor Game Platform
+After=network.target
+
+[Service]
+User=root
+WorkingDirectory=/root/parlor
+ExecStart=/root/parlor/venv/bin/python main.py
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+```
+
+**Service commands:**
+
+```bash
+sudo systemctl status parlor    # Check status
+sudo systemctl restart parlor   # Restart after code changes
+sudo systemctl stop parlor      # Stop
+sudo systemctl start parlor     # Start
+journalctl -u parlor -f         # Tail logs
 ```
 
 ## Adding a New Multiplayer Game
 
-1. Create `games/{game_id}.py` implementing `BaseGame`
-2. Create `templates/games/{game_id}.html` with game-specific UI
-3. Register game in `main.py` game registry
-4. Add game to index page game list
-5. Optionally add `static/css/games/{game_id}.css` for custom styles
+### Backend (Python)
 
-The game implementation handles only game logic. Matchmaking, WebSocket management, disconnection handling, and rematch flow are all provided by the platform.
+1. Create `games/{game_id}.py` with a class inheriting from `BaseGame`
+2. Set class attributes: `game_id` (URL slug) and `display_name`
+3. Implement required methods:
+   - `handle_move(player, data)` - Process moves, update state, broadcast updates
+   - `get_game_state(for_player)` - Return personalized state dict
+   - `reset_for_rematch()` - Reset state for new round/game
+4. Register in `main.py`:
+   ```python
+   GAME_REGISTRY: dict[str, type[BaseGame]] = {
+       "rps": RockPaperScissors,
+       "yourgame": YourGame,  # Add here
+   }
+   ```
+
+### Frontend (HTML/JS)
+
+1. Create `templates/games/{game_id}.html` extending `base.html`
+2. Include join screen with name input form
+3. Initialize `GameClient` with game-specific handlers
+4. Implement UI rendering based on game state
+
+### Index Page
+
+Add to `templates/index.html` game grid (automatic if using registry, but may want custom icon/description).
+
+### Optional
+
+- Add `static/css/games/{game_id}.css` for game-specific styles
+- Add game-specific emoji/icon to index page
+
+The platform handles: matchmaking, WebSocket lifecycle, disconnection/reconnection, URL management. Your game only handles game logic.
 
 ## Single-Player Games
 
@@ -399,21 +558,28 @@ Single-player games are for same-device play (e.g., couch co-op word games). The
 ### Example Solo Game Template
 
 ```html
-{% extends "base.html" %}
-{% block content %}
+{% extends "base.html" %} {% block content %}
 <div id="game-container">
-    <!-- Game UI here -->
+  <!-- Game UI here -->
 </div>
 
 <script>
-    // All game logic runs client-side
-    const state = { /* ... */ };
-    
-    function init() { /* ... */ }
-    function handleInput() { /* ... */ }
-    function render() { /* ... */ }
-    
-    init();
+  // All game logic runs client-side
+  const state = {
+    /* ... */
+  };
+
+  function init() {
+    /* ... */
+  }
+  function handleInput() {
+    /* ... */
+  }
+  function render() {
+    /* ... */
+  }
+
+  init();
 </script>
 {% endblock %}
 ```
