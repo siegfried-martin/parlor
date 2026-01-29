@@ -1,0 +1,332 @@
+{% extends "base.html" %}
+
+{% block title %}{{ game_name }} - Parlor{% endblock %}
+
+{% block content %}
+<div class="game-container" id="game-container">
+    <!-- Join Screen -->
+    <div id="join-screen" class="screen active">
+        <a href="/" class="back-link">&larr; Back to Lobby</a>
+        <h1>{{ game_name }}</h1>
+        <form id="join-form" class="join-form">
+            <input
+                type="text"
+                id="name-input"
+                placeholder="Enter your name"
+                maxlength="20"
+                required
+                autocomplete="off"
+            >
+            <button type="submit" class="btn btn-primary">Play</button>
+        </form>
+    </div>
+
+    <!-- Waiting Screen -->
+    <div id="waiting-screen" class="screen">
+        <div class="waiting-content">
+            <div class="spinner"></div>
+            <p id="waiting-message">Waiting for opponent...</p>
+        </div>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="game-screen" class="screen">
+        <div class="game-header">
+            <div class="player-info player-self">
+                <span class="player-name" id="my-name">You</span>
+                <span class="player-score" id="my-score">0</span>
+            </div>
+            <div class="vs">VS</div>
+            <div class="player-info player-opponent">
+                <span class="player-name" id="opponent-name">Opponent</span>
+                <span class="player-score" id="opponent-score">0</span>
+            </div>
+        </div>
+
+        <div class="round-indicator">
+            Round <span id="round-number">1</span>
+        </div>
+
+        <div class="game-area">
+            <!-- Choice Display (during reveal) -->
+            <div id="reveal-area" class="reveal-area hidden">
+                <div class="choice-display">
+                    <div class="choice-card" id="my-choice-display">
+                        <span class="choice-emoji"></span>
+                    </div>
+                    <div class="choice-card" id="opponent-choice-display">
+                        <span class="choice-emoji"></span>
+                    </div>
+                </div>
+                <div id="result-message" class="result-message"></div>
+            </div>
+
+            <!-- Choice Buttons -->
+            <div id="choice-area" class="choice-area">
+                <p class="instruction" id="choice-instruction">Choose your weapon!</p>
+                <div class="choice-buttons">
+                    <button class="choice-btn" data-choice="rock" title="Rock">
+                        <span class="choice-emoji">&#9994;</span>
+                        <span class="choice-label">Rock</span>
+                    </button>
+                    <button class="choice-btn" data-choice="paper" title="Paper">
+                        <span class="choice-emoji">&#9995;</span>
+                        <span class="choice-label">Paper</span>
+                    </button>
+                    <button class="choice-btn" data-choice="scissors" title="Scissors">
+                        <span class="choice-emoji">&#9996;</span>
+                        <span class="choice-label">Scissors</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="status-bar" class="status-bar"></div>
+    </div>
+
+    <!-- Disconnected Overlay -->
+    <div id="disconnect-overlay" class="overlay hidden">
+        <div class="overlay-content">
+            <p>Opponent disconnected</p>
+            <p class="subtext">Waiting for them to return...</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/game-utils.js"></script>
+<script src="/static/js/game-client.js"></script>
+<script>
+    const CHOICE_EMOJIS = {
+        rock: '&#9994;',
+        paper: '&#9995;',
+        scissors: '&#9996;'
+    };
+
+    // Get instance_id from URL if present (for reconnection)
+    const pathParts = window.location.pathname.split('/');
+    const instanceId = pathParts.length > 3 ? pathParts[3] : null;
+    const gameId = '{{ game_id }}';
+
+    let client = null;
+    let myName = null;
+    let opponentName = null;
+    let hasChosen = false;
+
+    // DOM elements
+    const joinScreen = document.getElementById('join-screen');
+    const waitingScreen = document.getElementById('waiting-screen');
+    const gameScreen = document.getElementById('game-screen');
+    const joinForm = document.getElementById('join-form');
+    const nameInput = document.getElementById('name-input');
+    const waitingMessage = document.getElementById('waiting-message');
+    const choiceButtons = document.querySelectorAll('.choice-btn');
+    const choiceArea = document.getElementById('choice-area');
+    const revealArea = document.getElementById('reveal-area');
+    const choiceInstruction = document.getElementById('choice-instruction');
+    const disconnectOverlay = document.getElementById('disconnect-overlay');
+    const statusBar = document.getElementById('status-bar');
+
+    function showScreen(screen) {
+        [joinScreen, waitingScreen, gameScreen].forEach(s => s.classList.remove('active'));
+        screen.classList.add('active');
+    }
+
+    function updateScores(scores) {
+        document.getElementById('my-score').textContent = scores[myName] || 0;
+        document.getElementById('opponent-score').textContent = scores[opponentName] || 0;
+    }
+
+    function setChoiceButtonsEnabled(enabled) {
+        choiceButtons.forEach(btn => {
+            btn.disabled = !enabled;
+            btn.classList.remove('selected', 'waiting');
+        });
+    }
+
+    function showChoice(elementId, choice) {
+        const el = document.getElementById(elementId);
+        const emoji = el.querySelector('.choice-emoji');
+        if (choice && CHOICE_EMOJIS[choice]) {
+            emoji.innerHTML = CHOICE_EMOJIS[choice];
+            el.className = 'choice-card ' + choice;
+        } else {
+            emoji.innerHTML = '?';
+            el.className = 'choice-card';
+        }
+    }
+
+    // Initialize game client
+    function initGame(playerName) {
+        myName = playerName;
+        document.getElementById('my-name').textContent = myName;
+
+        client = new GameClient(gameId, {
+            onWaiting: (msg) => {
+                waitingMessage.textContent = msg.message;
+                showScreen(waitingScreen);
+            },
+
+            onMatched: (msg) => {
+                opponentName = msg.opponent_name;
+                document.getElementById('opponent-name').textContent = opponentName;
+                showScreen(gameScreen);
+            },
+
+            onRejoined: (msg) => {
+                opponentName = msg.opponent_name;
+                document.getElementById('opponent-name').textContent = opponentName;
+                showScreen(gameScreen);
+            },
+
+            onGameState: (state) => {
+                // Update round
+                document.getElementById('round-number').textContent = state.round;
+
+                // Update scores
+                updateScores(state.scores);
+
+                // Update opponent name if we have it
+                if (state.opponent_name && !opponentName) {
+                    opponentName = state.opponent_name;
+                    document.getElementById('opponent-name').textContent = opponentName;
+                }
+
+                // Handle phase
+                if (state.phase === 'choosing') {
+                    revealArea.classList.add('hidden');
+                    choiceArea.classList.remove('hidden');
+
+                    const myChoice = state.choices[myName];
+                    const opponentHasChosen = state.choices[opponentName] === 'chosen';
+
+                    if (myChoice) {
+                        // I've chosen, waiting for opponent
+                        hasChosen = true;
+                        choiceButtons.forEach(btn => {
+                            btn.disabled = true;
+                            if (btn.dataset.choice === myChoice) {
+                                btn.classList.add('selected');
+                            }
+                        });
+                        choiceInstruction.textContent = opponentHasChosen
+                            ? 'Both chosen! Revealing...'
+                            : 'Waiting for opponent...';
+                    } else {
+                        // Haven't chosen yet
+                        hasChosen = false;
+                        setChoiceButtonsEnabled(true);
+                        choiceInstruction.textContent = opponentHasChosen
+                            ? 'Opponent is ready! Make your choice!'
+                            : 'Choose your weapon!';
+                    }
+                } else if (state.phase === 'reveal') {
+                    // Will be handled by round_result
+                }
+
+                // Handle opponent connection status
+                if (!state.opponent_connected) {
+                    disconnectOverlay.classList.remove('hidden');
+                } else {
+                    disconnectOverlay.classList.add('hidden');
+                }
+            },
+
+            onRoundResult: (msg) => {
+                // Show reveal area
+                choiceArea.classList.add('hidden');
+                revealArea.classList.remove('hidden');
+
+                // Show choices
+                showChoice('my-choice-display', msg.choices[myName]);
+                showChoice('opponent-choice-display', msg.choices[opponentName]);
+
+                // Show result
+                const resultEl = document.getElementById('result-message');
+                if (msg.winner === null) {
+                    resultEl.textContent = "It's a tie!";
+                    resultEl.className = 'result-message tie';
+                } else if (msg.winner === myName) {
+                    resultEl.textContent = 'You win!';
+                    resultEl.className = 'result-message win';
+                } else {
+                    resultEl.textContent = 'You lose!';
+                    resultEl.className = 'result-message lose';
+                }
+
+                // Update scores
+                updateScores(msg.scores);
+            },
+
+            onNewRound: (msg) => {
+                // Reset for new round
+                hasChosen = false;
+                document.getElementById('round-number').textContent = msg.round;
+                revealArea.classList.add('hidden');
+                choiceArea.classList.remove('hidden');
+                setChoiceButtonsEnabled(true);
+                choiceInstruction.textContent = 'Choose your weapon!';
+            },
+
+            onOpponentDisconnected: () => {
+                disconnectOverlay.classList.remove('hidden');
+            },
+
+            onOpponentReconnected: () => {
+                disconnectOverlay.classList.add('hidden');
+            },
+
+            onError: (msg) => {
+                statusBar.textContent = msg.message;
+                statusBar.classList.add('error');
+                setTimeout(() => {
+                    statusBar.textContent = '';
+                    statusBar.classList.remove('error');
+                }, 3000);
+            },
+
+            onDisconnected: () => {
+                statusBar.textContent = 'Connection lost. Refresh to reconnect.';
+                statusBar.classList.add('error');
+            }
+        });
+
+        // Connect with instance ID if present (for reconnection)
+        client.connect(playerName, instanceId);
+    }
+
+    // Event handlers
+    joinForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = nameInput.value.trim();
+        if (name) {
+            initGame(name);
+        }
+    });
+
+    choiceButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            if (hasChosen || btn.disabled) return;
+
+            const choice = btn.dataset.choice;
+            hasChosen = true;
+
+            // Visual feedback
+            choiceButtons.forEach(b => {
+                b.disabled = true;
+                if (b === btn) {
+                    b.classList.add('selected');
+                }
+            });
+            choiceInstruction.textContent = 'Waiting for opponent...';
+
+            // Send move
+            client.sendMove({ choice });
+        });
+    });
+
+    // Auto-focus name input
+    nameInput.focus();
+</script>
+{% endblock %}

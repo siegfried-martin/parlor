@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Parlor - Game Lobby{% endblock %}
+
+{% block content %}
+<header class="hero">
+    <h1>Parlor</h1>
+    <p class="tagline">Simple games, good times</p>
+</header>
+
+<main>
+    <section class="game-section">
+        <h2>Multiplayer</h2>
+        <div class="game-grid">
+            {% for game in games %}
+            <a href="/game/{{ game.id }}" class="game-card">
+                <div class="game-icon">
+                    {% if game.id == 'rps' %}
+                    <span class="emoji">&#9994;&#9995;&#9996;</span>
+                    {% else %}
+                    <span class="emoji">&#127922;</span>
+                    {% endif %}
+                </div>
+                <h3>{{ game.name }}</h3>
+                <p class="game-desc">Play against a friend</p>
+            </a>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="game-section">
+        <h2>Single Player</h2>
+        <div class="game-grid">
+            <div class="game-card coming-soon">
+                <div class="game-icon">
+                    <span class="emoji">&#128302;</span>
+                </div>
+                <h3>Coming Soon</h3>
+                <p class="game-desc">More games on the way</p>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer>
+    <p>A cozy corner for games</p>
+</footer>
+{% endblock %}
