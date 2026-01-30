@@ -19,6 +19,8 @@
                     <span class="emoji">&#9994;&#9995;&#9996;</span>
                     {% elif game.id == 'image-reveal' %}
                     <span class="emoji">&#128444;</span>
+                    {% elif game.id == 'event-dash' %}
+                    <span class="emoji">&#128506;</span>
                     {% else %}
                     <span class="emoji">&#127922;</span>
                     {% endif %}
@@ -26,6 +28,8 @@
                 <h3>{{ game.name }}</h3>
                 {% if game.id == 'image-reveal' %}
                 <p class="game-desc">Upload & guess hidden images</p>
+                {% elif game.id == 'event-dash' %}
+                <p class="game-desc">Race to find top-rated spots</p>
                 {% else %}
                 <p class="game-desc">Play against a friend</p>
                 {% endif %}

@@ -17,6 +17,7 @@ from fastapi.responses import HTMLResponse
 from games.base import BaseGame, Player
 from games.rps import RockPaperScissors
 from games.image_reveal import ImageReveal
+from games.event_dash import EventDash
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -26,6 +27,7 @@ logger = logging.getLogger(__name__)
 GAME_REGISTRY: dict[str, type[BaseGame]] = {
     "rps": RockPaperScissors,
     "image-reveal": ImageReveal,
+    "event-dash": EventDash,
 }
 
 # Active game instances: instance_id -> BaseGame
@@ -83,12 +85,18 @@ async def game_lobby(request: Request, game_id: str):
         return HTMLResponse("Game not found", status_code=404)
 
     game_class = GAME_REGISTRY[game_id]
-    return templates.TemplateResponse(f"games/{game_id}.html", {
+    context = {
         "request": request,
         "game_id": game_id,
         "game_name": game_class.display_name,
         "instance_id": None,
-    })
+    }
+
+    # Add Google Maps API key for event-dash
+    if game_id == "event-dash":
+        context["google_maps_api_key"] = os.getenv("GOOGLE_MAPS_API_KEY", "")
+
+    return templates.TemplateResponse(f"games/{game_id}.html", context)
 
 
 @app.get("/game/{game_id}/{instance_id}", response_class=HTMLResponse)
@@ -98,12 +106,18 @@ async def game_instance(request: Request, game_id: str, instance_id: str):
         return HTMLResponse("Game not found", status_code=404)
 
     game_class = GAME_REGISTRY[game_id]
-    return templates.TemplateResponse(f"games/{game_id}.html", {
+    context = {
         "request": request,
         "game_id": game_id,
         "game_name": game_class.display_name,
         "instance_id": instance_id,
-    })
+    }
+
+    # Add Google Maps API key for event-dash
+    if game_id == "event-dash":
+        context["google_maps_api_key"] = os.getenv("GOOGLE_MAPS_API_KEY", "")
+
+    return templates.TemplateResponse(f"games/{game_id}.html", context)
 
 
 @app.get("/solo/{game_id}", response_class=HTMLResponse)

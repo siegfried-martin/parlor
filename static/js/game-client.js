@@ -141,8 +141,22 @@ class GameClient {
                 this.handlers.onError?.(msg);
                 break;
 
+            // Event Dash custom messages
+            case 'game_configured':
+            case 'game_starting':
+            case 'selection_confirmed':
+            case 'opponent_selection':
+            case 'opponent_finished':
+            case 'skip_requested':
+            case 'skip_declined':
+            case 'round_skipped':
+            case 'waiting_for_skip_response':
+                this.handlers.onMessage?.(msg);
+                break;
+
             default:
-                console.log('Unknown message type:', msg.type);
+                console.log('Unhandled message type:', msg.type);
+                this.handlers.onMessage?.(msg);
         }
     }
 
