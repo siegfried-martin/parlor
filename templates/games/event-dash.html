@@ -225,6 +225,8 @@
     let timerInterval = null;
     let countdownInterval = null;
     let lastTimerUpdate = null;
+    let resultsData = null;  // Store results for fallback handling
+    let resultsShown = false;
 
     // Screens
     const screens = {
@@ -237,6 +239,7 @@
     };
 
     function showScreen(name) {
+        console.log('showScreen:', name);
         Object.entries(screens).forEach(([key, el]) => {
             el.classList.toggle('active', key === name);
         });
@@ -276,6 +279,9 @@
         },
 
         onGameOver: (msg) => {
+            console.log('Game over received, showing results');
+            resultsData = msg.data;
+            resultsShown = true;
             showResults(msg.data);
         },
 
@@ -328,7 +334,11 @@
                 }
                 break;
             case 'finished':
-                // Handled by game_over message
+                // Ensure results screen is shown
+                if (resultsData && !screens.results.classList.contains('active')) {
+                    console.log('Finished phase: ensuring results screen is shown');
+                    showResults(resultsData);
+                }
                 break;
         }
     }
@@ -351,6 +361,10 @@
     }
 
     function startCountdown(data) {
+        // Reset results state for new game
+        resultsData = null;
+        resultsShown = false;
+
         showScreen('countdown');
         document.getElementById('countdown-city').textContent = `${data.city}, ${data.state}`;
 
@@ -640,12 +654,18 @@
     }
 
     function showResults(data) {
+        console.log('showResults called with:', data);
+
         if (timerInterval) {
             clearInterval(timerInterval);
             timerInterval = null;
         }
 
+        // Hide map overlay if open
+        hideMap();
+
         showScreen('results');
+        console.log('Switched to results screen');
 
         document.getElementById('results-city').textContent = `${data.city}, ${data.state}`;
         document.getElementById('winner-text').textContent =
