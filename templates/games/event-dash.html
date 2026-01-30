@@ -1,0 +1,814 @@
+{% extends "base.html" %}
+
+{% block title %}Event Dash - Parlor{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="/static/css/games/event-dash.css">
+{% endblock %}
+
+{% block content %}
+<div id="game-container" class="event-dash-game">
+    <!-- Join Screen -->
+    <div id="join-screen" class="screen active">
+        <a href="/" class="back-link">&larr; Back to Lobby</a>
+        <h1>Event Dash</h1>
+        <p class="game-description">
+            Race to find the best-rated restaurants and activities in a random US city via Street View!
+        </p>
+        <div class="rules-box">
+            <p><strong>How to play:</strong></p>
+            <ul>
+                <li>You'll be dropped into Street View in a random city</li>
+                <li>Search for and select 2 restaurants + 1 activity</li>
+                <li>Highest total Google rating wins!</li>
+            </ul>
+        </div>
+        <form id="join-form" class="join-form">
+            <input type="text" id="player-name" placeholder="Enter your name" required maxlength="20" autocomplete="off">
+            <button type="submit" class="btn btn-primary">Find Match</button>
+        </form>
+    </div>
+
+    <!-- Waiting Screen -->
+    <div id="waiting-screen" class="screen">
+        <div class="waiting-content">
+            <div class="spinner"></div>
+            <p id="waiting-message">Waiting for opponent...</p>
+        </div>
+    </div>
+
+    <!-- Lobby Screen (Host Only Config) -->
+    <div id="lobby-screen" class="screen">
+        <h1>Event Dash</h1>
+        <p id="opponent-status" class="game-description"></p>
+
+        <div id="host-config" class="config-panel">
+            <div class="config-section">
+                <h3>Time Limit</h3>
+                <div class="config-options">
+                    <button type="button" class="config-btn time-option" data-value="30">30s</button>
+                    <button type="button" class="config-btn time-option" data-value="60">1m</button>
+                    <button type="button" class="config-btn time-option selected" data-value="90">90s</button>
+                    <button type="button" class="config-btn time-option" data-value="120">2m</button>
+                    <button type="button" class="config-btn time-option" data-value="300">5m</button>
+                    <button type="button" class="config-btn time-option" data-value="null">None</button>
+                </div>
+            </div>
+
+            <div class="config-section">
+                <h3>Starting Points</h3>
+                <div class="config-options">
+                    <button type="button" class="config-btn start-option selected" data-value="true">Same Location</button>
+                    <button type="button" class="config-btn start-option" data-value="false">Different</button>
+                </div>
+            </div>
+
+            <button id="start-game-btn" class="btn btn-primary btn-block">Start Game</button>
+        </div>
+
+        <div id="guest-wait" class="waiting-content hidden">
+            <div class="spinner"></div>
+            <p>Waiting for host to start...</p>
+        </div>
+    </div>
+
+    <!-- Countdown Screen -->
+    <div id="countdown-screen" class="screen">
+        <div class="countdown-content">
+            <p class="countdown-label">Get ready!</p>
+            <p id="countdown-city" class="countdown-city">City, State</p>
+            <div id="countdown-number" class="countdown-number">3</div>
+        </div>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="game-screen" class="screen">
+        <div class="game-header">
+            <span id="city-display" class="city-name">City, State</span>
+            <span id="timer" class="timer">--:--</span>
+        </div>
+
+        <div class="game-views">
+            <div class="street-view-container">
+                <div id="street-view"></div>
+                <button id="map-toggle" class="map-toggle-btn">Map</button>
+                <div id="map-overlay" class="map-overlay hidden">
+                    <div id="selection-map"></div>
+                    <p class="map-hint">Tap a business to select</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="picks-panel">
+            <div class="picks-content">
+                <div id="pick-restaurant-1" class="pick-slot">
+                    <span class="pick-icon">&#127869;</span>
+                    <span class="pick-label">Restaurant 1</span>
+                    <span class="pick-check">&#10003;</span>
+                </div>
+                <div id="pick-restaurant-2" class="pick-slot">
+                    <span class="pick-icon">&#127869;</span>
+                    <span class="pick-label">Restaurant 2</span>
+                    <span class="pick-check">&#10003;</span>
+                </div>
+                <div id="pick-activity" class="pick-slot">
+                    <span class="pick-icon">&#127917;</span>
+                    <span class="pick-label">Activity</span>
+                    <span class="pick-check">&#10003;</span>
+                </div>
+            </div>
+            <div class="picks-footer">
+                <span id="opponent-progress" class="opponent-progress"></span>
+                <button id="skip-btn" class="skip-btn">Skip?</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Screen -->
+    <div id="results-screen" class="screen">
+        <div class="results-header">
+            <h2 id="winner-text">Results</h2>
+            <p id="results-city" class="results-city"></p>
+        </div>
+
+        <div class="results-map-container">
+            <div id="results-map"></div>
+        </div>
+
+        <div class="map-legend">
+            <div class="legend-item">
+                <span class="legend-dot player1"></span>
+                <span id="legend-player1">Player 1</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-dot player2"></span>
+                <span id="legend-player2">Player 2</span>
+            </div>
+        </div>
+
+        <div class="player-results">
+            <div id="player1-result" class="player-result">
+                <div class="player-result-header">
+                    <span class="player-result-name">Player 1</span>
+                    <span class="player-result-total">0.0</span>
+                </div>
+                <div class="player-selections"></div>
+                <div class="winner-badge hidden">Winner!</div>
+            </div>
+            <div id="player2-result" class="player-result">
+                <div class="player-result-header">
+                    <span class="player-result-name">Player 2</span>
+                    <span class="player-result-total">0.0</span>
+                </div>
+                <div class="player-selections"></div>
+                <div class="winner-badge hidden">Winner!</div>
+            </div>
+        </div>
+
+        <div class="results-actions">
+            <button id="rematch-btn" class="btn btn-primary">Rematch</button>
+            <button id="new-city-btn" class="btn btn-secondary">New City</button>
+        </div>
+    </div>
+
+    <!-- Selection Modal -->
+    <div id="selection-modal" class="modal-overlay hidden">
+        <div class="modal">
+            <h3 id="selected-place-name">Place Name</h3>
+            <p id="selected-place-address" class="modal-address"></p>
+            <p id="selected-place-rating" class="modal-rating hidden"></p>
+            <p id="selection-error" class="modal-error hidden"></p>
+            <div class="modal-buttons">
+                <button id="select-restaurant-btn" class="btn btn-restaurant hidden">Restaurant</button>
+                <button id="select-activity-btn" class="btn btn-activity hidden">Activity</button>
+            </div>
+            <button id="cancel-selection-btn" class="btn btn-secondary modal-cancel">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Skip Modal -->
+    <div id="skip-modal" class="modal-overlay hidden">
+        <div class="modal">
+            <h3>Skip Round?</h3>
+            <p><span id="skip-requester">Opponent</span> wants to skip.</p>
+            <div class="modal-buttons">
+                <button id="continue-game-btn" class="btn btn-primary">Continue</button>
+                <button id="agree-skip-btn" class="btn btn-secondary">Skip</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast hidden"></div>
+
+    <!-- Disconnect Overlay -->
+    <div id="disconnect-overlay" class="disconnect-overlay hidden">
+        <p>Opponent disconnected...</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&libraries=places"></script>
+<script src="/static/js/game-client.js"></script>
+<script>
+(function() {
+    const gameId = "event-dash";
+    const instanceId = {{ instance_id | tojson | safe if instance_id else "null" }};
+
+    // State
+    let state = null;
+    let panorama = null;
+    let selectionMap = null;
+    let placesService = null;
+    let selectedPlace = null;
+    let timerInterval = null;
+    let countdownInterval = null;
+    let lastTimerUpdate = null;
+
+    // Screens
+    const screens = {
+        join: document.getElementById('join-screen'),
+        waiting: document.getElementById('waiting-screen'),
+        lobby: document.getElementById('lobby-screen'),
+        countdown: document.getElementById('countdown-screen'),
+        game: document.getElementById('game-screen'),
+        results: document.getElementById('results-screen')
+    };
+
+    function showScreen(name) {
+        Object.entries(screens).forEach(([key, el]) => {
+            el.classList.toggle('active', key === name);
+        });
+    }
+
+    // Client setup
+    const client = new GameClient(gameId, {
+        onWaiting: () => {
+            showScreen('waiting');
+        },
+
+        onMatched: (msg) => {
+            showScreen('lobby');
+            document.getElementById('opponent-status').textContent = `Playing against ${msg.opponent_name}`;
+        },
+
+        onRejoined: () => {
+            // State update will handle screen
+        },
+
+        onGameState: (data) => {
+            state = data;
+            lastTimerUpdate = Date.now();
+            handleStateUpdate();
+        },
+
+        onOpponentDisconnected: () => {
+            document.getElementById('disconnect-overlay').classList.remove('hidden');
+        },
+
+        onOpponentReconnected: () => {
+            document.getElementById('disconnect-overlay').classList.add('hidden');
+        },
+
+        onError: (msg) => {
+            showToast(msg.message || 'Error');
+        },
+
+        onGameOver: (msg) => {
+            showResults(msg.data);
+        },
+
+        onMessage: (msg) => {
+            switch (msg.type) {
+                case 'game_configured':
+                    // Host sees their own config, ignore
+                    break;
+                case 'game_starting':
+                    startCountdown(msg.data);
+                    break;
+                case 'selection_confirmed':
+                    showToast(`Selected: ${msg.data.name}`);
+                    break;
+                case 'opponent_finished':
+                    showToast('Opponent finished! Hurry!');
+                    break;
+                case 'skip_requested':
+                    document.getElementById('skip-requester').textContent = msg.by;
+                    document.getElementById('skip-modal').classList.remove('hidden');
+                    break;
+                case 'skip_declined':
+                    document.getElementById('skip-modal').classList.add('hidden');
+                    showToast('Skip declined');
+                    break;
+                case 'round_skipped':
+                    document.getElementById('skip-modal').classList.add('hidden');
+                    showToast('Round skipped');
+                    break;
+            }
+        }
+    });
+
+    function handleStateUpdate() {
+        if (!state) return;
+
+        switch (state.phase) {
+            case 'lobby':
+                showScreen('lobby');
+                updateLobbyUI();
+                break;
+            case 'countdown':
+                // Handled by game_starting message
+                break;
+            case 'playing':
+                // Only switch to game screen if we're not already there
+                // (countdown handles the transition)
+                if (screens.game.classList.contains('active')) {
+                    updateGameUI();
+                }
+                break;
+            case 'finished':
+                // Handled by game_over message
+                break;
+        }
+    }
+
+    function updateLobbyUI() {
+        const hostConfig = document.getElementById('host-config');
+        const guestWait = document.getElementById('guest-wait');
+
+        if (state.is_host) {
+            hostConfig.classList.remove('hidden');
+            guestWait.classList.add('hidden');
+        } else {
+            hostConfig.classList.add('hidden');
+            guestWait.classList.remove('hidden');
+        }
+
+        if (state.opponent_name) {
+            document.getElementById('opponent-status').textContent = `Playing against ${state.opponent_name}`;
+        }
+    }
+
+    function startCountdown(data) {
+        showScreen('countdown');
+        document.getElementById('countdown-city').textContent = `${data.city}, ${data.state}`;
+
+        let count = data.countdown;
+        document.getElementById('countdown-number').textContent = count;
+
+        if (countdownInterval) clearInterval(countdownInterval);
+
+        countdownInterval = setInterval(() => {
+            count--;
+            if (count > 0) {
+                document.getElementById('countdown-number').textContent = count;
+            } else {
+                clearInterval(countdownInterval);
+                countdownInterval = null;
+                showScreen('game');
+                initStreetView();
+            }
+        }, 1000);
+    }
+
+    function initStreetView() {
+        if (!state?.my_start) {
+            console.error('No start location in state');
+            return;
+        }
+
+        const pos = { lat: state.my_start.lat, lng: state.my_start.lng };
+
+        // Initialize Street View
+        panorama = new google.maps.StreetViewPanorama(
+            document.getElementById('street-view'),
+            {
+                position: pos,
+                pov: { heading: Math.random() * 360, pitch: 0 },
+                zoom: 1,
+                addressControl: false,
+                showRoadLabels: true
+            }
+        );
+
+        // Initialize selection map - locked mini-map for clicking nearby businesses
+        selectionMap = new google.maps.Map(document.getElementById('selection-map'), {
+            center: pos,
+            zoom: 19,  // Zoomed in to immediate surroundings
+            mapTypeControl: false,
+            streetViewControl: false,
+            fullscreenControl: false,
+            zoomControl: false,
+            scaleControl: false,
+            rotateControl: false,
+            panControl: false,
+            draggable: false,        // Can't drag
+            scrollwheel: false,      // Can't zoom with scroll
+            disableDoubleClickZoom: true,
+            gestureHandling: 'none', // Disable all gestures
+            clickableIcons: true,    // But CAN click on POIs
+            styles: [
+                { featureType: 'poi.business', stylers: [{ visibility: 'on' }] },
+                { featureType: 'poi.attraction', stylers: [{ visibility: 'on' }] }
+            ]
+        });
+
+        placesService = new google.maps.places.PlacesService(selectionMap);
+
+        // Sync map with street view position
+        panorama.addListener('position_changed', () => {
+            const newPos = panorama.getPosition();
+            if (newPos) {
+                selectionMap.setCenter(newPos);
+            }
+        });
+
+        // Auto-hide map overlay when clicking in street view area
+        // Use capture phase to catch clicks before Google's handlers
+        document.querySelector('.street-view-container').addEventListener('click', (e) => {
+            // Only hide if clicking outside the overlay and toggle button
+            if (!e.target.closest('.map-overlay') && !e.target.closest('.map-toggle-btn')) {
+                hideMap();
+            }
+        }, true);  // capture phase
+
+        // Handle POI clicks on the map
+        selectionMap.addListener('click', (e) => {
+            if (e.placeId) {
+                e.stop();  // Prevent default info window
+                fetchPlaceDetails(e.placeId);
+            }
+        });
+
+        if (state.city) {
+            document.getElementById('city-display').textContent = `${state.city.city}, ${state.city.state}`;
+        }
+
+        startTimer();
+        updateGameUI();
+    }
+
+    function fetchPlaceDetails(placeId) {
+        placesService.getDetails(
+            {
+                placeId: placeId,
+                fields: ['place_id', 'name', 'rating', 'types', 'geometry', 'formatted_address']
+            },
+            (place, status) => {
+                if (status === google.maps.places.PlacesServiceStatus.OK && place) {
+                    showSelectionModal(place);
+                } else {
+                    showToast('Could not get place details');
+                }
+            }
+        );
+    }
+
+    function startTimer() {
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = setInterval(updateTimerDisplay, 200);
+    }
+
+    function updateTimerDisplay() {
+        const el = document.getElementById('timer');
+        if (!state || state.config?.time_limit == null) {
+            el.textContent = '--:--';
+            return;
+        }
+
+        // Calculate remaining time accounting for elapsed since last update
+        let remaining = state.remaining_time;
+        if (remaining != null && lastTimerUpdate) {
+            const elapsed = (Date.now() - lastTimerUpdate) / 1000;
+            const multiplier = state.timer_doubled ? 2 : 1;
+            remaining = Math.max(0, remaining - (elapsed * multiplier));
+        }
+
+        if (remaining == null) {
+            el.textContent = '--:--';
+            return;
+        }
+
+        const mins = Math.floor(remaining / 60);
+        const secs = Math.floor(remaining % 60);
+        el.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+
+        el.classList.remove('warning', 'danger');
+        if (state.timer_doubled) {
+            el.textContent += ' 2X';
+            el.classList.add('danger');
+        } else if (remaining <= 10) {
+            el.classList.add('danger');
+        } else if (remaining <= 30) {
+            el.classList.add('warning');
+        }
+    }
+
+    function updateGameUI() {
+        if (!state) return;
+
+        const r = state.my_selections?.restaurants || [];
+        const a = state.my_selections?.activity;
+
+        updateSlot('restaurant-1', r[0]);
+        updateSlot('restaurant-2', r[1]);
+        updateSlot('activity', a);
+
+        const oppR = state.opponent_restaurant_count || 0;
+        const oppA = state.opponent_has_activity ? 1 : 0;
+        document.getElementById('opponent-progress').textContent =
+            `Opponent: ${oppR}/2 restaurants, ${oppA}/1 activity`;
+    }
+
+    function updateSlot(id, sel) {
+        const slot = document.getElementById('pick-' + id);
+        if (!slot) return;
+
+        if (sel) {
+            slot.classList.add('filled');
+            slot.querySelector('.pick-label').textContent = sel.name;
+        } else {
+            slot.classList.remove('filled');
+            const defaults = {
+                'restaurant-1': 'Restaurant 1',
+                'restaurant-2': 'Restaurant 2',
+                'activity': 'Activity'
+            };
+            slot.querySelector('.pick-label').textContent = defaults[id];
+        }
+    }
+
+    // Place types - expanded to catch more Google types
+    const RESTAURANT_TYPES = new Set([
+        'restaurant', 'cafe', 'bakery', 'bar', 'meal_delivery', 'meal_takeaway',
+        'food', 'fast_food_restaurant', 'coffee_shop', 'pizza_restaurant',
+        'chinese_restaurant', 'japanese_restaurant', 'italian_restaurant',
+        'mexican_restaurant', 'indian_restaurant', 'thai_restaurant',
+        'vietnamese_restaurant', 'hamburger_restaurant', 'sandwich_shop',
+        'ice_cream_shop', 'breakfast_restaurant', 'brunch_restaurant',
+        'seafood_restaurant', 'steak_house', 'sushi_restaurant',
+        'american_restaurant', 'diner'
+    ]);
+    const ACTIVITY_TYPES = new Set([
+        'museum', 'art_gallery', 'park', 'tourist_attraction', 'zoo', 'aquarium',
+        'amusement_park', 'bowling_alley', 'movie_theater', 'night_club',
+        'shopping_mall', 'gym', 'stadium', 'library', 'spa', 'casino',
+        'concert_hall', 'performing_arts_theater', 'movie_rental', 'book_store',
+        'clothing_store', 'department_store', 'electronics_store', 'store',
+        'monument', 'landmark', 'historical_landmark', 'memorial', 'national_park',
+        'state_park', 'city_hall', 'courthouse', 'church', 'place_of_worship'
+    ]);
+
+    function showSelectionModal(place) {
+        selectedPlace = place;
+
+        document.getElementById('selected-place-name').textContent = place.name;
+        document.getElementById('selected-place-address').textContent = place.formatted_address || '';
+
+        // Don't show rating during selection - only revealed at end
+        document.getElementById('selected-place-rating').classList.add('hidden');
+
+        const types = place.types || [];
+        const isRest = types.some(t => RESTAURANT_TYPES.has(t));
+        const isAct = types.some(t => ACTIVITY_TYPES.has(t));
+
+        // Count filled restaurant slots properly
+        const restaurants = state?.my_selections?.restaurants || [null, null];
+        const filledRestaurants = restaurants.filter(r => r != null).length;  // != catches null and undefined
+        const hasRestSlot = filledRestaurants < 2;
+        const hasActSlot = !state?.my_selections?.activity;  // falsy check for null/undefined
+
+        console.log('Selection check:', {
+            restaurants,
+            filledRestaurants,
+            hasRestSlot,
+            activity: state?.my_selections?.activity,
+            hasActSlot,
+            isRest,
+            isAct
+        });
+
+        const restBtn = document.getElementById('select-restaurant-btn');
+        const actBtn = document.getElementById('select-activity-btn');
+        const errEl = document.getElementById('selection-error');
+
+        restBtn.classList.add('hidden');
+        actBtn.classList.add('hidden');
+        errEl.classList.add('hidden');
+
+        let showError = null;
+
+        if (!isRest && !isAct) {
+            showError = "This place doesn't qualify";
+        } else {
+            if (isRest && hasRestSlot) restBtn.classList.remove('hidden');
+            if (isAct && hasActSlot) actBtn.classList.remove('hidden');
+
+            if (restBtn.classList.contains('hidden') && actBtn.classList.contains('hidden')) {
+                showError = "No slots available for this type";
+            }
+        }
+
+        if (showError) {
+            errEl.textContent = showError;
+            errEl.classList.remove('hidden');
+        }
+
+        document.getElementById('selection-modal').classList.remove('hidden');
+    }
+
+    function hideSelectionModal() {
+        document.getElementById('selection-modal').classList.add('hidden');
+        selectedPlace = null;
+    }
+
+    function confirmSelection(category) {
+        if (!selectedPlace) return;
+
+        client.sendMove({
+            action: 'select_place',
+            place_id: selectedPlace.place_id,
+            category: category,
+            name: selectedPlace.name,
+            rating: selectedPlace.rating || 0,
+            lat: selectedPlace.geometry?.location?.lat(),
+            lng: selectedPlace.geometry?.location?.lng()
+        });
+
+        hideSelectionModal();
+    }
+
+    function showResults(data) {
+        if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        }
+
+        showScreen('results');
+
+        document.getElementById('results-city').textContent = `${data.city}, ${data.state}`;
+        document.getElementById('winner-text').textContent =
+            data.winner ? `${data.winner} wins!` : "It's a tie!";
+
+        // Map
+        const center = data.center || { lat: 39.8, lng: -98.5 };
+        const map = new google.maps.Map(document.getElementById('results-map'), {
+            center, zoom: 12, disableDefaultUI: true, zoomControl: true
+        });
+
+        const bounds = new google.maps.LatLngBounds();
+
+        function addMarkers(selections, color) {
+            selections.forEach(s => {
+                if (s?.lat && s?.lng) {
+                    const pos = { lat: s.lat, lng: s.lng };
+                    new google.maps.Marker({
+                        position: pos, map,
+                        icon: {
+                            path: google.maps.SymbolPath.CIRCLE,
+                            scale: 8, fillColor: color, fillOpacity: 1,
+                            strokeColor: '#fff', strokeWeight: 2
+                        }
+                    });
+                    bounds.extend(pos);
+                }
+            });
+        }
+
+        addMarkers(data.player1.selections, '#4dabf7');
+        addMarkers(data.player2.selections, '#e94560');
+
+        if (!bounds.isEmpty()) map.fitBounds(bounds, 40);
+
+        document.getElementById('legend-player1').textContent = data.player1.name;
+        document.getElementById('legend-player2').textContent = data.player2.name;
+
+        renderPlayerResult('player1', data.player1, data.winner === data.player1.name);
+        renderPlayerResult('player2', data.player2, data.winner === data.player2.name);
+    }
+
+    function renderPlayerResult(id, p, isWinner) {
+        const el = document.getElementById(id + '-result');
+        el.classList.toggle('winner', isWinner);
+        el.querySelector('.player-result-name').textContent = p.name;
+        el.querySelector('.player-result-total').textContent = p.total.toFixed(1);
+        el.querySelector('.winner-badge').classList.toggle('hidden', !isWinner);
+
+        const selEl = el.querySelector('.player-selections');
+        selEl.innerHTML = '';
+
+        const rests = p.selections.filter(s => s.category === 'restaurant');
+        for (let i = 0; i < 2; i++) {
+            const r = rests[i];
+            const div = document.createElement('div');
+            div.className = 'result-sel' + (r ? '' : ' empty');
+            div.innerHTML = r
+                ? `<span>&#127869; ${r.name}</span><span>${r.rating || '-'}</span>`
+                : '<span>&#127869; --</span>';
+            selEl.appendChild(div);
+        }
+
+        const act = p.selections.find(s => s.category === 'activity');
+        const actDiv = document.createElement('div');
+        actDiv.className = 'result-sel' + (act ? '' : ' empty');
+        actDiv.innerHTML = act
+            ? `<span>&#127917; ${act.name}</span><span>${act.rating || '-'}</span>`
+            : '<span>&#127917; --</span>';
+        selEl.appendChild(actDiv);
+    }
+
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.classList.remove('hidden');
+        setTimeout(() => t.classList.add('hidden'), 3000);
+    }
+
+    // Map overlay functions
+    function toggleMap() {
+        const overlay = document.getElementById('map-overlay');
+        overlay.classList.toggle('hidden');
+    }
+
+    function hideMap() {
+        const overlay = document.getElementById('map-overlay');
+        overlay.classList.add('hidden');
+    }
+
+    // Event listeners
+    document.getElementById('join-form').addEventListener('submit', e => {
+        e.preventDefault();
+        const name = document.getElementById('player-name').value.trim();
+        if (name) {
+            sessionStorage.setItem('parlor_event-dash_name', name);
+            client.connect(name, instanceId);
+        }
+    });
+
+    document.querySelectorAll('.time-option').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.time-option').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            sendConfig();
+        });
+    });
+
+    document.querySelectorAll('.start-option').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.start-option').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            sendConfig();
+        });
+    });
+
+    function sendConfig() {
+        const timeVal = document.querySelector('.time-option.selected')?.dataset.value;
+        const startVal = document.querySelector('.start-option.selected')?.dataset.value;
+        client.sendMove({
+            action: 'configure',
+            time_limit: timeVal === 'null' ? null : parseInt(timeVal),
+            same_start: startVal === 'true'
+        });
+    }
+
+    document.getElementById('start-game-btn').addEventListener('click', () => {
+        client.sendMove({ action: 'start_game' });
+    });
+
+    document.getElementById('skip-btn').addEventListener('click', () => {
+        client.sendMove({ action: 'request_skip' });
+    });
+
+    document.getElementById('continue-game-btn').addEventListener('click', () => {
+        client.sendMove({ action: 'respond_skip', agree: false });
+        document.getElementById('skip-modal').classList.add('hidden');
+    });
+
+    document.getElementById('agree-skip-btn').addEventListener('click', () => {
+        client.sendMove({ action: 'respond_skip', agree: true });
+        document.getElementById('skip-modal').classList.add('hidden');
+    });
+
+    document.getElementById('select-restaurant-btn').addEventListener('click', () => confirmSelection('restaurant'));
+    document.getElementById('select-activity-btn').addEventListener('click', () => confirmSelection('activity'));
+    document.getElementById('cancel-selection-btn').addEventListener('click', hideSelectionModal);
+
+    document.getElementById('map-toggle').addEventListener('click', toggleMap);
+
+    document.getElementById('rematch-btn').addEventListener('click', () => {
+        client.sendMove({ action: 'rematch' });
+    });
+
+    document.getElementById('new-city-btn').addEventListener('click', () => {
+        client.sendMove({ action: 'new_city' });
+    });
+
+    // Auto-rejoin
+    if (instanceId) {
+        const savedName = sessionStorage.getItem('parlor_event-dash_name');
+        if (savedName) client.connect(savedName, instanceId);
+    }
+})();
+</script>
+{% endblock %}
