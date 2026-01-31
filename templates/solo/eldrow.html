@@ -4,12 +4,13 @@
 
 {% block head %}
 <link rel="stylesheet" href="/static/css/solo/eldrow.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 {% endblock %}
 
 {% block content %}
 <div id="game-container" class="eldrow-game">
     <!-- Setup Screen -->
-    <div id="setup-screen" class="screen setup-screen active">
+    <div id="setup-screen" class="screen setup-screen">
         <a href="/" class="back-link">&larr; Back to Lobby</a>
         <header class="hero">
             <h1>Eldrow</h1>
@@ -94,8 +95,28 @@
             </div>
         </div>
 
-        <div id="boards-container" class="boards-container">
-            <!-- Boards rendered by JS -->
+        <div class="game-body">
+            <!-- Zoomed board view (for multi-board when one is selected) -->
+            <div id="zoomed-board-container" class="zoomed-board-container hidden">
+                <div class="zoomed-board-header">
+                    <button id="back-to-grid-btn" class="back-to-grid-btn">&larr; All Boards</button>
+                    <span id="zoomed-board-title" class="zoomed-board-title">Board 1</span>
+                </div>
+                <div id="zoomed-board" class="zoomed-board">
+                    <!-- Zoomed board rendered by JS -->
+                </div>
+            </div>
+
+            <!-- Board grid (scrollable area) -->
+            <div id="boards-container" class="boards-container">
+                <!-- Boards rendered by JS -->
+            </div>
+
+            <!-- Input display for multi-board -->
+            <div id="input-row" class="input-row hidden">
+                <div id="input-display" class="input-display"></div>
+                <div id="guess-counter" class="guess-counter"></div>
+            </div>
         </div>
 
         <div id="keyboard" class="keyboard">
@@ -105,6 +126,7 @@
 
     <!-- Results Screen -->
     <div id="results-screen" class="screen results-screen">
+        <a href="/" class="back-link">&larr; Back to Lobby</a>
         <h2 id="results-title" class="results-title">Results</h2>
         <p id="results-summary" class="results-summary"></p>
 
