@@ -19,11 +19,15 @@
     right: 0;
     bottom: 0;
     overflow: hidden;
+    background: var(--color-bg);
+    z-index: 10;
 }
 
-/* Screen Management */
-.eldrow-game .screen {
-    display: none;
+/* Screen Management - use IDs for higher specificity */
+#setup-screen,
+#game-screen,
+#results-screen {
+    display: none !important;
     position: absolute;
     top: 0;
     left: 0;
@@ -33,18 +37,22 @@
     background: var(--color-bg);
 }
 
-.eldrow-game .screen.active {
-    display: block;
+#setup-screen.active {
+    display: block !important;
+}
+
+#game-screen.active {
+    display: flex !important;
+    flex-direction: column;
+}
+
+#results-screen.active {
+    display: block !important;
 }
 
 /* Setup Screen */
 .setup-screen {
     padding: 1rem;
-}
-
-.setup-screen .container {
-    max-width: 700px;
-    margin: 0 auto;
 }
 
 .setup-content {
@@ -204,18 +212,12 @@
 
 /* Game Screen - Fixed Layout */
 .game-screen {
-    display: none;
-    flex-direction: column;
     height: 100%;
     max-width: 100%;
     overflow: hidden;
 }
 
-.game-screen.active {
-    display: flex;
-}
-
-.game-header {
+.eldrow-game .game-header {
     flex-shrink: 0;
     display: flex;
     justify-content: space-between;
@@ -223,6 +225,8 @@
     padding: 0.5rem 1rem;
     border-bottom: 1px solid var(--cell-border);
     background: var(--color-bg);
+    margin-bottom: 0;
+    border-radius: 0;
 }
 
 .game-title {
@@ -432,7 +436,7 @@
 }
 
 .zoomed-board-container.hidden {
-    display: none;
+    display: none !important;
 }
 
 .zoomed-board-header {
@@ -496,7 +500,7 @@
 }
 
 .input-row.hidden {
-    display: none;
+    display: none !important;
 }
 
 .input-display {
@@ -532,7 +536,7 @@
 }
 
 /* Keyboard - Fixed at Bottom */
-.keyboard {
+.eldrow-game .keyboard {
     flex-shrink: 0;
     padding: 0.5rem;
     padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
@@ -589,7 +593,7 @@
 }
 
 /* Toast */
-.toast {
+.eldrow-game .toast {
     position: fixed;
     top: 10%;
     left: 50%;
@@ -603,8 +607,8 @@
     animation: slideDown 0.3s ease;
 }
 
-.toast.hidden {
-    display: none;
+.eldrow-game .toast.hidden {
+    display: none !important;
 }
 
 @keyframes slideDown {
@@ -626,12 +630,6 @@
 .results-screen .back-link {
     display: inline-block;
     margin-bottom: 1rem;
-}
-
-.results-content {
-    max-width: 500px;
-    margin: 0 auto;
-    text-align: center;
 }
 
 .results-title {
@@ -681,7 +679,7 @@
 }
 
 /* Loading Overlay */
-.loading {
+.eldrow-game .loading {
     position: fixed;
     top: 0;
     left: 0;
@@ -696,11 +694,11 @@
     z-index: 100;
 }
 
-.loading.hidden {
-    display: none;
+.eldrow-game .loading.hidden {
+    display: none !important;
 }
 
-.loading .spinner {
+.eldrow-game .loading .spinner {
     width: 40px;
     height: 40px;
 }
@@ -801,7 +799,7 @@
         height: 40px;
     }
 
-    .game-header {
+    .eldrow-game .game-header {
         padding: 0.25rem 1rem;
     }
 
