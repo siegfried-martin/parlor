@@ -22,35 +22,61 @@
             mode: 'daily',
             preset: 'wordle'
         },
-        phase: 'setup',
+        phase: 'setup', // 'setup' | 'playing' | 'complete'
         targetWords: [],
         guesses: [],
         currentInput: '',
-        selectedBoard: null,
+        selectedBoard: null, // null = grid view, number = zoomed view
         boards: [],
         won: false,
         animating: false
     };
 
-    // DOM Elements
-    const screens = {};
+    // DOM Elements cache
+    const elements = {};
     let toastTimeout = null;
 
     // Initialize
     function init() {
-        screens.setup = document.getElementById('setup-screen');
-        screens.game = document.getElementById('game-screen');
-        screens.results = document.getElementById('results-screen');
-
+        cacheElements();
         setupEventListeners();
         updateSetupUI();
         showScreen('setup');
     }
 
+    function cacheElements() {
+        elements.setupScreen = document.getElementById('setup-screen');
+        elements.gameScreen = document.getElementById('game-screen');
+        elements.resultsScreen = document.getElementById('results-screen');
+        elements.boardsContainer = document.getElementById('boards-container');
+        elements.zoomedBoardContainer = document.getElementById('zoomed-board-container');
+        elements.zoomedBoard = document.getElementById('zoomed-board');
+        elements.zoomedBoardTitle = document.getElementById('zoomed-board-title');
+        elements.inputRow = document.getElementById('input-row');
+        elements.inputDisplay = document.getElementById('input-display');
+        elements.guessCounter = document.getElementById('guess-counter');
+        elements.keyboard = document.getElementById('keyboard');
+        elements.loading = document.getElementById('loading');
+        elements.toast = document.getElementById('toast');
+    }
+
     function showScreen(name) {
-        Object.values(screens).forEach(s => s.classList.remove('active'));
-        if (screens[name]) {
-            screens[name].classList.add('active');
+        // Hide all screens first
+        elements.setupScreen.classList.remove('active');
+        elements.gameScreen.classList.remove('active');
+        elements.resultsScreen.classList.remove('active');
+
+        // Show the requested screen
+        switch (name) {
+            case 'setup':
+                elements.setupScreen.classList.add('active');
+                break;
+            case 'game':
+                elements.gameScreen.classList.add('active');
+                break;
+            case 'results':
+                elements.resultsScreen.classList.add('active');
+                break;
         }
     }
 
@@ -72,26 +98,33 @@
 
         // Header buttons
         document.getElementById('new-game-btn')?.addEventListener('click', () => startGame(state.config.mode));
-        document.getElementById('setup-btn')?.addEventListener('click', () => {
-            state.phase = 'setup';
-            showScreen('setup');
-        });
+        document.getElementById('setup-btn')?.addEventListener('click', goToSetup);
 
         // Results buttons
         document.getElementById('copy-results-btn')?.addEventListener('click', copyResults);
-        document.getElementById('play-again-btn')?.addEventListener('click', () => {
-            state.phase = 'setup';
-            showScreen('setup');
+        document.getElementById('play-again-btn')?.addEventListener('click', goToSetup);
+
+        // Back to grid button
+        document.getElementById('back-to-grid-btn')?.addEventListener('click', () => {
+            state.selectedBoard = null;
+            renderGame();
         });
 
         // Keyboard input
         document.addEventListener('keydown', handleKeyDown);
 
         // On-screen keyboard
-        document.getElementById('keyboard')?.addEventListener('click', handleKeyboardClick);
+        elements.keyboard?.addEventListener('click', handleKeyboardClick);
 
         // Board selection for multi-board
-        document.getElementById('boards-container')?.addEventListener('click', handleBoardClick);
+        elements.boardsContainer?.addEventListener('click', handleBoardClick);
+    }
+
+    function goToSetup() {
+        state.phase = 'setup';
+        state.selectedBoard = null;
+        updateSetupUI();
+        showScreen('setup');
     }
 
     function handleStepperClick(e) {
@@ -181,8 +214,10 @@
 
     function updateStepperButtons(field, min, max) {
         const value = state.config[field];
-        document.querySelector(`.stepper-btn[data-field="${field}"][data-delta="-1"]`).disabled = value <= min;
-        document.querySelector(`.stepper-btn[data-field="${field}"][data-delta="1"]`).disabled = value >= max;
+        const decBtn = document.querySelector(`.stepper-btn[data-field="${field}"][data-delta="-1"]`);
+        const incBtn = document.querySelector(`.stepper-btn[data-field="${field}"][data-delta="1"]`);
+        if (decBtn) decBtn.disabled = value <= min;
+        if (incBtn) incBtn.disabled = value >= max;
     }
 
     // Word list loading
@@ -209,9 +244,8 @@
     }
 
     function showLoading(show) {
-        const loader = document.getElementById('loading');
-        if (loader) {
-            loader.classList.toggle('hidden', !show);
+        if (elements.loading) {
+            elements.loading.classList.toggle('hidden', !show);
         }
     }
 
@@ -302,7 +336,7 @@
 
         state.guesses = [];
         state.currentInput = '';
-        state.selectedBoard = state.config.boardCount > 1 ? 0 : null;
+        state.selectedBoard = null;
         state.phase = 'playing';
         state.won = false;
         state.animating = false;
@@ -313,27 +347,43 @@
 
     // Game rendering
     function renderGame() {
-        const container = document.getElementById('boards-container');
         const isMulti = state.config.boardCount > 1;
 
         if (isMulti) {
-            renderMultiBoard(container);
+            if (state.selectedBoard !== null) {
+                // Show zoomed view
+                renderZoomedBoard();
+                elements.zoomedBoardContainer.classList.remove('hidden');
+                elements.boardsContainer.classList.add('hidden');
+                elements.inputRow.classList.add('hidden');
+            } else {
+                // Show grid view
+                renderMultiBoard();
+                elements.zoomedBoardContainer.classList.add('hidden');
+                elements.boardsContainer.classList.remove('hidden');
+                elements.inputRow.classList.remove('hidden');
+                updateInputDisplay();
+                updateGuessCounter();
+            }
         } else {
-            renderSingleBoard(container);
+            // Single board
+            renderSingleBoard();
+            elements.zoomedBoardContainer.classList.add('hidden');
+            elements.boardsContainer.classList.remove('hidden');
+            elements.inputRow.classList.add('hidden');
         }
 
         renderKeyboard();
-        updateGuessCounter();
     }
 
-    function renderSingleBoard(container) {
-        container.innerHTML = '';
+    function renderSingleBoard() {
+        elements.boardsContainer.innerHTML = '';
         const board = createBoardElement(0, false);
-        container.appendChild(board);
+        elements.boardsContainer.appendChild(board);
     }
 
-    function renderMultiBoard(container) {
-        container.innerHTML = '';
+    function renderMultiBoard() {
+        elements.boardsContainer.innerHTML = '';
 
         // Determine grid columns
         const count = state.config.boardCount;
@@ -349,7 +399,6 @@
             wrapper.className = 'mini-board';
             wrapper.dataset.board = i;
 
-            if (state.selectedBoard === i) wrapper.classList.add('selected');
             if (state.boards[i].solved) wrapper.classList.add('solved');
 
             const board = createBoardElement(i, true);
@@ -365,31 +414,41 @@
             grid.appendChild(wrapper);
         }
 
-        container.appendChild(grid);
+        elements.boardsContainer.appendChild(grid);
+    }
 
-        // Input display
-        const inputDisplay = document.createElement('div');
-        inputDisplay.className = 'input-display';
-        inputDisplay.id = 'input-display';
-        for (let i = 0; i < state.config.wordLength; i++) {
-            const span = document.createElement('span');
-            span.textContent = state.currentInput[i] || '';
-            inputDisplay.appendChild(span);
+    function renderZoomedBoard() {
+        const boardIndex = state.selectedBoard;
+        const board = state.boards[boardIndex];
+
+        // Update title
+        if (board.solved) {
+            elements.zoomedBoardTitle.textContent = state.targetWords[boardIndex].toUpperCase();
+            elements.zoomedBoardTitle.classList.add('solved');
+        } else {
+            elements.zoomedBoardTitle.textContent = `Board ${boardIndex + 1}`;
+            elements.zoomedBoardTitle.classList.remove('solved');
         }
-        container.appendChild(inputDisplay);
 
-        // Guess counter
+        // Render the board at full size
+        elements.zoomedBoard.innerHTML = '';
+        const boardEl = createBoardElement(boardIndex, false);
+        elements.zoomedBoard.appendChild(boardEl);
+
+        // Add guess counter
         const counter = document.createElement('div');
         counter.className = 'guess-counter';
-        counter.id = 'guess-counter';
-        container.appendChild(counter);
+        counter.textContent = `Guess ${state.guesses.length + 1} of ${state.config.maxGuesses}`;
+        elements.zoomedBoard.appendChild(counter);
     }
 
     function createBoardElement(boardIndex, mini) {
         const boardEl = document.createElement('div');
         boardEl.className = 'board';
 
-        for (let row = 0; row < state.config.maxGuesses; row++) {
+        const maxRows = mini ? Math.min(state.config.maxGuesses, 8) : state.config.maxGuesses;
+
+        for (let row = 0; row < maxRows; row++) {
             const rowEl = document.createElement('div');
             rowEl.className = 'board-row';
             rowEl.dataset.row = row;
@@ -406,7 +465,7 @@
                     cell.textContent = guess[col];
                     cell.classList.add(result[col], 'filled');
                 } else if (row === state.guesses.length && !mini) {
-                    // Current input row (only for single board)
+                    // Current input row (only for non-mini boards)
                     cell.textContent = state.currentInput[col] || '';
                     if (state.currentInput[col]) cell.classList.add('filled');
                 }
@@ -421,19 +480,20 @@
     }
 
     function updateGuessCounter() {
-        const counter = document.getElementById('guess-counter');
-        if (counter) {
-            counter.textContent = `Guess ${state.guesses.length + 1} of ${state.config.maxGuesses}`;
+        if (elements.guessCounter) {
+            elements.guessCounter.textContent = `Guess ${state.guesses.length + 1} of ${state.config.maxGuesses}`;
         }
     }
 
     function updateInputDisplay() {
-        const display = document.getElementById('input-display');
-        if (!display) return;
+        if (!elements.inputDisplay) return;
 
-        const spans = display.querySelectorAll('span');
+        elements.inputDisplay.innerHTML = '';
         for (let i = 0; i < state.config.wordLength; i++) {
-            spans[i].textContent = state.currentInput[i] || '';
+            const span = document.createElement('span');
+            span.textContent = state.currentInput[i] || '';
+            if (state.currentInput[i]) span.classList.add('filled');
+            elements.inputDisplay.appendChild(span);
         }
     }
 
@@ -468,8 +528,7 @@
 
     // Keyboard
     function renderKeyboard() {
-        const keyboard = document.getElementById('keyboard');
-        if (!keyboard) return;
+        if (!elements.keyboard) return;
 
         const rows = [
             ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
@@ -479,7 +538,7 @@
 
         const keyboardState = getKeyboardState();
 
-        keyboard.innerHTML = '';
+        elements.keyboard.innerHTML = '';
         rows.forEach(row => {
             const rowEl = document.createElement('div');
             rowEl.className = 'keyboard-row';
@@ -502,13 +561,13 @@
                 rowEl.appendChild(keyEl);
             });
 
-            keyboard.appendChild(rowEl);
+            elements.keyboard.appendChild(rowEl);
         });
     }
 
     function getKeyboardState() {
-        // If multi-board with selection, show that board's state
-        if (state.config.boardCount > 1 && state.selectedBoard !== null) {
+        // If zoomed into a board, show that board's state
+        if (state.selectedBoard !== null) {
             return state.boards[state.selectedBoard].letterStates;
         }
 
@@ -551,6 +610,10 @@
         } else if (e.key === 'Backspace') {
             e.preventDefault();
             deleteChar();
+        } else if (e.key === 'Escape' && state.selectedBoard !== null) {
+            e.preventDefault();
+            state.selectedBoard = null;
+            renderGame();
         } else if (/^[a-zA-Z]$/.test(e.key)) {
             e.preventDefault();
             addChar(e.key.toLowerCase());
@@ -574,43 +637,61 @@
     }
 
     function handleBoardClick(e) {
+        if (state.config.boardCount <= 1) return;
+
         const miniBoard = e.target.closest('.mini-board');
         if (!miniBoard) return;
 
         const boardIndex = parseInt(miniBoard.dataset.board);
-        if (state.selectedBoard === boardIndex) {
-            state.selectedBoard = null;
-        } else {
-            state.selectedBoard = boardIndex;
-        }
-
+        state.selectedBoard = boardIndex;
         renderGame();
     }
 
     function addChar(char) {
         if (state.currentInput.length < state.config.wordLength) {
             state.currentInput += char;
-            if (state.config.boardCount > 1) {
-                updateInputDisplay();
-            } else {
-                updateCurrentRow();
-            }
+            updateCurrentDisplay();
         }
     }
 
     function deleteChar() {
         if (state.currentInput.length > 0) {
             state.currentInput = state.currentInput.slice(0, -1);
-            if (state.config.boardCount > 1) {
-                updateInputDisplay();
-            } else {
-                updateCurrentRow();
-            }
+            updateCurrentDisplay();
         }
     }
 
-    function updateCurrentRow() {
-        const board = document.querySelector('.board');
+    function updateCurrentDisplay() {
+        if (state.config.boardCount > 1) {
+            if (state.selectedBoard !== null) {
+                // Update zoomed board current row
+                updateZoomedBoardCurrentRow();
+            } else {
+                // Update input display
+                updateInputDisplay();
+            }
+        } else {
+            // Update single board current row
+            updateSingleBoardCurrentRow();
+        }
+    }
+
+    function updateSingleBoardCurrentRow() {
+        const board = elements.boardsContainer.querySelector('.board');
+        if (!board) return;
+
+        const row = board.querySelectorAll('.board-row')[state.guesses.length];
+        if (!row) return;
+
+        const cells = row.querySelectorAll('.cell');
+        cells.forEach((cell, i) => {
+            cell.textContent = state.currentInput[i] || '';
+            cell.classList.toggle('filled', !!state.currentInput[i]);
+        });
+    }
+
+    function updateZoomedBoardCurrentRow() {
+        const board = elements.zoomedBoard.querySelector('.board');
         if (!board) return;
 
         const row = board.querySelectorAll('.board-row')[state.guesses.length];
@@ -668,14 +749,16 @@
     }
 
     function shakeCurrentRow() {
-        if (state.config.boardCount > 1) {
-            const display = document.getElementById('input-display');
-            if (display) {
-                display.classList.add('shake');
-                setTimeout(() => display.classList.remove('shake'), 500);
+        if (state.config.boardCount > 1 && state.selectedBoard === null) {
+            // Shake input display
+            if (elements.inputDisplay) {
+                elements.inputDisplay.classList.add('shake');
+                setTimeout(() => elements.inputDisplay.classList.remove('shake'), 500);
             }
         } else {
-            const board = document.querySelector('.board');
+            // Shake current row on board
+            const container = state.selectedBoard !== null ? elements.zoomedBoard : elements.boardsContainer;
+            const board = container.querySelector('.board');
             const row = board?.querySelectorAll('.board-row')[state.guesses.length];
             if (row) {
                 row.classList.add('shake');
@@ -688,14 +771,16 @@
         const delay = 300;
         const flipDuration = 500;
 
-        if (state.config.boardCount === 1) {
-            // Single board animation
-            const board = document.querySelector('.board');
+        // Only animate single board or zoomed view
+        if (state.config.boardCount === 1 || state.selectedBoard !== null) {
+            const container = state.selectedBoard !== null ? elements.zoomedBoard : elements.boardsContainer;
+            const board = container.querySelector('.board');
             const rowIndex = state.guesses.length - 1;
             const row = board?.querySelectorAll('.board-row')[rowIndex];
             if (!row) return;
 
-            const result = evaluateGuess(guess, state.targetWords[0]);
+            const targetIndex = state.selectedBoard !== null ? state.selectedBoard : 0;
+            const result = evaluateGuess(guess, state.targetWords[targetIndex]);
             const cells = row.querySelectorAll('.cell');
 
             for (let i = 0; i < cells.length; i++) {
@@ -707,12 +792,12 @@
                 await new Promise(r => setTimeout(r, flipDuration / 2));
 
                 if (i < cells.length - 1) {
-                    await new Promise(r => setTimeout(r, delay - flipDuration));
+                    await new Promise(r => setTimeout(r, Math.max(0, delay - flipDuration)));
                 }
             }
         } else {
-            // Multi-board: just wait a moment for visual feedback
-            await new Promise(r => setTimeout(r, 500));
+            // Multi-board grid view: just wait a moment
+            await new Promise(r => setTimeout(r, 400));
         }
     }
 
@@ -868,20 +953,14 @@
 
     // Toast
     function showToast(message) {
-        let toast = document.getElementById('toast');
-        if (!toast) {
-            toast = document.createElement('div');
-            toast.id = 'toast';
-            toast.className = 'toast';
-            document.body.appendChild(toast);
-        }
+        if (!elements.toast) return;
 
-        toast.textContent = message;
-        toast.classList.remove('hidden');
+        elements.toast.textContent = message;
+        elements.toast.classList.remove('hidden');
 
         if (toastTimeout) clearTimeout(toastTimeout);
         toastTimeout = setTimeout(() => {
-            toast.classList.add('hidden');
+            elements.toast.classList.add('hidden');
         }, 1500);
     }
 
