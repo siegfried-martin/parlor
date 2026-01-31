@@ -405,9 +405,9 @@
 }
 
 .mini-board .cell {
-    width: 18px;
-    height: 18px;
-    font-size: 0.5rem;
+    width: 24px;
+    height: 24px;
+    font-size: 0.65rem;
     border-width: 1px;
 }
 
@@ -729,9 +729,9 @@
     }
 
     .mini-board .cell {
-        width: 14px;
-        height: 14px;
-        font-size: 0.4rem;
+        width: 20px;
+        height: 20px;
+        font-size: 0.55rem;
     }
 
     .input-display span {
@@ -770,8 +770,9 @@
     }
 
     .mini-board .cell {
-        width: 12px;
-        height: 12px;
+        width: 16px;
+        height: 16px;
+        font-size: 0.5rem;
     }
 
     .input-display span {

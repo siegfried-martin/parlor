@@ -462,7 +462,7 @@
                 if (row < state.guesses.length) {
                     const guess = state.guesses[row];
                     const result = evaluateGuess(guess, state.targetWords[boardIndex]);
-                    cell.textContent = mini ? '' : guess[col];
+                    cell.textContent = guess[col];
                     cell.classList.add(result[col], 'filled');
                 } else if (row === state.guesses.length && !mini) {
                     // Current input row (only for non-mini boards)
