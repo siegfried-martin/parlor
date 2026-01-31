@@ -292,6 +292,13 @@
         onGameState: (data) => {
             currentState = data;
             renderGameState(data);
+
+            // Handle opponent connection status
+            if (!data.opponent_connected) {
+                elements.disconnectOverlay.classList.remove('hidden');
+            } else {
+                elements.disconnectOverlay.classList.add('hidden');
+            }
         },
 
         onRoundResult: (msg) => {
@@ -568,9 +575,18 @@
         e.preventDefault();
         const name = elements.nameInput.value.trim();
         if (name) {
+            sessionStorage.setItem('parlor_image-reveal_name', name);
             client.connect(name, instanceId);
         }
     });
+
+    // Auto-rejoin if we have an instance ID and saved name
+    if (instanceId) {
+        const savedName = sessionStorage.getItem('parlor_image-reveal_name');
+        if (savedName) {
+            client.connect(savedName, instanceId);
+        }
+    }
 
     // Image upload
     elements.imageInput.addEventListener('change', (e) => {

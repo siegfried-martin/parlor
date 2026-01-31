@@ -301,9 +301,18 @@
         e.preventDefault();
         const name = nameInput.value.trim();
         if (name) {
+            sessionStorage.setItem('parlor_rps_name', name);
             initGame(name);
         }
     });
+
+    // Auto-rejoin if we have an instance ID and saved name
+    if (instanceId) {
+        const savedName = sessionStorage.getItem('parlor_rps_name');
+        if (savedName) {
+            initGame(savedName);
+        }
+    }
 
     choiceButtons.forEach(btn => {
         btn.addEventListener('click', () => {
