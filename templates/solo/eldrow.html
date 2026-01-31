@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block title %}Eldrow - Parlor{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="/static/css/solo/eldrow.css">
+{% endblock %}
+
+{% block content %}
+<div id="game-container" class="eldrow-game">
+    <!-- Setup Screen -->
+    <div id="setup-screen" class="screen setup-screen active">
+        <a href="/" class="back-link">&larr; Back to Lobby</a>
+        <header class="hero">
+            <h1>Eldrow</h1>
+            <p class="tagline">Customizable word puzzle</p>
+        </header>
+
+        <div class="setup-content">
+            <div class="config-panel">
+                <div class="config-row">
+                    <span class="config-label">Word Length</span>
+                    <div class="stepper">
+                        <button class="stepper-btn" data-field="wordLength" data-delta="-1">&minus;</button>
+                        <span class="stepper-value" id="word-length-value">5</span>
+                        <button class="stepper-btn" data-field="wordLength" data-delta="1">+</button>
+                    </div>
+                </div>
+
+                <div class="config-row">
+                    <span class="config-label">Boards</span>
+                    <div class="stepper">
+                        <button class="stepper-btn" data-field="boardCount" data-delta="-1">&minus;</button>
+                        <span class="stepper-value" id="board-count-value">1</span>
+                        <button class="stepper-btn" data-field="boardCount" data-delta="1">+</button>
+                    </div>
+                </div>
+
+                <div class="config-row">
+                    <span class="config-label">
+                        Guesses
+                        <span class="config-hint" id="guesses-hint">(suggested)</span>
+                    </span>
+                    <div class="stepper">
+                        <button class="stepper-btn" data-field="maxGuesses" data-delta="-1">&minus;</button>
+                        <span class="stepper-value" id="max-guesses-value">6</span>
+                        <button class="stepper-btn" data-field="maxGuesses" data-delta="1">+</button>
+                    </div>
+                </div>
+
+                <div class="start-buttons">
+                    <button id="start-daily" class="btn btn-primary">Daily</button>
+                    <button id="start-practice" class="btn btn-secondary">Practice</button>
+                </div>
+            </div>
+
+            <div class="preset-panel">
+                <h3>Presets</h3>
+
+                <button class="preset-btn selected" data-preset="wordle">
+                    <div class="preset-info">
+                        <div class="preset-name">Wordle</div>
+                        <div class="preset-desc">5 letters, 1 board, 6 guesses</div>
+                    </div>
+                    <span class="daily-badge">Daily</span>
+                </button>
+
+                <button class="preset-btn" data-preset="quordle">
+                    <div class="preset-info">
+                        <div class="preset-name">Quordle</div>
+                        <div class="preset-desc">5 letters, 4 boards, 9 guesses</div>
+                    </div>
+                    <span class="daily-badge">Daily</span>
+                </button>
+
+                <button class="preset-btn" data-preset="octordle">
+                    <div class="preset-info">
+                        <div class="preset-name">Octordle</div>
+                        <div class="preset-desc">5 letters, 8 boards, 13 guesses</div>
+                    </div>
+                    <span class="daily-badge">Daily</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="game-screen" class="screen game-screen">
+        <div class="game-header">
+            <span class="game-title">Eldrow</span>
+            <div class="header-buttons">
+                <button id="new-game-btn" class="header-btn">New</button>
+                <button id="setup-btn" class="header-btn">Setup</button>
+            </div>
+        </div>
+
+        <div id="boards-container" class="boards-container">
+            <!-- Boards rendered by JS -->
+        </div>
+
+        <div id="keyboard" class="keyboard">
+            <!-- Keyboard rendered by JS -->
+        </div>
+    </div>
+
+    <!-- Results Screen -->
+    <div id="results-screen" class="screen results-screen">
+        <h2 id="results-title" class="results-title">Results</h2>
+        <p id="results-summary" class="results-summary"></p>
+
+        <div id="emoji-grid" class="emoji-grid"></div>
+
+        <div class="results-buttons">
+            <button id="copy-results-btn" class="btn btn-primary">Copy Results</button>
+            <button id="play-again-btn" class="btn btn-secondary">Play Again</button>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading" class="loading hidden">
+        <div class="spinner"></div>
+        <p>Loading words...</p>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast hidden"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/solo/eldrow.js"></script>
+{% endblock %}
