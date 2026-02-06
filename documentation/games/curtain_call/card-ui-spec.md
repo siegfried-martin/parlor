@@ -419,7 +419,7 @@ window.gameDebug.listCards()  // List all available cards
 3. **Stub is narrower** (24px vs spec's 56px) for space efficiency
 4. **Description shown in small view** with 2-line clamp (original spec suggested hiding it)
 
-### Next Steps
-- Card logic overhaul
-- Additional UI tweaks
-- Return to previous milestones
+### Next Steps (Milestone Order)
+1. **Milestone 16: Starting Menu & Scene Flow** — Title screen, protagonist selection, scene transitions
+2. **Milestone 17: Card Logic Overhaul** — Refactor card data/effects, standardize action system
+3. **Milestone 18+:** Full Act I Run and remaining milestones

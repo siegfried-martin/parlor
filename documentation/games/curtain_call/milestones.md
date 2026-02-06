@@ -19,13 +19,15 @@
 | 13  | Keywords Implementation   | ✅ Complete |
 | 14  | Debuff System             | ✅ Complete |
 | 15  | Defensive Keywords        | ✅ Complete |
-| 16  | Full Act I Run            | Next        |
-| 17  | Act II Implementation     | Pending     |
-| 18  | Act III Implementation    | Pending     |
-| 19  | Full Run Flow             | Pending     |
-| 20  | Curtain Transitions       | Pending     |
-| 21  | Polish & Complete Assets  | Pending     |
-| 22  | Persistence Integration   | Pending     |
+| 16  | Starting Menu & Scene Flow| Next        |
+| 17  | Card Logic Overhaul       | Pending     |
+| 18  | Full Act I Run            | Pending     |
+| 19  | Act II Implementation     | Pending     |
+| 20  | Act III Implementation    | Pending     |
+| 21  | Full Run Flow             | Pending     |
+| 22  | Curtain Transitions       | Pending     |
+| 23  | Polish & Complete Assets  | Pending     |
+| 24  | Persistence Integration   | Pending     |
 
 ---
 
@@ -235,7 +237,87 @@ Ward, Ovation, Curtain, Deflect.
 5. Visual indicators for active defensive effects
 6. Correct interaction with other keywords (e.g., Piercing vs Ward)
 
-### 16. Full Act I Run
+### 16. Starting Menu & Scene Flow
+
+Complete game entry flow from title screen through scene transitions into combat.
+
+**Acceptance Criteria:**
+
+#### A. Title/Starting Menu
+
+1. Title screen displays game name "Curtain Call" with theatrical styling
+2. "New Performance" button to begin run setup
+3. Protagonist selection panel shows both Aldric and Pip
+   - Display silhouette, name, and brief description for each
+   - Both must be selected (currently only 2 protagonists, so both auto-selected or require confirmation)
+   - Visual indication of selected state
+4. Starting Attack selection for each protagonist
+   - Show 2-3 starting attack options per protagonist
+   - **Currently grayed out / disabled** — placeholder for future implementation
+   - Tooltip or label indicating "Coming Soon"
+5. "Begin" / "Raise the Curtain" button to start the run
+6. Menu fits within 375×812 viewport without scrolling
+
+#### B. Stage Layout Arrangement
+
+1. Reposition UI elements for cleaner visual hierarchy:
+   - Enemy area at top (~20%)
+   - Stage area with heroes and MacGuffin (~25%)
+   - Hand area for cards (~35%)
+   - Controls/audience area at bottom (~20%)
+2. Ensure all elements visible and properly sized at mobile scale
+3. Stage edge divider clearly separates performance area from hand/controls
+4. Back button or menu access from gameplay screen
+
+#### C. Scene Transitions
+
+1. **Menu → Game transition:**
+   - Curtain-rise animation (curtains part from center, reveal stage)
+   - Duration: ~1.5s
+   - Immediately enters first scene selection after transition
+2. **Between scenes:**
+   - Brief curtain-close/open or fade transition
+   - Show scene progress indicator during transition
+   - Duration: ~1s
+3. **Scene → Combat transition:**
+   - Enemy enters from side or fades in
+   - Heroes take positions
+   - Intent display appears
+4. All transitions use CSS animations (no heavy JS animation libraries)
+5. Transitions can be skipped with a tap (optional, for repeat players)
+
+#### D. Game State Flow
+
+1. Menu → Protagonist Confirm → Scene 1 Selection → Combat → Reward → Scene 2 Selection → Combat → Reward → Boss → Victory/Defeat
+2. State machine tracks current phase (menu, scene_select, combat, reward, transition)
+3. Cannot interact with game elements during transitions
+4. Proper cleanup when returning to menu or restarting
+
+---
+
+### 17. Card Logic Overhaul
+
+Refactor card system for cleaner data flow, better extensibility, and proper keyword/effect resolution.
+
+**Acceptance Criteria:**
+
+1. Card definitions separated into data file (JSON or JS module)
+2. Card effects use standardized action system:
+   - `{ type: 'damage', value: 6, target: 'enemy' }`
+   - `{ type: 'block', value: 5, target: 'macguffin' }`
+   - `{ type: 'draw', value: 1 }`
+   - `{ type: 'apply_status', status: 'weakness', duration: 2, target: 'enemy' }`
+3. Keywords modify card behavior through event hooks:
+   - `onPlay`, `onDiscard`, `onDraw`, `onTurnStart`, `onTurnEnd`
+4. Effect resolution order is deterministic and documented
+5. Card targeting system supports: `enemy`, `self`, `macguffin`, `all_enemies`, `random`
+6. Upgrade paths defined in card data (base → upgraded version)
+7. Card pool organized by protagonist and rarity
+8. Unit tests for core card resolution logic (if test framework exists)
+
+---
+
+### 18. Full Act I Run
 
 Complete Act I playthrough from scene selection through boss.
 
@@ -248,7 +330,7 @@ Complete Act I playthrough from scene selection through boss.
 5. Difficulty feels appropriate for starting deck
 6. Run takes ~5 minutes for Act I
 
-### 17. Act II Implementation
+### 19. Act II Implementation
 
 4 new enemies and The Director boss.
 
@@ -260,7 +342,7 @@ Complete Act I playthrough from scene selection through boss.
 4. Difficulty step-up from Act I
 5. Scene selection works same as Act I
 
-### 18. Act III Implementation
+### 20. Act III Implementation
 
 4 new enemies and The Playwright boss.
 
@@ -272,7 +354,7 @@ Complete Act I playthrough from scene selection through boss.
 4. Highest difficulty, requires evolved deck
 5. Victory over Playwright = run complete
 
-### 19. Full Run Flow
+### 21. Full Run Flow
 
 Protagonist selection through victory or defeat.
 
@@ -285,7 +367,7 @@ Protagonist selection through victory or defeat.
 5. Defeat at any point shows defeat screen with "Try Again" option
 6. Victory screen shows run summary
 
-### 20. Curtain Transitions
+### 22. Curtain Transitions
 
 Themed scene and act transitions.
 
@@ -297,7 +379,7 @@ Themed scene and act transitions.
 4. Defeat: curtain falls with audience boo animation
 5. Transitions are smooth and don't feel sluggish (~1-2s)
 
-### 21. Polish & Complete Assets
+### 23. Polish & Complete Assets
 
 All character silhouettes, expressions, and speech bubble text.
 
@@ -310,7 +392,7 @@ All character silhouettes, expressions, and speech bubble text.
 5. Audience variety (different shapes/accessories)
 6. Visual consistency across all assets
 
-### 22. Persistence Integration
+### 24. Persistence Integration
 
 SQLite storage for unlocks and run history.
 
