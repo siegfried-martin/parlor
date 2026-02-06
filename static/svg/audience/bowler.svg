@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 70">
+  <!-- Classic bowler hat gentleman -->
+  <ellipse cx="25" cy="58" rx="22" ry="16" fill="#1A1A2E"/>
+  <circle cx="25" cy="35" r="14" fill="#1A1A2E"/>
+  <!-- Hat brim -->
+  <ellipse cx="25" cy="22" rx="16" ry="4" fill="#1A1A2E"/>
+  <!-- Rounded hat dome -->
+  <ellipse cx="25" cy="14" rx="12" ry="10" fill="#1A1A2E"/>
+</svg>

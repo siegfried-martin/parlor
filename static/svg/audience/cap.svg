@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 70">
+  <!-- Casual person with baseball cap -->
+  <ellipse cx="25" cy="58" rx="22" ry="16" fill="#1A1A2E"/>
+  <circle cx="25" cy="35" r="14" fill="#1A1A2E"/>
+  <!-- Cap dome -->
+  <ellipse cx="25" cy="22" rx="14" ry="8" fill="#1A1A2E"/>
+  <!-- Cap bill -->
+  <ellipse cx="36" cy="24" rx="10" ry="4" fill="#1A1A2E"/>
+</svg>

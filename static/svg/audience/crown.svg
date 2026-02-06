@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 70">
+  <!-- Royalty with tiny crown -->
+  <ellipse cx="25" cy="58" rx="22" ry="16" fill="#1A1A2E"/>
+  <circle cx="25" cy="35" r="14" fill="#1A1A2E"/>
+  <!-- Crown -->
+  <polygon points="12,22 14,10 18,18 22,6 25,16 28,6 32,18 36,10 38,22" fill="#1A1A2E"/>
+  <rect x="12" y="20" width="26" height="6" fill="#1A1A2E"/>
+</svg>

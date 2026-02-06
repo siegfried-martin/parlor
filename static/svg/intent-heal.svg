@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Heart icon for heal intent - Curtain Call puppet theater style -->
+  <!-- Classic heart shape, simple silhouette with backlight cutout -->
+  <path d="M16 28
+           C16 28 4 18 4 11
+           C4 6 8 3 12 3
+           C14.5 3 16 5 16 5
+           C16 5 17.5 3 20 3
+           C24 3 28 6 28 11
+           C28 18 16 28 16 28Z"
+        fill="#1A1A2E"/>
+  <!-- Small inner highlight cutout to suggest light shining through -->
+  <ellipse cx="11" cy="10" rx="2.5" ry="2" fill="#F4E4C1"/>
+</svg>

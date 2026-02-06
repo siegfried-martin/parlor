@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}Curtain Call - Parlor{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="/static/css/solo/curtain-call.css">
+<link rel="stylesheet" href="/static/css/puppet-animations.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=IM+Fell+English:ital@0;1&family=Special+Elite&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+{% endblock %}
+
+{% block content %}
+<div id="game-container" class="curtain-call">
+    <a href="/" class="back-link">&larr; Back to Lobby</a>
+
+    <!-- Speech Bubble Container (Milestone 5) -->
+    <div class="speech-bubble-container" id="speech-bubbles"></div>
+
+    <!-- Scene Selection Screen (Milestone 11) -->
+    <div class="scene-select-overlay" id="scene-select-overlay" style="display: none;">
+        <div class="scene-select-content">
+            <h2 class="scene-title" id="scene-title">Act I - Scene 1</h2>
+            <p class="scene-subtitle">Choose your opponent</p>
+            <div class="enemy-choices" id="enemy-choices">
+                <!-- Enemy choices rendered here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Progress Indicator (Milestone 11) -->
+    <div class="progress-indicator" id="progress-indicator">
+        <span class="progress-dot" data-scene="1"></span>
+        <span class="progress-dot" data-scene="2"></span>
+        <span class="progress-dot boss" data-scene="boss"></span>
+    </div>
+
+    <!-- Card Rewards Screen (Milestone 10) -->
+    <div class="rewards-overlay" id="rewards-overlay" style="display: none;">
+        <div class="rewards-content">
+            <h2 class="rewards-title">Choose a Card</h2>
+            <div class="rewards-cards" id="rewards-cards">
+                <!-- Reward cards rendered here -->
+            </div>
+            <div class="rewards-buttons">
+                <button class="rewards-btn confirm-btn" id="confirm-reward-btn" disabled>Add to Deck</button>
+                <button class="rewards-btn skip-btn" id="skip-reward-btn">Skip</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enemy Area (~25% of screen) -->
+    <div class="enemy-area">
+        <div class="enemy-intent intent-attack">
+            <img src="/static/svg/intent-attack.svg" alt="Attack" class="intent-icon" id="intent-icon">
+            <span class="intent-value intent-attack">7</span>
+        </div>
+        <div class="enemy-puppet enemy-idle" id="enemy-puppet">
+            <img src="/static/svg/enemy-placeholder.svg" alt="Enemy" class="puppet-svg enemy-svg">
+        </div>
+        <div class="enemy-hp-bar">
+            <div class="hp-fill" style="width: 100%;"></div>
+            <span class="hp-text">28/28</span>
+        </div>
+    </div>
+
+    <!-- Stage Area (~30% of screen) -->
+    <div class="stage-area">
+        <!-- Left Hero (Aldric) -->
+        <div class="hero-puppet hero-left aldric-idle" id="hero-aldric">
+            <img src="/static/svg/aldric.svg" alt="Aldric" class="puppet-svg hero-svg">
+        </div>
+
+        <!-- MacGuffin (center) -->
+        <div class="macguffin macguffin-idle" id="macguffin">
+            <img src="/static/svg/macguffin.svg" alt="MacGuffin" class="puppet-svg macguffin-svg">
+            <div class="macguffin-hp-bar">
+                <div class="hp-fill" style="width: 100%;"></div>
+                <span class="hp-text">60/60</span>
+            </div>
+            <div class="macguffin-block" id="macguffin-block">
+                <span class="block-icon">&#x1F6E1;</span>
+                <span class="block-value">0</span>
+            </div>
+        </div>
+
+        <!-- Right Hero (Pip) -->
+        <div class="hero-puppet hero-right pip-idle" id="hero-pip">
+            <img src="/static/svg/pip.svg" alt="Pip" class="puppet-svg hero-svg">
+        </div>
+    </div>
+
+    <!-- Hand Area (~30% of screen) -->
+    <div class="hand-area">
+        <div class="hand-cards" id="hand-cards">
+            <!-- Cards are rendered dynamically by game.js -->
+        </div>
+    </div>
+
+    <!-- Stage Edge (divider) -->
+    <div class="stage-edge"></div>
+
+    <!-- Controls Area - Audience Floor -->
+    <div class="controls-area">
+        <!-- Audience Strip - members generated dynamically by JS -->
+        <div class="audience-strip" id="audience-strip"></div>
+
+        <!-- Energy and End Turn -->
+        <div class="controls-right">
+            <div class="energy-indicator">
+                <span class="energy-icon">&#x26A1;</span>
+                <span class="energy-value">3</span>
+            </div>
+            <button class="end-turn-btn" id="end-turn-btn">End Turn</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/solo/curtain-call/game.js"></script>
+{% endblock %}

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 70">
+  <!-- Person with long flowing hair -->
+  <ellipse cx="25" cy="58" rx="22" ry="16" fill="#1A1A2E"/>
+  <circle cx="25" cy="30" r="14" fill="#1A1A2E"/>
+  <!-- Long hair flowing down sides -->
+  <ellipse cx="8" cy="42" rx="8" ry="20" fill="#1A1A2E"/>
+  <ellipse cx="42" cy="42" rx="8" ry="20" fill="#1A1A2E"/>
+  <!-- Hair on top -->
+  <ellipse cx="25" cy="18" rx="14" ry="6" fill="#1A1A2E"/>
+</svg>

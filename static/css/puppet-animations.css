@@ -1,0 +1,344 @@
+/* Puppet Animations for Curtain Call
+ * All animations use CSS transforms on whole SVG elements (puppet-style, not skeletal)
+ */
+
+/* ========================================
+   IDLE ANIMATIONS
+   ======================================== */
+
+/* Generic idle bob - subtle breathing effect */
+.puppet-idle {
+    animation: puppet-bob 2s ease-in-out infinite;
+}
+
+@keyframes puppet-bob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+}
+
+/* Bron-specific idle - heavier, slower sway with shadow skew */
+/* Asymmetric: lingers left, quicker return right */
+.aldric-idle {
+    animation: aldric-sway 5s ease-in-out infinite;
+    transform-origin: center bottom;
+}
+
+@keyframes aldric-sway {
+    0% { transform: translateX(0) translateY(0) rotate(0deg) skewX(0deg); }
+    40% { transform: translateX(-5px) translateY(-2px) rotate(-1deg) skewX(3deg); }
+    60% { transform: translateX(4px) translateY(-3px) rotate(0.8deg) skewX(-2deg); }
+    100% { transform: translateX(0) translateY(0) rotate(0deg) skewX(0deg); }
+}
+
+/* Pip-specific idle - quicker, bouncier sway with shadow skew */
+/* Asymmetric: quick to the right, slow drift back left */
+.pip-idle {
+    animation: pip-sway 3.5s ease-in-out infinite;
+    transform-origin: center bottom;
+}
+
+@keyframes pip-sway {
+    0% { transform: translateX(0) translateY(0) rotate(0deg) skewX(0deg); }
+    25% { transform: translateX(5px) translateY(-4px) rotate(1deg) skewX(-4deg); }
+    70% { transform: translateX(-4px) translateY(-2px) rotate(-0.8deg) skewX(3deg); }
+    100% { transform: translateX(0) translateY(0) rotate(0deg) skewX(0deg); }
+}
+
+/* Enemy idle - larger menacing sway with shadow skew */
+/* Asymmetric: slow creep left, pause, then sweep right */
+.enemy-idle {
+    animation: enemy-sway 4.2s ease-in-out infinite;
+    transform-origin: center bottom;
+}
+
+@keyframes enemy-sway {
+    0% { transform: translateX(0) translateY(0) rotate(0deg) skewX(0deg); }
+    35% { transform: translateX(-8px) translateY(-2px) rotate(-1.5deg) skewX(4deg); }
+    55% { transform: translateX(-6px) translateY(-1px) rotate(-1deg) skewX(3deg); }
+    80% { transform: translateX(7px) translateY(-2px) rotate(1.2deg) skewX(-4deg); }
+    100% { transform: translateX(0) translateY(0) rotate(0deg) skewX(0deg); }
+}
+
+/* MacGuffin idle - gentle glow pulse (using scale) */
+.macguffin-idle {
+    animation: macguffin-pulse 2s ease-in-out infinite;
+}
+
+@keyframes macguffin-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+}
+
+/* ========================================
+   ATTACK ANIMATIONS
+   ======================================== */
+
+/* Generic attack - lunge forward and snap back */
+.puppet-attack {
+    animation: puppet-lunge 0.3s ease-out;
+}
+
+@keyframes puppet-lunge {
+    0% { transform: translateX(0); }
+    40% { transform: translateX(30px); }
+    100% { transform: translateX(0); }
+}
+
+/* Bron attack - heavier lunge */
+.aldric-attack {
+    animation: aldric-lunge 0.35s ease-out;
+}
+
+@keyframes aldric-lunge {
+    0% { transform: translateX(0) rotate(0deg); }
+    30% { transform: translateX(35px) rotate(5deg); }
+    100% { transform: translateX(0) rotate(0deg); }
+}
+
+/* Pip attack - quick dart */
+.pip-attack {
+    animation: pip-dart 0.25s ease-out;
+}
+
+@keyframes pip-dart {
+    0% { transform: translateX(0) scale(1); }
+    40% { transform: translateX(25px) scale(1.05); }
+    100% { transform: translateX(0) scale(1); }
+}
+
+/* Enemy attack - lunge toward player (left direction) */
+.enemy-attack {
+    animation: enemy-lunge 0.35s ease-out;
+}
+
+@keyframes enemy-lunge {
+    0% { transform: translateY(0); }
+    40% { transform: translateY(25px); }
+    100% { transform: translateY(0); }
+}
+
+/* ========================================
+   HURT ANIMATIONS
+   ======================================== */
+
+/* Generic hurt - shake */
+.puppet-hurt {
+    animation: puppet-shake 0.3s ease-out;
+}
+
+@keyframes puppet-shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-8px); }
+    40% { transform: translateX(8px); }
+    60% { transform: translateX(-5px); }
+    80% { transform: translateX(5px); }
+}
+
+/* Bron hurt - heavier shake */
+.aldric-hurt {
+    animation: aldric-shake 0.35s ease-out;
+}
+
+@keyframes aldric-shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-10px); }
+    40% { transform: translateX(10px); }
+    60% { transform: translateX(-6px); }
+    80% { transform: translateX(6px); }
+}
+
+/* Pip hurt - quicker shake */
+.pip-hurt {
+    animation: pip-shake 0.25s ease-out;
+}
+
+@keyframes pip-shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    50% { transform: translateX(6px); }
+    75% { transform: translateX(-4px); }
+}
+
+/* Enemy hurt - recoil back */
+.enemy-hurt {
+    animation: enemy-recoil 0.3s ease-out;
+}
+
+@keyframes enemy-recoil {
+    0%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-15px); }
+    60% { transform: translateY(-10px); }
+}
+
+/* MacGuffin hurt - flash/shake */
+.macguffin-hurt {
+    animation: macguffin-shake 0.4s ease-out;
+}
+
+@keyframes macguffin-shake {
+    0%, 100% { transform: translateX(0) scale(1); }
+    25% { transform: translateX(-5px) scale(0.98); }
+    50% { transform: translateX(5px) scale(0.98); }
+    75% { transform: translateX(-3px) scale(0.99); }
+}
+
+/* ========================================
+   BLOCK ANIMATIONS
+   ======================================== */
+
+/* Generic block - brace backward */
+.puppet-block {
+    animation: puppet-brace 0.3s ease-out;
+}
+
+@keyframes puppet-brace {
+    0% { transform: rotate(0); }
+    30% { transform: rotate(-5deg); }
+    100% { transform: rotate(0); }
+}
+
+/* Bron block - sturdy stance */
+.aldric-block {
+    animation: aldric-brace 0.35s ease-out;
+}
+
+@keyframes aldric-brace {
+    0% { transform: translateX(0) rotate(0); }
+    40% { transform: translateX(-8px) rotate(-3deg); }
+    100% { transform: translateX(0) rotate(0); }
+}
+
+/* Pip block - nimble dodge back */
+.pip-block {
+    animation: pip-dodge 0.25s ease-out;
+}
+
+@keyframes pip-dodge {
+    0% { transform: translateX(0) scale(1); }
+    40% { transform: translateX(-15px) scale(0.95); }
+    100% { transform: translateX(0) scale(1); }
+}
+
+/* ========================================
+   DEFEAT ANIMATIONS
+   ======================================== */
+
+/* Generic defeat - fall over and sink */
+.puppet-defeat {
+    animation: puppet-fall 0.8s ease-in forwards;
+}
+
+@keyframes puppet-fall {
+    0% { transform: rotate(0) translateY(0); opacity: 1; }
+    100% { transform: rotate(45deg) translateY(80px); opacity: 0; }
+}
+
+/* Bron defeat - heavy topple */
+.aldric-defeat {
+    animation: aldric-fall 1s ease-in forwards;
+}
+
+@keyframes aldric-fall {
+    0% { transform: rotate(0) translateY(0); opacity: 1; }
+    100% { transform: rotate(60deg) translateY(100px); opacity: 0; }
+}
+
+/* Pip defeat - flutter down */
+.pip-defeat {
+    animation: pip-fall 0.7s ease-in forwards;
+}
+
+@keyframes pip-fall {
+    0% { transform: rotate(0) translateY(0) scale(1); opacity: 1; }
+    50% { transform: rotate(-20deg) translateY(30px) scale(0.9); opacity: 0.8; }
+    100% { transform: rotate(30deg) translateY(70px) scale(0.7); opacity: 0; }
+}
+
+/* Enemy defeat - dramatic collapse */
+.enemy-defeat {
+    animation: enemy-fall 0.9s ease-in forwards;
+}
+
+@keyframes enemy-fall {
+    0% { transform: rotate(0) translateY(0) scale(1); opacity: 1; }
+    30% { transform: rotate(-10deg) translateY(-20px) scale(1.05); opacity: 1; }
+    100% { transform: rotate(-45deg) translateY(100px) scale(0.8); opacity: 0; }
+}
+
+/* ========================================
+   AUDIENCE ANIMATIONS
+   ======================================== */
+
+/* Single bob animation - triggered by JS at random intervals */
+.audience-member.audience-bob {
+    animation: audience-single-bob 0.4s ease-out;
+}
+
+@keyframes audience-single-bob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+
+/* Multi-bob animation - some members do 2-3 bobs */
+.audience-member.audience-multi-bob {
+    animation: audience-multi-bob 0.8s ease-out;
+}
+
+@keyframes audience-multi-bob {
+    0%, 100% { transform: translateY(0); }
+    25% { transform: translateY(-8px); }
+    50% { transform: translateY(0); }
+    75% { transform: translateY(-6px); }
+}
+
+/* Wave animation - staggered via animation-delay set by JS */
+.audience-member.audience-wave {
+    animation: audience-wave-motion 0.6s ease-out;
+    animation-delay: var(--wave-delay, 0s);
+}
+
+@keyframes audience-wave-motion {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px) scale(1.1); }
+}
+
+/* Audience excited - quick jump */
+.audience-member.audience-excited {
+    animation: audience-jump 0.4s ease-out;
+}
+
+@keyframes audience-jump {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+}
+
+/* Audience worried - slump down */
+.audience-member.audience-worried {
+    animation: audience-slump 0.5s ease-out forwards;
+}
+
+@keyframes audience-slump {
+    0% { transform: translateY(0) rotate(0); }
+    100% { transform: translateY(5px) rotate(-5deg); }
+}
+
+/* ========================================
+   UTILITY CLASSES
+   ======================================== */
+
+/* Glow effect for buffs/heals */
+.puppet-glow {
+    filter: drop-shadow(0 0 8px #F5B041);
+    animation: glow-pulse 0.5s ease-out;
+}
+
+@keyframes glow-pulse {
+    0% { filter: drop-shadow(0 0 0px #F5B041); }
+    50% { filter: drop-shadow(0 0 15px #F5B041); }
+    100% { filter: drop-shadow(0 0 8px #F5B041); }
+}
+
+/* Debuff effect - purple tint */
+.puppet-debuffed {
+    filter: drop-shadow(0 0 5px #8E44AD);
+}

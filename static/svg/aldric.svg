@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 320">
+  <!-- Bron, the Ironclad - Stocky hammer-wielding puppet -->
+
+  <!-- Puppet stick (extends below the figure) -->
+  <rect x="94" y="255" width="12" height="65" fill="#3D2B1F" rx="2"/>
+
+  <!-- Body - stocky and round -->
+  <ellipse cx="100" cy="180" rx="50" ry="45" fill="#1A1A2E"/>
+
+  <!-- Head - large and round (cutesy proportions) -->
+  <circle cx="100" cy="95" r="55" fill="#1A1A2E"/>
+
+  <!-- Helmet crest/ridge -->
+  <ellipse cx="100" cy="50" rx="15" ry="10" fill="#1A1A2E"/>
+
+  <!-- Left arm -->
+  <ellipse cx="45" cy="165" rx="18" ry="30" fill="#1A1A2E"/>
+
+  <!-- Right arm (holding hammer) -->
+  <ellipse cx="155" cy="155" rx="18" ry="35" fill="#1A1A2E"/>
+
+  <!-- Hammer head -->
+  <rect x="160" y="110" width="35" height="25" rx="3" fill="#1A1A2E"/>
+  <!-- Hammer handle -->
+  <rect x="150" y="125" width="15" height="45" rx="2" fill="#1A1A2E"/>
+
+  <!-- Legs - short and stubby -->
+  <ellipse cx="75" cy="235" rx="20" ry="25" fill="#1A1A2E"/>
+  <ellipse cx="125" cy="235" rx="20" ry="25" fill="#1A1A2E"/>
+
+  <!-- Eye cutouts (backlight showing through) -->
+  <g id="aldric-eyes">
+    <ellipse cx="80" cy="90" rx="8" ry="6" fill="#F4E4C1"/>
+    <ellipse cx="120" cy="90" rx="8" ry="6" fill="#F4E4C1"/>
+  </g>
+
+  <!-- Mouth cutout -->
+  <g id="aldric-mouth">
+    <ellipse cx="100" cy="115" rx="12" ry="6" fill="#F4E4C1"/>
+  </g>
+
+  <!-- Belt buckle cutout (decorative) -->
+  <rect x="90" y="175" width="20" height="15" rx="2" fill="#F4E4C1"/>
+</svg>

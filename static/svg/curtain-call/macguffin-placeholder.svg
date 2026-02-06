@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 45">
+  <!-- MacGuffin - Treasure Chest Silhouette -->
+  <!-- Simple chest shape with curved lid -->
+
+  <g fill="#1A1A2E">
+    <!-- Chest base -->
+    <rect x="5" y="20" width="40" height="22" rx="2"/>
+
+    <!-- Curved lid -->
+    <path d="M5 22
+             Q5 10, 25 8
+             Q45 10, 45 22
+             L45 20
+             L5 20
+             Z"/>
+
+    <!-- Lid line/seam -->
+    <rect x="5" y="18" width="40" height="4" fill="#1A1A2E"/>
+
+    <!-- Lock/clasp suggestion (slightly lighter to show detail) -->
+    <rect x="21" y="24" width="8" height="10" rx="1" fill="#2A2A3E"/>
+    <circle cx="25" cy="29" r="2" fill="#1A1A2E"/>
+
+    <!-- Corner studs -->
+    <circle cx="9" cy="38" r="2"/>
+    <circle cx="41" cy="38" r="2"/>
+    <circle cx="9" cy="24" r="2"/>
+    <circle cx="41" cy="24" r="2"/>
+
+    <!-- Subtle glow effect hinting at treasure within -->
+    <ellipse cx="25" cy="12" rx="8" ry="3" fill="#3A3A4E" opacity="0.3"/>
+  </g>
+</svg>

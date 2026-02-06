@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 45 55">
+  <!-- Small girl with pigtails - child sized -->
+  <ellipse cx="22" cy="45" rx="16" ry="12" fill="#1A1A2E"/>
+  <circle cx="22" cy="28" r="11" fill="#1A1A2E"/>
+  <!-- Pigtails -->
+  <ellipse cx="6" cy="26" rx="5" ry="10" fill="#1A1A2E"/>
+  <ellipse cx="38" cy="26" rx="5" ry="10" fill="#1A1A2E"/>
+  <!-- Hair bump -->
+  <ellipse cx="22" cy="18" rx="8" ry="4" fill="#1A1A2E"/>
+</svg>

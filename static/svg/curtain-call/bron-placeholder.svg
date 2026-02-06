@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 55 70">
+  <!-- Bron, the Ironclad - Placeholder Silhouette -->
+  <!-- Stocky, broad-shouldered figure with hammer, round head, short legs -->
+
+  <!-- Main body silhouette -->
+  <g fill="#1A1A2E">
+    <!-- Head (round, with helmet crest suggestion) -->
+    <ellipse cx="27.5" cy="12" rx="10" ry="9"/>
+    <!-- Helmet crest -->
+    <path d="M27.5 3 L30 8 L25 8 Z"/>
+
+    <!-- Broad shoulders and torso (stocky) -->
+    <path d="M12 18
+             Q10 22, 10 30
+             L10 42
+             Q10 44, 14 45
+             L14 50
+             Q12 52, 14 54
+             L22 54
+             Q24 52, 22 50
+             L22 45
+             L33 45
+             L33 50
+             Q31 52, 33 54
+             L41 54
+             Q43 52, 41 50
+             L41 45
+             Q45 44, 45 42
+             L45 30
+             Q45 22, 43 18
+             Z"/>
+
+    <!-- Left arm with hammer -->
+    <path d="M10 22
+             Q5 24, 4 30
+             L4 38
+             Q3 40, 5 40
+             L8 40
+             L10 30
+             Z"/>
+
+    <!-- Hammer head (on left) -->
+    <rect x="0" y="34" width="8" height="12" rx="1"/>
+
+    <!-- Right arm -->
+    <path d="M45 22
+             Q50 24, 50 30
+             L50 36
+             Q52 38, 50 38
+             L46 38
+             L45 28
+             Z"/>
+
+    <!-- Puppet stick -->
+    <rect x="26" y="54" width="3" height="16" fill="#3D2B1F"/>
+  </g>
+</svg>

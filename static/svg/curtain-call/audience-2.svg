@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 30">
+  <!-- Audience Member 2 - Head with small hat -->
+  <g fill="#1A1A2E">
+    <!-- Head -->
+    <ellipse cx="10" cy="12" rx="6" ry="6"/>
+    <!-- Small bowler hat -->
+    <ellipse cx="10" cy="7" rx="7" ry="2"/>
+    <rect x="6" y="4" width="8" height="4" rx="2"/>
+    <!-- Shoulders -->
+    <path d="M2 30 Q2 22, 10 20 Q18 22, 18 30 Z"/>
+  </g>
+</svg>

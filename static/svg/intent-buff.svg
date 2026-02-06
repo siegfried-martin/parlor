@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Up-arrow icon for buff intent - Curtain Call puppet theater style -->
+  <!-- Simple upward pointing arrow, silhouette style -->
+  <path d="M16 3
+           L28 17
+           L21 17
+           L21 29
+           L11 29
+           L11 17
+           L4 17
+           Z"
+        fill="#1A1A2E"/>
+  <!-- Small highlight cutout in the arrow shaft -->
+  <rect x="14" y="18" width="4" height="6" rx="1" fill="#F4E4C1"/>
+</svg>
