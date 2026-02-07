@@ -1,7 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 70">
-  <!-- Elegant person with hair bun -->
-  <ellipse cx="25" cy="58" rx="20" ry="15" fill="#1A1A2E"/>
-  <circle cx="25" cy="34" r="14" fill="#1A1A2E"/>
-  <!-- Hair bun on top -->
-  <circle cx="25" cy="12" r="10" fill="#1A1A2E"/>
+  <!-- Person with small hair bun on top -->
+  <path d="M5 68 Q5 48 25 44 Q45 48 45 68 Z" fill="#1A1A2E"/>
+  <circle cx="25" cy="34" r="13" fill="#1A1A2E"/>
+  <!-- Hair -->
+  <ellipse cx="25" cy="22" rx="11" ry="4" fill="#1A1A2E"/>
+  <!-- Small bun -->
+  <circle cx="25" cy="14" r="6" fill="#1A1A2E"/>
 </svg>

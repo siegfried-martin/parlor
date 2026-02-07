@@ -19,7 +19,8 @@
 | 13  | Keywords Implementation   | ✅ Complete |
 | 14  | Debuff System             | ✅ Complete |
 | 15  | Defensive Keywords        | ✅ Complete |
-| 16  | Starting Menu & Scene Flow| Next        |
+| 16  | Starting Menu & Scene Flow| ✅ Complete |
+| 16b | JS File Refactor          | Next        |
 | 17  | Card Logic Overhaul       | Pending     |
 | 18  | Full Act I Run            | Pending     |
 | 19  | Act II Implementation     | Pending     |
@@ -248,20 +249,19 @@ Complete game entry flow from title screen through scene transitions into combat
 1. Title screen displays game name "Curtain Call" with theatrical styling
 2. "New Performance" button to begin run setup
 3. Protagonist selection panel shows both Aldric and Pip
-   - Display silhouette, name, and brief description for each
-   - Both must be selected (currently only 2 protagonists, so both auto-selected or require confirmation)
-   - Visual indication of selected state
-4. Starting Attack selection for each protagonist
-   - Show 2-3 starting attack options per protagonist
-   - **Currently grayed out / disabled** — placeholder for future implementation
-   - Tooltip or label indicating "Coming Soon"
-5. "Begin" / "Raise the Curtain" button to start the run
+   - Each `.cs-card` has `data-protagonist` attribute and `.selected` class
+   - Both start selected (minimum 2 required); clicking a card when both are selected shows a shake feedback
+   - Gold border glow on selected cards, dimmed when unselected
+4. Starting Attack shown per protagonist inside each card
+   - Aldric: Hammer Swing (6 dmg), Pip: Quick Jab (4 dmg, draw 1)
+   - Displayed as selectable pills (`.cs-attack-option.selected`) — one option each for now, pre-selected
+5. "Raise the Curtain" button to start the run
 6. Menu fits within 375×812 viewport without scrolling
 
 #### B. Stage Layout Arrangement
 
 1. Reposition UI elements for cleaner visual hierarchy:
-   - Enemy area at top (~20%)
+   - Enemy area at top (~20%, z-index 42 to render above valance)
    - Stage area with heroes and MacGuffin (~25%)
    - Hand area for cards (~35%)
    - Controls/audience area at bottom (~20%)
@@ -272,26 +272,44 @@ Complete game entry flow from title screen through scene transitions into combat
 #### C. Scene Transitions
 
 1. **Menu → Game transition:**
-   - Curtain-rise animation (curtains part from center, reveal stage)
-   - Duration: ~1.5s
-   - Immediately enters first scene selection after transition
+   - `startPerformance()` keeps curtains closed, shows scene selection overlay on top (z-index 100)
+   - `initializeAnimations()` called here (not in `setup()`) so audience doesn't animate during menus
+   - Player picks enemy from overlay → `selectEnemy()` opens curtains to reveal combat
 2. **Between scenes:**
-   - Brief curtain-close/open or fade transition
-   - Show scene progress indicator during transition
-   - Duration: ~1s
-3. **Scene → Combat transition:**
-   - Enemy enters from side or fades in
-   - Heroes take positions
-   - Intent display appears
-4. All transitions use CSS animations (no heavy JS animation libraries)
-5. Transitions can be skipped with a tap (optional, for repeat players)
+   - `advanceScene()` uses `curtainClose()` helper to close curtains (~1.3s)
+   - Scene selection overlay appears on top of closed curtains
+   - Player picks enemy → `selectEnemy()` opens curtains via `curtainOpen()`
+3. **Boss transition:**
+   - `startBossCombat()` sets up boss behind closed curtains, then calls `curtainOpen()`
+4. **Curtain helpers:**
+   - `curtainClose(callback)` — closes curtains, executes callback, does NOT auto-open
+   - `curtainOpen(callback)` — opens curtains from closed state
+   - `curtainTransition(callback)` — full close→callback→open cycle (used for auto transitions)
+5. All transitions use CSS animations (no heavy JS animation libraries)
 
 #### D. Game State Flow
 
-1. Menu → Protagonist Confirm → Scene 1 Selection → Combat → Reward → Scene 2 Selection → Combat → Reward → Boss → Victory/Defeat
-2. State machine tracks current phase (menu, scene_select, combat, reward, transition)
-3. Cannot interact with game elements during transitions
+1. Menu → Protagonist Confirm → Scene Selection (curtains closed) → Combat (curtains open) → Reward → Scene Selection (curtains close) → Combat (curtains open) → ... → Boss → Victory/Defeat
+2. State machine tracks current phase (menu, character-select, scene-select, combat, reward, act-complete)
+3. `isAnimating` flag prevents interaction during curtain transitions
 4. Proper cleanup when returning to menu or restarting
+
+---
+
+### 16b. JS File Refactor
+
+Split the 3400-line `game.js` monolith into logical modules before the card overhaul.
+
+**Acceptance Criteria:**
+
+1. `cards.js` — `CARD_DEFINITIONS`, `CARD_POOLS`, `STARTING_DECK`, `KEYWORD_GLOSSARY`
+2. `enemies.js` — Enemy definitions, act structure, enemy patterns
+3. `game.js` — `CurtainCallGame` class (combat, UI, rendering, state management)
+4. Files loaded via separate `<script>` tags in dependency order
+5. No behavioral changes — pure extraction refactor
+6. All existing gameplay works identically after split
+
+**Priority:** Must complete before Milestone 17 (Card Logic Overhaul). Working in a 3400-line file makes the card overhaul unnecessarily painful.
 
 ---
 

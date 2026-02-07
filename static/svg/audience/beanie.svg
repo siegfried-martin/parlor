@@ -1,9 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 70">
-  <!-- Person with beanie/knit cap -->
-  <ellipse cx="25" cy="58" rx="22" ry="16" fill="#1A1A2E"/>
-  <circle cx="25" cy="36" r="14" fill="#1A1A2E"/>
+  <!-- Person with beanie and pom-pom -->
+  <path d="M5 68 Q5 48 25 44 Q45 48 45 68 Z" fill="#1A1A2E"/>
+  <circle cx="25" cy="36" r="13" fill="#1A1A2E"/>
   <!-- Beanie -->
-  <path d="M10 30 Q10 10 25 8 Q40 10 40 30 Q25 28 10 30 Z" fill="#1A1A2E"/>
-  <!-- Pom pom on top -->
+  <path d="M12 30 Q12 12 25 8 Q38 12 38 30 Z" fill="#1A1A2E"/>
+  <!-- Pom-pom on top -->
   <circle cx="25" cy="6" r="5" fill="#1A1A2E"/>
 </svg>

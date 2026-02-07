@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 55">
-  <!-- Small boy - child sized -->
-  <ellipse cx="20" cy="45" rx="16" ry="12" fill="#1A1A2E"/>
-  <circle cx="20" cy="28" r="12" fill="#1A1A2E"/>
-  <!-- Simple short hair -->
-  <ellipse cx="20" cy="18" rx="10" ry="5" fill="#1A1A2E"/>
+  <!-- Small boy - child sized with connected shoulders -->
+  <path d="M4 54 Q4 38 20 34 Q36 38 36 54 Z" fill="#1A1A2E"/>
+  <circle cx="20" cy="24" r="11" fill="#1A1A2E"/>
+  <!-- Short hair -->
+  <ellipse cx="20" cy="14" rx="9" ry="4" fill="#1A1A2E"/>
 </svg>

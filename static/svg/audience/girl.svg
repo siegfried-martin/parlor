@@ -1,10 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 45 55">
-  <!-- Small girl with pigtails - child sized -->
-  <ellipse cx="22" cy="45" rx="16" ry="12" fill="#1A1A2E"/>
-  <circle cx="22" cy="28" r="11" fill="#1A1A2E"/>
-  <!-- Pigtails -->
-  <ellipse cx="6" cy="26" rx="5" ry="10" fill="#1A1A2E"/>
-  <ellipse cx="38" cy="26" rx="5" ry="10" fill="#1A1A2E"/>
-  <!-- Hair bump -->
-  <ellipse cx="22" cy="18" rx="8" ry="4" fill="#1A1A2E"/>
+  <!-- Small girl with pigtails connected to head -->
+  <path d="M5 54 Q5 38 22 34 Q39 38 39 54 Z" fill="#1A1A2E"/>
+  <circle cx="22" cy="24" r="10" fill="#1A1A2E"/>
+  <!-- Hair -->
+  <ellipse cx="22" cy="15" rx="8" ry="3" fill="#1A1A2E"/>
+  <!-- Left pigtail connected to head -->
+  <path d="M12 18 Q6 16 4 22 Q2 30 6 34 Q8 28 12 24 Z" fill="#1A1A2E"/>
+  <!-- Right pigtail connected to head -->
+  <path d="M32 18 Q38 16 40 22 Q42 30 38 34 Q36 28 32 24 Z" fill="#1A1A2E"/>
 </svg>

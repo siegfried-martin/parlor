@@ -11,7 +11,250 @@
 
 {% block content %}
 <div id="game-container" class="curtain-call">
+
+    <!-- LAYER 1: SVG Stage Background -->
+    <svg class="stage-bg" viewBox="0 0 375 812" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+        <defs>
+            <radialGradient id="stageLight" cx="0.5" cy="0.25" r="0.6">
+                <stop offset="0%" stop-color="#F4E4C1"/>
+                <stop offset="60%" stop-color="#E8D4A8"/>
+                <stop offset="100%" stop-color="#D4A055"/>
+            </radialGradient>
+            <linearGradient id="darkStage" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#3A2E1E"/>
+                <stop offset="40%" stop-color="#2A2018"/>
+                <stop offset="100%" stop-color="#1A1410"/>
+            </linearGradient>
+            <linearGradient id="spillGlow" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#D4A055" stop-opacity="0.15"/>
+                <stop offset="30%" stop-color="#D4A055" stop-opacity="0.05"/>
+                <stop offset="100%" stop-color="#D4A055" stop-opacity="0"/>
+            </linearGradient>
+            <radialGradient id="spotlight1" cx="0.3" cy="0.15" r="0.5">
+                <stop offset="0%" stop-color="#FFF8E0" stop-opacity="0.12"/>
+                <stop offset="100%" stop-color="#FFF8E0" stop-opacity="0"/>
+            </radialGradient>
+            <radialGradient id="spotlight2" cx="0.7" cy="0.15" r="0.5">
+                <stop offset="0%" stop-color="#FFF8E0" stop-opacity="0.08"/>
+                <stop offset="100%" stop-color="#FFF8E0" stop-opacity="0"/>
+            </radialGradient>
+            <linearGradient id="audienceGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#3A2E22"/>
+                <stop offset="100%" stop-color="#2A2018"/>
+            </linearGradient>
+            <radialGradient id="audienceGlow" cx="0.5" cy="0.3" r="0.7">
+                <stop offset="0%" stop-color="#D4A055" stop-opacity="0.08"/>
+                <stop offset="100%" stop-color="#D4A055" stop-opacity="0"/>
+            </radialGradient>
+        </defs>
+
+        <!-- Bright upper stage -->
+        <rect x="0" y="0" width="375" height="430" fill="url(#stageLight)"/>
+        <rect x="0" y="0" width="375" height="430" fill="url(#spotlight1)"/>
+        <rect x="0" y="0" width="375" height="430" fill="url(#spotlight2)"/>
+        <rect x="0" y="0" width="30" height="430" fill="#4A3508" opacity="0.08"/>
+        <rect x="345" y="0" width="30" height="430" fill="#4A3508" opacity="0.08"/>
+
+        <!-- Dark lower stage -->
+        <rect x="0" y="430" width="375" height="283" fill="url(#darkStage)"/>
+        <rect x="0" y="430" width="375" height="283" fill="url(#spillGlow)"/>
+        <line x1="20" y1="460" x2="160" y2="460" stroke="#3A2E1E" stroke-width="0.5" opacity="0.25"/>
+        <line x1="200" y1="490" x2="355" y2="490" stroke="#3A2E1E" stroke-width="0.5" opacity="0.25"/>
+        <line x1="40" y1="520" x2="280" y2="520" stroke="#3A2E1E" stroke-width="0.5" opacity="0.25"/>
+        <line x1="100" y1="555" x2="340" y2="555" stroke="#3A2E1E" stroke-width="0.5" opacity="0.25"/>
+        <line x1="20" y1="590" x2="200" y2="590" stroke="#3A2E1E" stroke-width="0.5" opacity="0.25"/>
+        <line x1="240" y1="620" x2="360" y2="620" stroke="#3A2E1E" stroke-width="0.5" opacity="0.25"/>
+        <line x1="30" y1="650" x2="170" y2="650" stroke="#3A2E1E" stroke-width="0.5" opacity="0.25"/>
+        <line x1="200" y1="680" x2="350" y2="680" stroke="#3A2E1E" stroke-width="0.5" opacity="0.25"/>
+        <rect x="0" y="430" width="12" height="283" fill="#0A0806" opacity="0.3"/>
+        <rect x="363" y="430" width="12" height="283" fill="#0A0806" opacity="0.3"/>
+
+        <!-- Floor spotlights -->
+        <path d="M 105,430 L 30,340 L 60,330 Q 80,370 105,430 Z" fill="#F5E0B0" opacity="0.06"/>
+        <path d="M 105,430 L 45,355 L 70,348 Q 85,380 105,430 Z" fill="#FFF8E0" opacity="0.04"/>
+        <ellipse cx="105" cy="432" rx="8" ry="4" fill="#4A3A28"/>
+        <rect x="99" y="425" width="12" height="8" rx="2" fill="#3A2A1A"/>
+        <ellipse cx="105" cy="426" rx="4" ry="2" fill="#FFE880" opacity="0.5"/>
+        <ellipse cx="105" cy="424" rx="6" ry="3" fill="#FFE880" opacity="0.15"/>
+        <path d="M 270,430 L 345,340 L 315,330 Q 295,370 270,430 Z" fill="#F5E0B0" opacity="0.06"/>
+        <path d="M 270,430 L 330,355 L 305,348 Q 290,380 270,430 Z" fill="#FFF8E0" opacity="0.04"/>
+        <ellipse cx="270" cy="432" rx="8" ry="4" fill="#4A3A28"/>
+        <rect x="264" y="425" width="12" height="8" rx="2" fill="#3A2A1A"/>
+        <ellipse cx="270" cy="426" rx="4" ry="2" fill="#FFE880" opacity="0.5"/>
+        <ellipse cx="270" cy="424" rx="6" ry="3" fill="#FFE880" opacity="0.15"/>
+
+        <!-- Audience -->
+        <rect x="0" y="713" width="375" height="99" fill="url(#audienceGrad)"/>
+        <rect x="0" y="713" width="375" height="99" fill="url(#audienceGlow)"/>
+        <rect x="0" y="713" width="375" height="3" fill="#5A4A30"/>
+        <rect x="0" y="713" width="375" height="1.5" fill="#8B7030" opacity="0.5"/>
+    </svg>
+
+    <!-- LAYER 2: Curtain panels (animated) -->
+    <div class="curtain-layer" id="curtain-layer">
+        <!-- LEFT CURTAIN -->
+        <svg class="curtain-left" viewBox="0 0 200 430" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+            <defs>
+                <linearGradient id="cL" x1="1" y1="0" x2="0" y2="0">
+                    <stop offset="0%" stop-color="#6B1520"/>
+                    <stop offset="20%" stop-color="#8B2030"/>
+                    <stop offset="45%" stop-color="#6B1520"/>
+                    <stop offset="65%" stop-color="#8B2030"/>
+                    <stop offset="85%" stop-color="#6B1520"/>
+                    <stop offset="100%" stop-color="#4A0E15"/>
+                </linearGradient>
+            </defs>
+            <rect x="0" y="0" width="200" height="430" fill="url(#cL)"/>
+            <path d="M 40,0 Q 42,100 38,200 Q 40,320 38,430" fill="none" stroke="#9B2838" stroke-width="1.5" opacity="0.4"/>
+            <path d="M 80,0 Q 84,120 80,250 Q 82,360 80,430" fill="none" stroke="#9B2838" stroke-width="1.5" opacity="0.35"/>
+            <path d="M 120,0 Q 118,140 122,280 Q 120,370 122,430" fill="none" stroke="#9B2838" stroke-width="1.5" opacity="0.3"/>
+            <path d="M 160,0 Q 162,110 158,220 Q 160,340 158,430" fill="none" stroke="#9B2838" stroke-width="1.5" opacity="0.25"/>
+            <path d="M 60,0 Q 58,150 62,300 Q 60,380 62,430" fill="none" stroke="#4A0E15" stroke-width="2" opacity="0.3"/>
+            <path d="M 100,0 Q 102,180 98,350 Q 100,400 98,430" fill="none" stroke="#4A0E15" stroke-width="2" opacity="0.25"/>
+            <path d="M 140,0 Q 138,130 142,270 Q 140,370 142,430" fill="none" stroke="#4A0E15" stroke-width="2" opacity="0.2"/>
+            <rect x="196" y="0" width="4" height="430" fill="#D4A030" opacity="0.5"/>
+            <rect x="198" y="0" width="2" height="430" fill="#F5D060" opacity="0.3"/>
+        </svg>
+
+        <!-- RIGHT CURTAIN -->
+        <svg class="curtain-right" viewBox="0 0 200 430" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+            <defs>
+                <linearGradient id="cR" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stop-color="#6B1520"/>
+                    <stop offset="20%" stop-color="#8B2030"/>
+                    <stop offset="45%" stop-color="#6B1520"/>
+                    <stop offset="65%" stop-color="#8B2030"/>
+                    <stop offset="85%" stop-color="#6B1520"/>
+                    <stop offset="100%" stop-color="#4A0E15"/>
+                </linearGradient>
+            </defs>
+            <rect x="0" y="0" width="200" height="430" fill="url(#cR)"/>
+            <path d="M 40,0 Q 42,100 38,200 Q 40,320 38,430" fill="none" stroke="#9B2838" stroke-width="1.5" opacity="0.25"/>
+            <path d="M 80,0 Q 84,120 80,250 Q 82,360 80,430" fill="none" stroke="#9B2838" stroke-width="1.5" opacity="0.3"/>
+            <path d="M 120,0 Q 118,140 122,280 Q 120,370 122,430" fill="none" stroke="#9B2838" stroke-width="1.5" opacity="0.35"/>
+            <path d="M 160,0 Q 162,110 158,220 Q 160,340 158,430" fill="none" stroke="#9B2838" stroke-width="1.5" opacity="0.4"/>
+            <path d="M 60,0 Q 58,150 62,300 Q 60,380 62,430" fill="none" stroke="#4A0E15" stroke-width="2" opacity="0.2"/>
+            <path d="M 100,0 Q 102,180 98,350 Q 100,400 98,430" fill="none" stroke="#4A0E15" stroke-width="2" opacity="0.25"/>
+            <path d="M 140,0 Q 138,130 142,270 Q 140,370 142,430" fill="none" stroke="#4A0E15" stroke-width="2" opacity="0.3"/>
+            <rect x="0" y="0" width="4" height="430" fill="#D4A030" opacity="0.5"/>
+            <rect x="0" y="0" width="2" height="430" fill="#F5D060" opacity="0.3"/>
+        </svg>
+
+        <!-- VALANCE (fixed, always visible) -->
+        <svg class="curtain-valance" viewBox="0 0 375 70" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <linearGradient id="valGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#4A0E15"/>
+                    <stop offset="50%" stop-color="#7B1828"/>
+                    <stop offset="100%" stop-color="#8B2030"/>
+                </linearGradient>
+                <linearGradient id="gTrim" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stop-color="#8B6914"/>
+                    <stop offset="30%" stop-color="#D4A030"/>
+                    <stop offset="50%" stop-color="#F5D060"/>
+                    <stop offset="70%" stop-color="#D4A030"/>
+                    <stop offset="100%" stop-color="#8B6914"/>
+                </linearGradient>
+            </defs>
+            <path d="
+                M 0,0 L 375,0 L 375,42
+                Q 340,52 300,46 Q 260,40 225,48 Q 190,56 150,46 Q 110,36 75,48 Q 40,58 0,44
+                Z
+            " fill="url(#valGrad)"/>
+            <path d="
+                M 0,44 Q 40,58 75,48 Q 110,36 150,46 Q 190,56 225,48 Q 260,40 300,46 Q 340,52 375,42
+            " fill="none" stroke="url(#gTrim)" stroke-width="2.5"/>
+            <line x1="75" y1="48" x2="75" y2="62" stroke="#D4A030" stroke-width="1.5"/>
+            <circle cx="75" cy="64" r="3" fill="#D4A030"/>
+            <line x1="150" y1="46" x2="150" y2="60" stroke="#D4A030" stroke-width="1.5"/>
+            <circle cx="150" cy="62" r="3" fill="#D4A030"/>
+            <line x1="225" y1="48" x2="225" y2="62" stroke="#D4A030" stroke-width="1.5"/>
+            <circle cx="225" cy="64" r="3" fill="#D4A030"/>
+            <line x1="300" y1="46" x2="300" y2="60" stroke="#D4A030" stroke-width="1.5"/>
+            <circle cx="300" cy="62" r="3" fill="#D4A030"/>
+        </svg>
+    </div>
+
+    <!-- LAYER 3: Game content -->
     <a href="/" class="back-link">&larr; Back to Lobby</a>
+
+    <!-- Title Screen (Milestone 16) -->
+    <div class="title-screen" id="title-screen" style="display: none;">
+        <div class="title-content">
+            <div class="title-heading">
+                <div class="title-presents">The Parlor Presents</div>
+                <h1 class="title-name">Curtain Call</h1>
+                <div class="title-subtitle">A Shadow Puppet Deck-Builder</div>
+            </div>
+            <button class="title-btn" id="new-performance-btn">New Performance</button>
+        </div>
+    </div>
+
+    <!-- Character Select Screen (Milestone 16) -->
+    <div class="character-select" id="character-select" style="display: none;">
+        <div class="character-select-content">
+            <h2 class="cs-title">Your Troupe</h2>
+
+            <div class="cs-protagonists">
+                <!-- Aldric -->
+                <div class="cs-card selected" data-protagonist="aldric">
+                    <div class="cs-puppet">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 320">
+                            <rect x="94" y="255" width="12" height="65" fill="#3D2B1F" rx="2"/>
+                            <ellipse cx="100" cy="180" rx="50" ry="45" fill="#1A1A2E"/>
+                            <circle cx="100" cy="95" r="55" fill="#1A1A2E"/>
+                            <ellipse cx="100" cy="50" rx="15" ry="10" fill="#1A1A2E"/>
+                            <ellipse cx="45" cy="165" rx="18" ry="30" fill="#1A1A2E"/>
+                            <ellipse cx="155" cy="155" rx="18" ry="35" fill="#1A1A2E"/>
+                            <rect x="160" y="110" width="35" height="25" rx="3" fill="#1A1A2E"/>
+                            <rect x="150" y="125" width="15" height="45" rx="2" fill="#1A1A2E"/>
+                            <ellipse cx="75" cy="235" rx="20" ry="25" fill="#1A1A2E"/>
+                            <ellipse cx="125" cy="235" rx="20" ry="25" fill="#1A1A2E"/>
+                            <g><ellipse cx="80" cy="90" rx="8" ry="6" fill="#F4E4C1"/><ellipse cx="120" cy="90" rx="8" ry="6" fill="#F4E4C1"/></g>
+                            <ellipse cx="100" cy="115" rx="12" ry="6" fill="#F4E4C1"/>
+                            <rect x="90" y="175" width="20" height="15" rx="2" fill="#F4E4C1"/>
+                        </svg>
+                    </div>
+                    <div class="cs-name">Aldric, the Ironclad</div>
+                    <div class="cs-desc">Stocky hammer-wielder. Hits hard, builds momentum with Charged attacks.</div>
+                    <div class="cs-attacks">
+                        <div class="cs-attack-label">Starting Attack</div>
+                        <div class="cs-attack-option selected" data-card="hammer-swing">Hammer Swing (6 dmg)</div>
+                    </div>
+                </div>
+
+                <!-- Pip -->
+                <div class="cs-card selected" data-protagonist="pip">
+                    <div class="cs-puppet">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 320">
+                            <rect x="94" y="250" width="10" height="70" fill="#3D2B1F" rx="2"/>
+                            <polygon points="100,10 140,100 60,100" fill="#1A1A2E"/>
+                            <ellipse cx="100" cy="100" rx="45" ry="12" fill="#1A1A2E"/>
+                            <circle cx="100" cy="115" r="35" fill="#1A1A2E"/>
+                            <path d="M65 120 Q30 130 25 160 Q20 190 40 200 Q55 195 50 170 Q55 150 65 140" fill="#1A1A2E"/>
+                            <ellipse cx="100" cy="185" rx="30" ry="35" fill="#1A1A2E"/>
+                            <ellipse cx="60" cy="175" rx="12" ry="22" fill="#1A1A2E"/>
+                            <rect x="40" y="155" width="6" height="35" rx="1" fill="#1A1A2E" transform="rotate(-20 43 172)"/>
+                            <ellipse cx="140" cy="175" rx="12" ry="22" fill="#1A1A2E"/>
+                            <ellipse cx="85" cy="235" rx="12" ry="25" fill="#1A1A2E"/>
+                            <ellipse cx="115" cy="235" rx="12" ry="25" fill="#1A1A2E"/>
+                            <g><circle cx="88" cy="110" r="7" fill="#F4E4C1"/><circle cx="112" cy="110" r="7" fill="#F4E4C1"/></g>
+                            <ellipse cx="100" cy="130" rx="8" ry="4" fill="#F4E4C1"/>
+                            <polygon points="100,35 103,45 114,45 105,52 109,63 100,56 91,63 95,52 86,45 97,45" fill="#F4E4C1"/>
+                        </svg>
+                    </div>
+                    <div class="cs-name">Pip, the Nimble</div>
+                    <div class="cs-desc">Quick trickster with a wand. Plays fast with Encore card recycling.</div>
+                    <div class="cs-attacks">
+                        <div class="cs-attack-label">Starting Attack</div>
+                        <div class="cs-attack-option selected" data-card="quick-jab">Quick Jab (4 dmg, draw 1)</div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="title-btn" id="raise-curtain-btn">Raise the Curtain</button>
+        </div>
+    </div>
 
     <!-- Speech Bubble Container (Milestone 5) -->
     <div class="speech-bubble-container" id="speech-bubbles"></div>

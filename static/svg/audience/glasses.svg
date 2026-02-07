@@ -1,11 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 70">
-  <!-- Intellectual person with glasses -->
-  <ellipse cx="25" cy="58" rx="22" ry="16" fill="#1A1A2E"/>
-  <circle cx="25" cy="32" r="15" fill="#1A1A2E"/>
-  <!-- Glasses - using negative space trick with slightly lighter shade -->
-  <circle cx="17" cy="30" r="6" fill="#1A1A2E" stroke="#2A2A3E" stroke-width="2"/>
-  <circle cx="33" cy="30" r="6" fill="#1A1A2E" stroke="#2A2A3E" stroke-width="2"/>
-  <line x1="23" y1="30" x2="27" y2="30" stroke="#2A2A3E" stroke-width="2"/>
-  <!-- Simple hair -->
-  <ellipse cx="25" cy="18" rx="12" ry="5" fill="#1A1A2E"/>
+  <!-- Person with glasses - seen from behind, arms and ear hooks visible -->
+  <path d="M5 68 Q5 48 25 44 Q45 48 45 68 Z" fill="#1A1A2E"/>
+  <circle cx="25" cy="32" r="13" fill="#1A1A2E"/>
+  <!-- Hair -->
+  <ellipse cx="25" cy="20" rx="11" ry="4" fill="#1A1A2E"/>
+  <!-- Glasses arms extending from sides of head -->
+  <rect x="2" y="30" width="12" height="3" rx="1" fill="#1A1A2E"/>
+  <rect x="36" y="30" width="12" height="3" rx="1" fill="#1A1A2E"/>
+  <!-- Ear hooks curving down -->
+  <path d="M2 30 Q0 30 0 33 Q0 38 3 40" stroke="#1A1A2E" stroke-width="2.5" fill="none"/>
+  <path d="M48 30 Q50 30 50 33 Q50 38 47 40" stroke="#1A1A2E" stroke-width="2.5" fill="none"/>
 </svg>

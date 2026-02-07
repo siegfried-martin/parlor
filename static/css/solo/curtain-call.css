@@ -18,13 +18,8 @@
     position: relative;
     overflow: hidden;
 
-    /* Warm parchment background with radial gradient */
-    background: radial-gradient(
-        ellipse at center,
-        #F4E4C1 0%,
-        #E8D4A8 50%,
-        #D4A055 100%
-    );
+    /* Background provided by SVG layer */
+    background: #1A1410;
 }
 
 .back-link {
@@ -40,6 +35,300 @@
 
 .back-link:hover {
     opacity: 1;
+}
+
+/* === SVG Stage Background === */
+.stage-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+
+/* === Curtain Layer === */
+.curtain-layer {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 40;
+}
+
+.curtain-left,
+.curtain-right {
+    position: absolute;
+    top: 0;
+    width: 200px;
+    height: 53%;  /* Matches bright stage proportion (430/812) */
+    transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.curtain-left {
+    left: 0;
+    transform: translateX(-182px);
+}
+
+.curtain-right {
+    right: 0;
+    transform: translateX(182px);
+}
+
+/* Curtain closed state */
+.curtain-call.curtain-closing .curtain-left,
+.curtain-call.curtain-closed .curtain-left {
+    transform: translateX(0px);
+}
+
+.curtain-call.curtain-closing .curtain-right,
+.curtain-call.curtain-closed .curtain-right {
+    transform: translateX(0px);
+}
+
+/* Curtain opening state */
+.curtain-call.curtain-opening .curtain-left {
+    transform: translateX(-182px);
+}
+
+.curtain-call.curtain-opening .curtain-right {
+    transform: translateX(182px);
+}
+
+.curtain-valance {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 70px;
+    pointer-events: none;
+    z-index: 41;
+}
+
+/* === Title Screen (Milestone 16) === */
+.title-screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 110;
+    background: radial-gradient(ellipse at 50% 40%, rgba(60, 40, 20, 0.6) 0%, rgba(20, 16, 12, 0.95) 70%);
+}
+
+.title-content {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+}
+
+.title-heading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.title-presents {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 14px;
+    color: #A08060;
+    letter-spacing: 2px;
+}
+
+.title-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 48px;
+    font-weight: 700;
+    color: #F4E4C1;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5), 0 0 40px rgba(212, 160, 85, 0.3);
+    margin: 0;
+    letter-spacing: 2px;
+}
+
+.title-subtitle {
+    font-family: 'IM Fell English', serif;
+    font-size: 16px;
+    color: #D4A055;
+    letter-spacing: 1px;
+}
+
+.title-btn {
+    background: linear-gradient(to bottom, #5A4030, #3A2818);
+    color: #F4E4C1;
+    border: 2px solid #D4A030;
+    border-radius: 10px;
+    padding: 14px 36px;
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    letter-spacing: 1px;
+}
+
+.title-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.title-btn:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* === Character Select Screen (Milestone 16) === */
+.character-select {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 110;
+    background: radial-gradient(ellipse at 50% 40%, rgba(60, 40, 20, 0.6) 0%, rgba(20, 16, 12, 0.95) 70%);
+}
+
+.character-select-content {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 20px 16px;
+    max-height: 100vh;
+}
+
+.cs-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: #F5B041;
+    margin: 0;
+    letter-spacing: 1px;
+}
+
+.cs-protagonists {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+}
+
+.cs-card {
+    background: rgba(244, 228, 193, 0.1);
+    border: 2px solid #8B7030;
+    border-radius: 12px;
+    padding: 14px 10px;
+    width: 155px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.cs-card.selected {
+    border-color: #D4A030;
+    box-shadow: 0 0 12px rgba(212, 160, 48, 0.4);
+}
+
+.cs-card:not(.selected) {
+    opacity: 0.5;
+}
+
+.cs-card.cs-card-shake {
+    animation: cs-shake 0.4s ease;
+}
+
+@keyframes cs-shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-4px); }
+    40% { transform: translateX(4px); }
+    60% { transform: translateX(-3px); }
+    80% { transform: translateX(2px); }
+}
+
+.cs-puppet {
+    width: 80px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cs-puppet svg {
+    width: 100%;
+    height: 100%;
+}
+
+.cs-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: #F4E4C1;
+}
+
+.cs-desc {
+    font-family: 'IM Fell English', serif;
+    font-size: 11px;
+    color: #A08060;
+    line-height: 1.3;
+}
+
+.cs-attacks {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    margin-top: 4px;
+    width: 100%;
+}
+
+.cs-attack-label {
+    font-family: 'Playfair Display', serif;
+    font-size: 10px;
+    color: #A08060;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.cs-attack-option {
+    font-family: 'IM Fell English', serif;
+    font-size: 11px;
+    color: #F4E4C1;
+    background: rgba(139, 112, 48, 0.2);
+    border: 1px solid #6B5A40;
+    border-radius: 10px;
+    padding: 4px 10px;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.cs-attack-option.selected {
+    border-color: #D4A030;
+    background: rgba(212, 160, 48, 0.25);
+    color: #F5D060;
+}
+
+/* === Game UI Hidden State === */
+.curtain-call.game-ui-hidden .enemy-area,
+.curtain-call.game-ui-hidden .stage-area,
+.curtain-call.game-ui-hidden .hand-area,
+.curtain-call.game-ui-hidden .stage-edge,
+.curtain-call.game-ui-hidden .controls-area,
+.curtain-call.game-ui-hidden .progress-indicator {
+    visibility: hidden;
 }
 
 /* === Color Variables === */
@@ -71,6 +360,7 @@
     justify-content: center;
     padding: 10px;
     position: relative;
+    z-index: 42;
 }
 
 .enemy-intent {
@@ -209,6 +499,7 @@
     gap: 20px;
     padding: 10px;
     position: relative;
+    z-index: 1;
 }
 
 .hero-puppet {
@@ -368,6 +659,7 @@
     justify-content: center;
     padding: 6px 8px 2px 8px;
     overflow: hidden;
+    z-index: 1;
 }
 
 .hand-cards {
@@ -673,6 +965,7 @@
         0 4px 8px rgba(0, 0, 0, 0.3),
         inset 0 2px 4px rgba(255, 255, 255, 0.2);
     position: relative;
+    z-index: 1;
 }
 
 /* Stage lip highlight */
@@ -697,12 +990,8 @@
     align-items: flex-start;
     justify-content: space-between;
     padding: 8px;
-    background: linear-gradient(to bottom,
-        #8A8A8A 0%,
-        #A0A0A0 50%,
-        #909090 100%
-    );
     min-height: 70px;
+    z-index: 1;
 }
 
 /* Audience strip - container for absolutely positioned members */
@@ -856,9 +1145,9 @@
 }
 
 .end-turn-btn {
-    background: var(--silhouette-color);
+    background: linear-gradient(to bottom, #4A3828, #3A2818);
     color: var(--parchment-light);
-    border: none;
+    border: 2px solid #8B7030;
     border-radius: 8px;
     padding: 8px 20px;
     font-size: 13px;
@@ -1612,6 +1901,11 @@
 
 /* Wider screens */
 @media (min-width: 420px) {
+    .hand-cards {
+        max-width: 374px;
+        column-gap: 12px;
+    }
+
     .game-card {
         width: 175px;
         height: 74px;
@@ -1631,6 +1925,11 @@
 }
 
 @media (min-width: 500px) {
+    .hand-cards {
+        max-width: 404px;
+        column-gap: 14px;
+    }
+
     .enemy-svg {
         width: 120px;
         height: 180px;

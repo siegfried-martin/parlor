@@ -777,6 +777,11 @@ class CurtainCallGame {
             sceneTitle: document.getElementById('scene-title'),
             enemyChoices: document.getElementById('enemy-choices'),
             progressIndicator: document.getElementById('progress-indicator'),
+            // Title & Character Select (Milestone 16)
+            titleScreen: document.getElementById('title-screen'),
+            characterSelect: document.getElementById('character-select'),
+            newPerformanceBtn: document.getElementById('new-performance-btn'),
+            raiseCurtainBtn: document.getElementById('raise-curtain-btn'),
         };
 
         // Rewards state
@@ -793,14 +798,12 @@ class CurtainCallGame {
         // Set up event listeners
         this.bindEvents();
 
-        // Initialize random animations for puppets and audience
-        this.initializeAnimations();
-
         // Expose debug API
         this.exposeDebugAPI();
 
-        // Start with scene selection
-        this.showSceneSelection();
+        // Start with curtains closed and title screen (Milestone 16)
+        this.elements.container.classList.add('curtain-closed', 'game-ui-hidden');
+        this.showTitleScreen();
 
         console.log('Curtain Call: Ready');
     }
@@ -2597,6 +2600,145 @@ class CurtainCallGame {
         this.advanceScene();
     }
 
+    // === Title & Character Select (Milestone 16) ===
+
+    showTitleScreen() {
+        this.runState.phase = 'menu';
+
+        if (this.elements.titleScreen) {
+            this.elements.titleScreen.style.display = 'flex';
+        }
+        if (this.elements.characterSelect) {
+            this.elements.characterSelect.style.display = 'none';
+        }
+
+        // Bind button (use onclick to avoid duplicate listeners)
+        if (this.elements.newPerformanceBtn) {
+            this.elements.newPerformanceBtn.onclick = () => this.showCharacterSelect();
+        }
+    }
+
+    showCharacterSelect() {
+        this.runState.phase = 'character-select';
+
+        if (this.elements.titleScreen) {
+            this.elements.titleScreen.style.display = 'none';
+        }
+        if (this.elements.characterSelect) {
+            this.elements.characterSelect.style.display = 'flex';
+        }
+
+        // Bind protagonist card click handlers
+        const csCards = document.querySelectorAll('.cs-card');
+        csCards.forEach(card => {
+            card.onclick = () => {
+                // With only 2 protagonists, both are always required.
+                // When more protagonists exist, toggle freely with min/max constraints.
+                const selectedCards = document.querySelectorAll('.cs-card.selected');
+                if (card.classList.contains('selected') && selectedCards.length <= 2) {
+                    // Can't deselect — need minimum 2. Show a brief shake.
+                    card.classList.add('cs-card-shake');
+                    setTimeout(() => card.classList.remove('cs-card-shake'), 400);
+                    return;
+                }
+                card.classList.toggle('selected');
+            };
+        });
+
+        // Bind button
+        if (this.elements.raiseCurtainBtn) {
+            this.elements.raiseCurtainBtn.onclick = () => this.startPerformance();
+        }
+    }
+
+    startPerformance() {
+        // Hide character select
+        if (this.elements.characterSelect) {
+            this.elements.characterSelect.style.display = 'none';
+        }
+
+        // Show game UI behind closed curtains
+        this.elements.container.classList.remove('game-ui-hidden');
+
+        // Keep curtain-closed (don't open yet) - scene selection appears on top
+        // Initialize animations now that the game is starting
+        this.initializeAnimations();
+
+        // Show scene selection overlay (z-index 100, above closed curtains at z-index 40)
+        this.showSceneSelection();
+    }
+
+    /**
+     * Reusable curtain close/open transition.
+     * Closes curtains, executes callback, then opens curtains.
+     * Used for cases that need auto close+open (like boss entrance).
+     * @param {Function} callback - Called while curtains are closed
+     */
+    curtainTransition(callback) {
+        this.isAnimating = true;
+
+        // Close curtains
+        this.elements.container.classList.add('curtain-closing');
+
+        setTimeout(() => {
+            // Curtains now closed
+            this.elements.container.classList.remove('curtain-closing');
+            this.elements.container.classList.add('curtain-closed');
+
+            // Execute the content swap
+            if (callback) callback();
+
+            // Brief pause while closed
+            setTimeout(() => {
+                // Open curtains
+                this.elements.container.classList.remove('curtain-closed');
+                this.elements.container.classList.add('curtain-opening');
+
+                setTimeout(() => {
+                    this.elements.container.classList.remove('curtain-opening');
+                    this.isAnimating = false;
+                }, 1300);
+            }, 400);
+        }, 1300);
+    }
+
+    /**
+     * Close curtains and execute callback. Does NOT auto-open.
+     * Player action (e.g. selecting an enemy) will trigger the open.
+     * @param {Function} callback - Called after curtains are closed
+     */
+    curtainClose(callback) {
+        this.isAnimating = true;
+
+        this.elements.container.classList.add('curtain-closing');
+
+        setTimeout(() => {
+            this.elements.container.classList.remove('curtain-closing');
+            this.elements.container.classList.add('curtain-closed');
+            this.isAnimating = false;
+
+            if (callback) callback();
+        }, 1300);
+    }
+
+    /**
+     * Open curtains from closed state and execute callback when done.
+     * @param {Function} callback - Called after curtains finish opening
+     */
+    curtainOpen(callback) {
+        this.isAnimating = true;
+
+        this.elements.container.classList.remove('curtain-closed');
+        this.elements.container.classList.add('curtain-opening');
+
+        setTimeout(() => {
+            this.elements.container.classList.remove('curtain-opening');
+            this.isAnimating = false;
+
+            if (callback) callback();
+        }, 1300);
+    }
+
     // === Scene Selection System (Milestone 11) ===
 
     showSceneSelection() {
@@ -2661,16 +2803,20 @@ class CurtainCallGame {
     selectEnemy(enemyId) {
         const enemy = this.enemies[enemyId];
         if (!enemy) return;
+        if (this.isAnimating) return;
 
         console.log(`Selected enemy: ${enemy.name}`);
 
-        // Hide scene selection
+        // Hide scene selection overlay
         if (this.elements.sceneSelectOverlay) {
             this.elements.sceneSelectOverlay.style.display = 'none';
         }
 
-        // Initialize combat with selected enemy
+        // Set up combat behind closed curtains
         this.startCombatWithEnemy(enemyId);
+
+        // Open curtains to reveal combat
+        this.curtainOpen();
     }
 
     startCombatWithEnemy(enemyId) {
@@ -2739,7 +2885,9 @@ class CurtainCallGame {
         }
 
         this.runState.currentScene = 'boss';
+        // Set up boss behind closed curtains, then open
         this.startCombatWithEnemy(act.boss);
+        this.curtainOpen();
     }
 
     advanceScene() {
@@ -2749,13 +2897,11 @@ class CurtainCallGame {
         if (typeof this.runState.currentScene === 'number') {
             this.runState.currentScene++;
 
-            if (this.runState.currentScene >= act.scenes.length) {
-                // All scenes complete, go to boss
-                this.showSceneSelection(); // This will trigger boss
-            } else {
-                // Next scene
+            // Close curtains, then show scene selection on top
+            // Player picks enemy -> selectEnemy() handles opening
+            this.curtainClose(() => {
                 this.showSceneSelection();
-            }
+            });
         } else if (this.runState.currentScene === 'boss') {
             // Boss defeated, act complete
             this.onActComplete();

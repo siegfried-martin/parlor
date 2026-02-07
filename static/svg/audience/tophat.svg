@@ -1,9 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 70">
-  <!-- Fancy gentleman with top hat -->
-  <ellipse cx="25" cy="58" rx="22" ry="16" fill="#1A1A2E"/>
-  <circle cx="25" cy="35" r="14" fill="#1A1A2E"/>
+  <!-- Gentleman with tall narrow top hat -->
+  <path d="M5 68 Q5 48 25 44 Q45 48 45 68 Z" fill="#1A1A2E"/>
+  <circle cx="25" cy="34" r="13" fill="#1A1A2E"/>
   <!-- Hat brim -->
-  <ellipse cx="25" cy="22" rx="18" ry="5" fill="#1A1A2E"/>
-  <!-- Hat top -->
-  <rect x="12" y="2" width="26" height="22" rx="3" fill="#1A1A2E"/>
+  <ellipse cx="25" cy="22" rx="16" ry="4" fill="#1A1A2E"/>
+  <!-- Tall narrow hat -->
+  <rect x="15" y="4" width="20" height="20" rx="2" fill="#1A1A2E"/>
 </svg>

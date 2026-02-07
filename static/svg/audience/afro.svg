@@ -1,6 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 70">
-  <!-- Person with big afro -->
-  <ellipse cx="25" cy="58" rx="22" ry="16" fill="#1A1A2E"/>
-  <!-- Large afro hair -->
-  <circle cx="25" cy="26" r="24" fill="#1A1A2E"/>
+  <!-- Person with afro - scaled down to reasonable size -->
+  <path d="M5 68 Q5 48 25 44 Q45 48 45 68 Z" fill="#1A1A2E"/>
+  <circle cx="25" cy="28" r="20" fill="#1A1A2E"/>
 </svg>
