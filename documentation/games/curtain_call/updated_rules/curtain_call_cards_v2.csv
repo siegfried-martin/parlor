@@ -1,0 +1,33 @@
+Protagonist,Name,Cost,Rarity,Type,Description
+Pip,Quick Jab,1,Basic,Attack,Deal 2 damage + 2 damage per unique debuff type on enemy
+Pip,Lucky Shot,1,Basic,Attack,Deal 3 damage. Gain 1 Luck
+Aldric,Galvanize,1,Basic,Attack,Deal 3 damage. Heal each protagonist by 1
+Aldric,Bulwark,2,Basic,Attack,Deal 5 damage. Reduce the cost of Defense cards in hand by 1
+MacGuffin,Block,1,Basic,Defense,Gain 3 Block
+MacGuffin,Inspire,1,Basic,Action,Gain 2 Inspire
+,,,,,,
+Aldric,Aegis,1,Uncommon,Defense,Gain 4 Block. Draw 1 card
+Aldric,Burning Devotion,2,Uncommon,Attack,Deal 12 damage. Gain 1 Burn
+Aldric,Enabling Strike,2,Uncommon,Attack,Deal 8 damage. Draw 1 card
+Aldric,Protective Stance,1,Uncommon,Action,Gain Taunt equal to Ovation. Gain Shield equal to Ovation
+Aldric,Protect,0,Uncommon,Action,Give 2 Shield to target protagonist
+Aldric,Iron Wall,2,Uncommon,Defense,Gain 10 Block
+Aldric,True Strike,1,Uncommon,Action,Target protagonist gains 1 Piercing and 1 Accuracy
+Aldric,Inspirational Shout,2,Uncommon,Action,Convert Ovation to Inspire
+Aldric,Cleanse,2,Uncommon,Defense,Gain 5 Block. Remove all Burn and Poison from target
+Aldric,Aggressive Strike,3,Uncommon,Attack,Deal 14 damage. Inflict 1 Heckled
+Aldric,Captivating Strike,1,Rare,Attack,Deal 1 damage. Gain 1 Ovation per damage dealt to target
+Aldric,Stoic Resistance,1,Rare,Defense,Gain 3 Block. Gain additional Block equal to Ovation on draw
+,,,,,,
+Pip,Good Fortune,1,Uncommon,Action,Convert Ovation to Luck
+Pip,Create Opportunity,1,Uncommon,Attack,Deal 3 damage. Reduce the cost of a random card in hand by 1
+Pip,Loaded Insult,1,Uncommon,Defense,Gain 1 Taunt and 1 Distract
+Pip,Coup de Grace,2,Uncommon,Attack,Deal 5 + [Ovation × 2] damage
+Pip,Pip's Cocktail,1,Uncommon,Action,Inflict 2 Poison and 2 Burn
+Pip,Annoying Poke,1,Uncommon,Attack,Deal 1 damage. Inflict 1 Frustration. Gain 1 Distract
+Pip,Stylish Dance,3,Uncommon,Action,Lose all Ovation. Inflict Stage Fright
+Pip,Hit Where It Hurts,1,Uncommon,Attack,Deal 3 damage. Inflict 2 Vulnerable
+Pip,Vex,2,Uncommon,Defense,Gain 2 Taunt. Inflict 2 Frustration and 1 Forgetful
+Pip,Best Explanation,1,Uncommon,Action,Inflict 1 Confused and 1 Forgetful
+Pip,Ultimate Jeer,2,Rare,Attack,Deal [Ovation] damage. Gain [Ovation] Taunt. Inflict [Ovation] Frustration
+Pip,Flirtatious Jeer,2,Rare,Action,Inflict 2 Weak, 2 Confused, and 2 Forgetful

@@ -355,23 +355,46 @@
 .enemy-area {
     flex: 0 1 20%;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
     justify-content: center;
-    padding: 10px;
+    padding: 10px 4px;
     position: relative;
     z-index: 42;
+    gap: 6px;
+}
+
+.enemy-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.enemy-sidebar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    min-width: 48px;
+}
+
+.enemy-sidebar-left {
+    align-items: flex-end;
+}
+
+.enemy-sidebar-right {
+    align-items: flex-start;
 }
 
 .enemy-intent {
     display: flex;
     align-items: center;
     gap: 6px;
-    padding: 6px 14px;
+    padding: 5px 10px;
     border-radius: 14px;
-    margin-bottom: 8px;
     transition: background 0.2s ease, border-color 0.2s ease;
     border: 2px solid;
+    white-space: nowrap;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
@@ -458,6 +481,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    cursor: pointer;
 }
 
 .enemy-hp-bar {
@@ -506,6 +530,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    position: relative;
 }
 
 .macguffin {
@@ -514,6 +539,7 @@
     align-items: center;
 }
 
+/* MacGuffin HP — amber/gold to signal permanent per-run resource */
 .macguffin-hp-bar {
     width: 70px;
     height: 14px;
@@ -522,13 +548,13 @@
     margin-top: 6px;
     position: relative;
     overflow: hidden;
-    border: 2px solid #27AE60;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+    border: 2px solid #D4A030;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4), 0 0 6px rgba(212, 160, 48, 0.2);
 }
 
 .macguffin-hp-bar .hp-fill {
     height: 100%;
-    background: linear-gradient(to bottom, #58D68D 0%, #27AE60 100%);
+    background: linear-gradient(to bottom, #F5D060 0%, #D4A030 100%);
     border-radius: 4px;
     transition: width 0.3s ease;
 }
@@ -542,6 +568,123 @@
     font-weight: bold;
     color: white;
     text-shadow: 0 1px 2px black;
+}
+
+/* Protagonist HP bars — blue tint, per-combat resource */
+.hero-hp-bar {
+    width: 60px;
+    height: 12px;
+    background: #1A1A1A;
+    border-radius: 6px;
+    margin-top: 4px;
+    position: relative;
+    overflow: hidden;
+    border: 2px solid #5DADE2;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.hero-hp-bar .hp-fill {
+    height: 100%;
+    background: linear-gradient(to bottom, #85C1E9 0%, #5DADE2 100%);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.hero-hp-bar .hp-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 9px;
+    font-weight: bold;
+    color: white;
+    text-shadow: 0 1px 2px black;
+}
+
+/* Knockout state */
+/* Protagonist Shield indicator (Milestone 18) */
+.hero-shield {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    background: rgba(20, 40, 60, 0.9);
+    padding: 2px 6px;
+    border-radius: 8px;
+    margin-top: 3px;
+    border: 1.5px solid #5DADE2;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.hero-shield .shield-icon {
+    font-size: 10px;
+    color: #5DADE2;
+}
+
+.hero-shield .shield-value {
+    font-size: 10px;
+    font-weight: bold;
+    color: #5DADE2;
+    text-shadow: 0 1px 2px black;
+}
+
+/* Protagonist Taunt indicator (Milestone 18) */
+.hero-taunt {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    background: rgba(60, 30, 20, 0.9);
+    padding: 2px 6px;
+    border-radius: 8px;
+    margin-top: 2px;
+    border: 1.5px solid #E67E22;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.hero-taunt .taunt-icon {
+    font-size: 10px;
+    color: #E67E22;
+}
+
+.hero-taunt .taunt-value {
+    font-size: 10px;
+    font-weight: bold;
+    color: #E67E22;
+    text-shadow: 0 1px 2px black;
+}
+
+.hero-puppet.knocked-out {
+    opacity: 0.35;
+    filter: grayscale(0.7);
+    transition: opacity 0.5s ease, filter 0.5s ease;
+}
+
+.hero-puppet.knocked-out .hero-hp-bar {
+    border-color: #7B2D26;
+}
+
+.hero-puppet.knocked-out .hero-hp-bar .hp-fill {
+    background: linear-gradient(to bottom, #C0392B 0%, #7B2D26 100%);
+}
+
+.hero-puppet .ko-badge {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 18px;
+    font-weight: bold;
+    color: #E74C3C;
+    text-shadow: 0 0 8px rgba(0, 0, 0, 0.8), 0 2px 4px rgba(0, 0, 0, 0.6);
+    letter-spacing: 2px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.hero-puppet.knocked-out .ko-badge {
+    opacity: 1;
 }
 
 /* === Status Effects Display (Milestone 13-15) === */
@@ -576,10 +719,10 @@
 }
 
 .enemy-status {
-    position: absolute;
-    bottom: -20px;
-    left: 50%;
-    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    align-items: flex-start;
 }
 
 /* Keyword tags on cards */
@@ -657,7 +800,7 @@
     display: flex;
     align-items: flex-start;
     justify-content: center;
-    padding: 6px 8px 2px 8px;
+    padding: 46px 8px 2px 8px;
     overflow: hidden;
     z-index: 1;
 }
@@ -672,6 +815,7 @@
     align-content: flex-start;
     max-width: 350px;
     overflow: hidden;
+    touch-action: none;
 }
 
 /* Z-index stacking - later cards on top (max 16 cards) */
@@ -734,6 +878,12 @@
 
 .game-card.unplayable {
     opacity: 0.5;
+}
+
+.game-card.ko-unplayable {
+    opacity: 0.35;
+    filter: grayscale(0.5);
+    pointer-events: none;
 }
 
 .game-card.playing {
@@ -832,7 +982,8 @@
     border: 1px solid #802018;
 }
 
-.energy-blip--neutral {
+.energy-blip--neutral,
+.energy-blip--macguffin {
     background: radial-gradient(circle at 35% 35%, #D0D0C0, #B0B0A0, #909080);
     border: 1px solid #707060;
 }
@@ -1641,6 +1792,35 @@
 
 /* === Card Zoom Overlay === */
 
+/* === Drag-to-Play === */
+
+.card-ghost {
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.9;
+    transform: scale(1.05) rotate(-2deg);
+    transition: none;
+    filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.5));
+}
+
+.game-card.dragging-source {
+    opacity: 0.3;
+}
+
+.drop-zone-valid {
+    outline: 2px dashed var(--buff-gold);
+    outline-offset: -2px;
+}
+
+.drop-target-active {
+    outline: 2px solid var(--buff-gold);
+    outline-offset: -2px;
+    background: rgba(245, 176, 65, 0.15) !important;
+}
+
+/* === Card Zoom === */
+
 .card-zoom-overlay {
     position: fixed;
     top: 0;
@@ -1848,6 +2028,23 @@
     border-top-color: #FFF9E6;
 }
 
+/* Keyword list bubble (card zoom explanations) */
+.keyword-list-bubble {
+    max-width: 280px;
+    min-width: 180px;
+    text-align: left;
+    padding: 8px 12px;
+}
+
+.keyword-list-bubble .keyword-row {
+    padding: 4px 0;
+    line-height: 1.35;
+}
+
+.keyword-list-bubble .keyword-row + .keyword-row {
+    border-top: 1px dashed rgba(26, 26, 46, 0.15);
+}
+
 /* === Status Icons - Clickable === */
 
 .status-icon {
@@ -1965,4 +2162,103 @@
     .card__type-badge {
         font-size: 7px;
     }
+}
+
+/* === Ovation Meter === */
+.ovation-meter {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    position: absolute;
+    bottom: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(30, 25, 15, 0.85);
+    padding: 3px 8px;
+    border-radius: 10px;
+    border: 1.5px solid #8B6914;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    z-index: 2;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.ovation-meter.ovation-active {
+    border-color: #D4A030;
+    box-shadow: 0 2px 6px rgba(212, 160, 48, 0.3);
+}
+
+.ovation-meter.ovation-max {
+    border-color: #F5D060;
+    box-shadow: 0 2px 8px rgba(245, 208, 96, 0.5);
+}
+
+.ovation-label {
+    font-size: 12px;
+}
+
+.ovation-bar {
+    width: 50px;
+    height: 8px;
+    background: #2A2018;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.ovation-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(to right, #D4A030, #F5D060);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.ovation-meter.ovation-max .ovation-fill {
+    background: linear-gradient(to right, #F5D060, #FFE880);
+}
+
+.ovation-value {
+    font-size: 10px;
+    font-weight: bold;
+    color: #D4A030;
+    min-width: 10px;
+    text-align: center;
+}
+
+.ovation-meter.ovation-max .ovation-value {
+    color: #F5D060;
+}
+
+/* === Protagonist Debuffs === */
+.protagonist-debuffs {
+    margin-top: 2px;
+    max-width: 80px;
+}
+
+.protagonist-debuffs .status-icon {
+    font-size: 10px;
+    padding: 1px 3px;
+}
+
+/* === MacGuffin Debuffs === */
+.macguffin-debuffs {
+    margin-top: 2px;
+}
+
+.macguffin-debuffs .status-icon {
+    font-size: 10px;
+    padding: 1px 3px;
+}
+
+/* === Enemy Passive Label === */
+
+/* === Enemy Choice Passive === */
+/* === Progress Indicator Act Labels === */
+.progress-act-label {
+    font-size: 8px;
+    font-weight: bold;
+    color: #A08060;
+    width: 10px;
+    text-align: center;
+    line-height: 14px;
 }

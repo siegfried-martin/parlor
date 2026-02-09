@@ -178,7 +178,7 @@
     <!-- LAYER 3: Game content -->
     <a href="/" class="back-link">&larr; Back to Lobby</a>
 
-    <!-- Title Screen (Milestone 16) -->
+    <!-- Title Screen -->
     <div class="title-screen" id="title-screen" style="display: none;">
         <div class="title-content">
             <div class="title-heading">
@@ -190,7 +190,7 @@
         </div>
     </div>
 
-    <!-- Character Select Screen (Milestone 16) -->
+    <!-- Character Select Screen -->
     <div class="character-select" id="character-select" style="display: none;">
         <div class="character-select-content">
             <h2 class="cs-title">Your Troupe</h2>
@@ -216,10 +216,11 @@
                         </svg>
                     </div>
                     <div class="cs-name">Aldric, the Ironclad</div>
-                    <div class="cs-desc">Stocky hammer-wielder. Hits hard, builds momentum with Charged attacks.</div>
+                    <div class="cs-desc">Tanky protector. Shields the MacGuffin with Block, Shield, and Taunt.</div>
                     <div class="cs-attacks">
                         <div class="cs-attack-label">Starting Attack</div>
-                        <div class="cs-attack-option selected" data-card="hammer-swing">Hammer Swing (6 dmg)</div>
+                        <div class="cs-attack-option selected" data-card="galvanize">Galvanize (3 dmg, heal 1)</div>
+                        <div class="cs-attack-option" data-card="bulwark">Bulwark (5 dmg, -1 defense cost)</div>
                     </div>
                 </div>
 
@@ -244,10 +245,11 @@
                         </svg>
                     </div>
                     <div class="cs-name">Pip, the Nimble</div>
-                    <div class="cs-desc">Quick trickster with a wand. Plays fast with Encore card recycling.</div>
+                    <div class="cs-desc">Tricky debuffer. Inflicts status effects and uses Distract to evade.</div>
                     <div class="cs-attacks">
                         <div class="cs-attack-label">Starting Attack</div>
-                        <div class="cs-attack-option selected" data-card="quick-jab">Quick Jab (4 dmg, draw 1)</div>
+                        <div class="cs-attack-option selected" data-card="quick-jab">Quick Jab (2 + 2/debuff dmg)</div>
+                        <div class="cs-attack-option" data-card="lucky-shot">Lucky Shot (3 dmg, +1 Luck)</div>
                     </div>
                 </div>
             </div>
@@ -256,13 +258,13 @@
         </div>
     </div>
 
-    <!-- Speech Bubble Container (Milestone 5) -->
+    <!-- Speech Bubble Container -->
     <div class="speech-bubble-container" id="speech-bubbles"></div>
 
-    <!-- Scene Selection Screen (Milestone 11) -->
+    <!-- Scene Selection Screen -->
     <div class="scene-select-overlay" id="scene-select-overlay" style="display: none;">
         <div class="scene-select-content">
-            <h2 class="scene-title" id="scene-title">Act I - Scene 1</h2>
+            <h2 class="scene-title" id="scene-title">Act 1: The Opening &mdash; Scene 1</h2>
             <p class="scene-subtitle">Choose your opponent</p>
             <div class="enemy-choices" id="enemy-choices">
                 <!-- Enemy choices rendered here -->
@@ -270,14 +272,10 @@
         </div>
     </div>
 
-    <!-- Progress Indicator (Milestone 11) -->
-    <div class="progress-indicator" id="progress-indicator">
-        <span class="progress-dot" data-scene="1"></span>
-        <span class="progress-dot" data-scene="2"></span>
-        <span class="progress-dot boss" data-scene="boss"></span>
-    </div>
+    <!-- Progress Indicator (dynamically rebuilt by JS for all 3 acts) -->
+    <div class="progress-indicator" id="progress-indicator"></div>
 
-    <!-- Card Rewards Screen (Milestone 10) -->
+    <!-- Card Rewards Screen -->
     <div class="rewards-overlay" id="rewards-overlay" style="display: none;">
         <div class="rewards-content">
             <h2 class="rewards-title">Choose a Card</h2>
@@ -293,17 +291,22 @@
 
     <!-- Enemy Area (~25% of screen) -->
     <div class="enemy-area">
-        <div class="enemy-intent intent-attack">
-            <img src="/static/svg/intent-attack.svg" alt="Attack" class="intent-icon" id="intent-icon">
-            <span class="intent-value intent-attack">7</span>
+        <div class="enemy-sidebar enemy-sidebar-left">
+            <div class="enemy-intent intent-attack">
+                <img src="/static/svg/intent-attack.svg" alt="Attack" class="intent-icon" id="intent-icon">
+                <span class="intent-value intent-attack">7</span>
+            </div>
         </div>
-        <div class="enemy-puppet enemy-idle" id="enemy-puppet">
-            <img src="/static/svg/enemy-placeholder.svg" alt="Enemy" class="puppet-svg enemy-svg">
+        <div class="enemy-center">
+            <div class="enemy-puppet enemy-idle" id="enemy-puppet">
+                <img src="/static/svg/enemy-placeholder.svg" alt="Enemy" class="puppet-svg enemy-svg">
+            </div>
+            <div class="enemy-hp-bar">
+                <div class="hp-fill" style="width: 100%;"></div>
+                <span class="hp-text">28/28</span>
+            </div>
         </div>
-        <div class="enemy-hp-bar">
-            <div class="hp-fill" style="width: 100%;"></div>
-            <span class="hp-text">28/28</span>
-        </div>
+        <div class="enemy-sidebar enemy-sidebar-right" id="enemy-modifiers"></div>
     </div>
 
     <!-- Stage Area (~30% of screen) -->
@@ -311,6 +314,10 @@
         <!-- Left Hero (Aldric) -->
         <div class="hero-puppet hero-left aldric-idle" id="hero-aldric">
             <img src="/static/svg/aldric.svg" alt="Aldric" class="puppet-svg hero-svg">
+            <div class="hero-hp-bar aldric-hp-bar">
+                <div class="hp-fill" style="width: 100%;"></div>
+                <span class="hp-text">20/20</span>
+            </div>
         </div>
 
         <!-- MacGuffin (center) -->
@@ -318,17 +325,30 @@
             <img src="/static/svg/macguffin.svg" alt="MacGuffin" class="puppet-svg macguffin-svg">
             <div class="macguffin-hp-bar">
                 <div class="hp-fill" style="width: 100%;"></div>
-                <span class="hp-text">60/60</span>
+                <span class="hp-text">50/50</span>
             </div>
-            <div class="macguffin-block" id="macguffin-block">
+            <div class="macguffin-block status-icon" id="macguffin-block" title="Block">
                 <span class="block-icon">&#x1F6E1;</span>
                 <span class="block-value">0</span>
             </div>
         </div>
 
+        <!-- Ovation Meter -->
+        <div class="ovation-meter" id="ovation-meter">
+            <span class="ovation-label">&#x1F44F;</span>
+            <div class="ovation-bar">
+                <div class="ovation-fill" id="ovation-fill"></div>
+            </div>
+            <span class="ovation-value" id="ovation-value">0</span>
+        </div>
+
         <!-- Right Hero (Pip) -->
         <div class="hero-puppet hero-right pip-idle" id="hero-pip">
             <img src="/static/svg/pip.svg" alt="Pip" class="puppet-svg hero-svg">
+            <div class="hero-hp-bar pip-hp-bar">
+                <div class="hp-fill" style="width: 100%;"></div>
+                <span class="hp-text">10/10</span>
+            </div>
         </div>
     </div>
 
@@ -360,5 +380,17 @@
 {% endblock %}
 
 {% block scripts %}
+<!-- Data files (no dependencies) -->
+<script src="/static/js/solo/curtain-call/cards.js"></script>
+<script src="/static/js/solo/curtain-call/enemies.js"></script>
+<!-- Core class definition -->
 <script src="/static/js/solo/curtain-call/game.js"></script>
+<!-- Prototype extensions (require CurtainCallGame class) -->
+<script src="/static/js/solo/curtain-call/combat.js"></script>
+<script src="/static/js/solo/curtain-call/renderer.js"></script>
+<script src="/static/js/solo/curtain-call/ui.js"></script>
+<!-- Audience: data + prototype extensions -->
+<script src="/static/js/solo/curtain-call/audience.js"></script>
+<!-- Instantiate after all extensions are loaded -->
+<script>const game = new CurtainCallGame();</script>
 {% endblock %}
