@@ -104,6 +104,11 @@ New games are designed in a companion Claude project and documented in `document
 2. Add route in `main.py` (simple template render)
 3. Add to index page under single-player section
 
+## Git Workflow
+
+- **Do not push directly to main** unless explicitly instructed. Work on feature branches and wait for verification before merging/pushing to main.
+- Commit to the current feature branch by default.
+
 ## Common Tasks
 
 ### Debugging WebSocket issues
