@@ -1974,7 +1974,7 @@
     border-radius: 12px;
     padding: 10px 14px;
     font-size: 13px;
-    font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', cursive, sans-serif;
+    font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', system-ui, sans-serif;
     color: var(--silhouette-color);
     max-width: 200px;
     min-width: 120px;
