@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 320">
+  <!-- Moth Swarm - Cluster of 4 moths arranged loosely -->
+
+  <!-- Puppet stick -->
+  <rect x="94" y="250" width="10" height="70" fill="#3D2B1F" rx="2"/>
+
+  <!-- Connecting threads from stick to moths (thin lines) -->
+  <line x1="99" y1="250" x2="70" y2="210" stroke="#3D2B1F" stroke-width="2"/>
+  <line x1="99" y1="250" x2="130" y2="200" stroke="#3D2B1F" stroke-width="2"/>
+  <line x1="99" y1="250" x2="90" y2="140" stroke="#3D2B1F" stroke-width="2"/>
+  <line x1="99" y1="250" x2="120" y2="100" stroke="#3D2B1F" stroke-width="2"/>
+
+  <!-- === Moth 1 (bottom-left, medium) === -->
+  <g transform="translate(65, 200) rotate(-15)">
+    <!-- Left wing -->
+    <ellipse cx="-18" cy="-5" rx="20" ry="14" fill="#1A1A2E"/>
+    <!-- Right wing -->
+    <ellipse cx="18" cy="-5" rx="20" ry="14" fill="#1A1A2E"/>
+    <!-- Lower left wing -->
+    <ellipse cx="-12" cy="10" rx="14" ry="10" fill="#1A1A2E"/>
+    <!-- Lower right wing -->
+    <ellipse cx="12" cy="10" rx="14" ry="10" fill="#1A1A2E"/>
+    <!-- Body -->
+    <ellipse cx="0" cy="2" rx="5" ry="14" fill="#1A1A2E"/>
+    <!-- Eyes -->
+    <circle cx="-3" cy="-8" r="2.5" fill="#F4E4C1"/>
+    <circle cx="3" cy="-8" r="2.5" fill="#F4E4C1"/>
+    <!-- Wing spot cutouts -->
+    <circle cx="-16" cy="-5" r="4" fill="#F4E4C1" opacity="0.6"/>
+    <circle cx="16" cy="-5" r="4" fill="#F4E4C1" opacity="0.6"/>
+    <!-- Antennae -->
+    <line x1="-2" y1="-12" x2="-10" y2="-25" stroke="#1A1A2E" stroke-width="2" stroke-linecap="round"/>
+    <line x1="2" y1="-12" x2="10" y2="-25" stroke="#1A1A2E" stroke-width="2" stroke-linecap="round"/>
+  </g>
+
+  <!-- === Moth 2 (right, medium) === -->
+  <g transform="translate(135, 190) rotate(10)">
+    <!-- Left wing -->
+    <ellipse cx="-16" cy="-4" rx="18" ry="12" fill="#1A1A2E"/>
+    <!-- Right wing -->
+    <ellipse cx="16" cy="-4" rx="18" ry="12" fill="#1A1A2E"/>
+    <!-- Lower left wing -->
+    <ellipse cx="-10" cy="8" rx="12" ry="9" fill="#1A1A2E"/>
+    <!-- Lower right wing -->
+    <ellipse cx="10" cy="8" rx="12" ry="9" fill="#1A1A2E"/>
+    <!-- Body -->
+    <ellipse cx="0" cy="2" rx="4.5" ry="12" fill="#1A1A2E"/>
+    <!-- Eyes -->
+    <circle cx="-3" cy="-7" r="2.5" fill="#F4E4C1"/>
+    <circle cx="3" cy="-7" r="2.5" fill="#F4E4C1"/>
+    <!-- Wing spot cutouts -->
+    <circle cx="-14" cy="-4" r="3.5" fill="#F4E4C1" opacity="0.6"/>
+    <circle cx="14" cy="-4" r="3.5" fill="#F4E4C1" opacity="0.6"/>
+    <!-- Antennae -->
+    <line x1="-2" y1="-10" x2="-9" y2="-22" stroke="#1A1A2E" stroke-width="2" stroke-linecap="round"/>
+    <line x1="2" y1="-10" x2="9" y2="-22" stroke="#1A1A2E" stroke-width="2" stroke-linecap="round"/>
+  </g>
+
+  <!-- === Moth 3 (top-center, large - lead moth) === -->
+  <g transform="translate(90, 125) rotate(-5)">
+    <!-- Left wing -->
+    <ellipse cx="-22" cy="-6" rx="24" ry="16" fill="#1A1A2E"/>
+    <!-- Right wing -->
+    <ellipse cx="22" cy="-6" rx="24" ry="16" fill="#1A1A2E"/>
+    <!-- Lower left wing -->
+    <ellipse cx="-15" cy="12" rx="16" ry="11" fill="#1A1A2E"/>
+    <!-- Lower right wing -->
+    <ellipse cx="15" cy="12" rx="16" ry="11" fill="#1A1A2E"/>
+    <!-- Body -->
+    <ellipse cx="0" cy="3" rx="6" ry="16" fill="#1A1A2E"/>
+    <!-- Eyes -->
+    <circle cx="-4" cy="-9" r="3" fill="#F4E4C1"/>
+    <circle cx="4" cy="-9" r="3" fill="#F4E4C1"/>
+    <!-- Wing spot cutouts -->
+    <circle cx="-20" cy="-6" r="5" fill="#F4E4C1" opacity="0.6"/>
+    <circle cx="20" cy="-6" r="5" fill="#F4E4C1" opacity="0.6"/>
+    <circle cx="-13" cy="12" r="3" fill="#F4E4C1" opacity="0.4"/>
+    <circle cx="13" cy="12" r="3" fill="#F4E4C1" opacity="0.4"/>
+    <!-- Antennae -->
+    <line x1="-3" y1="-14" x2="-14" y2="-30" stroke="#1A1A2E" stroke-width="2" stroke-linecap="round"/>
+    <line x1="3" y1="-14" x2="14" y2="-30" stroke="#1A1A2E" stroke-width="2" stroke-linecap="round"/>
+    <!-- Antenna tips -->
+    <circle cx="-14" cy="-30" r="3" fill="#1A1A2E"/>
+    <circle cx="14" cy="-30" r="3" fill="#1A1A2E"/>
+  </g>
+
+  <!-- === Moth 4 (upper-right, small) === -->
+  <g transform="translate(140, 100) rotate(20)">
+    <!-- Left wing -->
+    <ellipse cx="-13" cy="-3" rx="14" ry="10" fill="#1A1A2E"/>
+    <!-- Right wing -->
+    <ellipse cx="13" cy="-3" rx="14" ry="10" fill="#1A1A2E"/>
+    <!-- Lower left wing -->
+    <ellipse cx="-8" cy="7" rx="10" ry="7" fill="#1A1A2E"/>
+    <!-- Lower right wing -->
+    <ellipse cx="8" cy="7" rx="10" ry="7" fill="#1A1A2E"/>
+    <!-- Body -->
+    <ellipse cx="0" cy="2" rx="3.5" ry="10" fill="#1A1A2E"/>
+    <!-- Eyes -->
+    <circle cx="-2.5" cy="-5" r="2" fill="#F4E4C1"/>
+    <circle cx="2.5" cy="-5" r="2" fill="#F4E4C1"/>
+    <!-- Wing spot cutouts -->
+    <circle cx="-11" cy="-3" r="3" fill="#F4E4C1" opacity="0.6"/>
+    <circle cx="11" cy="-3" r="3" fill="#F4E4C1" opacity="0.6"/>
+    <!-- Antennae -->
+    <line x1="-2" y1="-8" x2="-8" y2="-18" stroke="#1A1A2E" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="2" y1="-8" x2="8" y2="-18" stroke="#1A1A2E" stroke-width="1.5" stroke-linecap="round"/>
+  </g>
+</svg>

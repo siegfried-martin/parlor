@@ -8,17 +8,17 @@ The first pair is designed to offer a clear mechanical contrast while being them
 
 ---
 
-### Bron, the Ironclad
+### Aldric, the Ironclad
 
 **Silhouette:** Stocky, broad-shouldered figure with a large hammer. Round head, short legs — reads as sturdy and strong. Cute, not intimidating.
 
-**Role:** Heavy hitter. Bron's cards deal big damage and his keyword rewards committing to consecutive attacks.
+**Role:** Heavy hitter. Aldric's cards deal big damage and his keyword rewards committing to consecutive attacks.
 
 **Stats:**
 
-- Attack Bonus: +2 damage on Bron's attack cards
-- Defense Specialty: Block (+2 bonus when Bron's cards grant Block)
-- Keyword Affinity: **Charged** — consecutive attacks by Bron deal escalating bonus damage
+- Attack Bonus: +2 damage on Aldric's attack cards
+- Defense Specialty: Block (+2 bonus when Aldric's cards grant Block)
+- Keyword Affinity: **Charged** — consecutive attacks by Aldric deal escalating bonus damage
 
 **Personality (speech bubbles):**
 
@@ -37,7 +37,7 @@ The first pair is designed to offer a clear mechanical contrast while being them
 
 ### Pip, the Nimble
 
-**Silhouette:** Small, wiry figure with oversized pointy hat and a trailing scarf. Maybe a dagger or wand in hand. Spiky, angular silhouette contrasts with Bron's roundness.
+**Silhouette:** Small, wiry figure with oversized pointy hat and a trailing scarf. Maybe a dagger or wand in hand. Spiky, angular silhouette contrasts with Aldric's roundness.
 
 **Role:** Utility and control. Pip's cards are cheaper, more numerous in effect, and revolve around card manipulation, debuffs, and tactical plays.
 
@@ -54,10 +54,10 @@ The first pair is designed to offer a clear mechanical contrast while being them
 - On encore trigger: `"ONCE MORE!"` `"ENCORE, ENCORE!"`
 - On playing a debuff: `"HOW'S THAT FEEL?"`
 
-**Cross-protagonist lines (with Bron):**
+**Cross-protagonist lines (with Aldric):**
 
-- After Bron's big hit: `"SHOW-OFF."`
-- When Bron is Stage Frighted: `"DEEP BREATHS, BIG GUY."`
+- After Aldric's big hit: `"SHOW-OFF."`
+- When Aldric is Stage Frighted: `"DEEP BREATHS, BIG GUY."`
 - When both combo: `"YOU MEAN MY TEAMWORK."`
 
 ---
@@ -69,18 +69,18 @@ The first pair is designed to offer a clear mechanical contrast while being them
 | Card                | Cost | Owner   | Effect                      | Upgraded Version            | Speech Bubble |
 | ------------------- | ---- | ------- | --------------------------- | --------------------------- | ------------- |
 | **Basic Block** ×4  | 1    | Neutral | Gain 5 Block.               | Gain 7 Block.               | `"BRACE!"`    |
-| **Hammer Swing** ×2 | 1    | Bron    | Deal 6 damage.              | Deal 8 damage.              | `"CLANG!"`    |
+| **Hammer Swing** ×2 | 1    | Aldric  | Deal 6 damage.              | Deal 8 damage.              | `"CLANG!"`    |
 | **Quick Jab** ×2    | 1    | Pip     | Deal 4 damage. Draw 1 card. | Deal 5 damage. Draw 1 card. | `"THWIP!"`    |
 
 **Starting deck total:** 8 cards. Functional but unexciting — every card reward is an improvement.
 
-Note: Bron's basic attack hits harder (6 + his +2 bonus = 8 effective). Pip's hits softer (4, no attack bonus) but replaces itself with a draw. This immediately establishes their identities.
+Note: Aldric's basic attack hits harder (6 + his +2 bonus = 8 effective). Pip's hits softer (4, no attack bonus) but replaces itself with a draw. This immediately establishes their identities.
 
 ---
 
-### Bron's Card Pool
+### Aldric's Card Pool
 
-Cards available as Bron's offering during card rewards. Not all are available from the start — some are unlockables (marked with 🔒).
+Cards available as Aldric's offering during card rewards. Not all are available from the start — some are unlockables (marked with 🔒).
 
 | Card                    | Cost | Effect                                   | Keywords | Upgraded Version                          | Speech Bubble             |
 | ----------------------- | ---- | ---------------------------------------- | -------- | ----------------------------------------- | ------------------------- |
@@ -338,23 +338,23 @@ Aggressive enemies that punish weaknesses and demand synergy.
 
 ### Starting Content (Available Immediately)
 
-**Protagonists:** Bron, Pip
+**Protagonists:** Aldric, Pip
 
 **Cards available in reward pools:**
 
-- Bron: Hammer Swing, Heavy Strike, Forge Ahead, Relentless Blow, Iron Wall, Tremor
+- Aldric: Hammer Swing, Heavy Strike, Forge Ahead, Relentless Blow, Iron Wall, Tremor
 - Pip: Quick Jab, Trick Shot, Smoke Bomb, Encore Performance, Cunning Plan, Mockery
 - Neutral: Basic Block, Patch Up, Hunker Down, Rally the Crowd, Second Wind
 
 ### Unlock Tier 1 — Clear Act I
 
-- 🔒 Bron: Curtain of Iron
+- 🔒 Aldric: Curtain of Iron
 - 🔒 Pip: Nimble Dodge
 - 🔒 Neutral: Treasure's Blessing
 
 ### Unlock Tier 2 — Win a Full Run
 
-- 🔒 Bron: Standing Ovation, Hammer Encore
+- 🔒 Aldric: Standing Ovation, Hammer Encore
 - 🔒 Pip: Rehearsed Routine, Grand Finale
 - 🔒 Neutral: Intermission, Desperate Plea
 
@@ -366,11 +366,11 @@ Additional protagonists and their card pools would form later unlock tiers, gate
 
 ## Balance Notes & Design Rationale
 
-**Bron's identity:** Big numbers, straightforward plans. Charged rewards going all-in on Bron attacks in a turn. His cards are expensive but impactful. A Bron-heavy deck wants to set up one explosive turn per combat cycle. Bron players should feel like they're swinging a wrecking ball.
+**Aldric's identity:** Big numbers, straightforward plans. Charged rewards going all-in on Aldric attacks in a turn. His cards are expensive but impactful. An Aldric-heavy deck wants to set up one explosive turn per combat cycle. Aldric players should feel like they're swinging a wrecking ball.
 
 **Pip's identity:** Cheap, tricky, card-flow-oriented. Encore rewards careful turn sequencing. Pip's attacks are weaker individually but Pip generates more card draw and applies debuffs. A Pip-heavy deck wants to play many cards per turn and control the enemy's effectiveness. Pip players should feel clever and slippery.
 
-**Together:** The pairing creates natural tension — Charged wants consecutive Bron attacks, but Pip cards are cheap and you want to play them for draw/debuff. The interesting turns are the ones where you decide: do I go full Bron for the Charged ramp, or mix in Pip for card advantage and control? Neither answer is always correct, which is the hallmark of good deckbuilder design.
+**Together:** The pairing creates natural tension — Charged wants consecutive Aldric attacks, but Pip cards are cheap and you want to play them for draw/debuff. The interesting turns are the ones where you decide: do I go full Aldric for the Charged ramp, or mix in Pip for card advantage and control? Neither answer is always correct, which is the hallmark of good deckbuilder design.
 
 **Neutral cards as safety net:** Healing, debuff removal, and emergency defense are mostly in the neutral pool. This means every pairing has access to survival tools, but investing in neutrals means fewer synergy cards. Another meaningful tradeoff.
 

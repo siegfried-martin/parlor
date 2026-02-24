@@ -199,21 +199,7 @@
                 <!-- Aldric -->
                 <div class="cs-card selected" data-protagonist="aldric">
                     <div class="cs-puppet">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 320">
-                            <rect x="94" y="255" width="12" height="65" fill="#3D2B1F" rx="2"/>
-                            <ellipse cx="100" cy="180" rx="50" ry="45" fill="#1A1A2E"/>
-                            <circle cx="100" cy="95" r="55" fill="#1A1A2E"/>
-                            <ellipse cx="100" cy="50" rx="15" ry="10" fill="#1A1A2E"/>
-                            <ellipse cx="45" cy="165" rx="18" ry="30" fill="#1A1A2E"/>
-                            <ellipse cx="155" cy="155" rx="18" ry="35" fill="#1A1A2E"/>
-                            <rect x="160" y="110" width="35" height="25" rx="3" fill="#1A1A2E"/>
-                            <rect x="150" y="125" width="15" height="45" rx="2" fill="#1A1A2E"/>
-                            <ellipse cx="75" cy="235" rx="20" ry="25" fill="#1A1A2E"/>
-                            <ellipse cx="125" cy="235" rx="20" ry="25" fill="#1A1A2E"/>
-                            <g><ellipse cx="80" cy="90" rx="8" ry="6" fill="#F4E4C1"/><ellipse cx="120" cy="90" rx="8" ry="6" fill="#F4E4C1"/></g>
-                            <ellipse cx="100" cy="115" rx="12" ry="6" fill="#F4E4C1"/>
-                            <rect x="90" y="175" width="20" height="15" rx="2" fill="#F4E4C1"/>
-                        </svg>
+                        <img src="/static/svg/aldric.svg" alt="Aldric">
                     </div>
                     <div class="cs-name">Aldric, the Ironclad</div>
                     <div class="cs-desc">Tanky protector. Shields the MacGuffin with Block, Shield, and Taunt.</div>
@@ -227,22 +213,7 @@
                 <!-- Pip -->
                 <div class="cs-card selected" data-protagonist="pip">
                     <div class="cs-puppet">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 320">
-                            <rect x="94" y="250" width="10" height="70" fill="#3D2B1F" rx="2"/>
-                            <polygon points="100,10 140,100 60,100" fill="#1A1A2E"/>
-                            <ellipse cx="100" cy="100" rx="45" ry="12" fill="#1A1A2E"/>
-                            <circle cx="100" cy="115" r="35" fill="#1A1A2E"/>
-                            <path d="M65 120 Q30 130 25 160 Q20 190 40 200 Q55 195 50 170 Q55 150 65 140" fill="#1A1A2E"/>
-                            <ellipse cx="100" cy="185" rx="30" ry="35" fill="#1A1A2E"/>
-                            <ellipse cx="60" cy="175" rx="12" ry="22" fill="#1A1A2E"/>
-                            <rect x="40" y="155" width="6" height="35" rx="1" fill="#1A1A2E" transform="rotate(-20 43 172)"/>
-                            <ellipse cx="140" cy="175" rx="12" ry="22" fill="#1A1A2E"/>
-                            <ellipse cx="85" cy="235" rx="12" ry="25" fill="#1A1A2E"/>
-                            <ellipse cx="115" cy="235" rx="12" ry="25" fill="#1A1A2E"/>
-                            <g><circle cx="88" cy="110" r="7" fill="#F4E4C1"/><circle cx="112" cy="110" r="7" fill="#F4E4C1"/></g>
-                            <ellipse cx="100" cy="130" rx="8" ry="4" fill="#F4E4C1"/>
-                            <polygon points="100,35 103,45 114,45 105,52 109,63 100,56 91,63 95,52 86,45 97,45" fill="#F4E4C1"/>
-                        </svg>
+                        <img src="/static/svg/pip.svg" alt="Pip">
                     </div>
                     <div class="cs-name">Pip, the Nimble</div>
                     <div class="cs-desc">Tricky debuffer. Inflicts status effects and uses Distract to evade.</div>
@@ -285,7 +256,22 @@
             <div class="rewards-buttons">
                 <button class="rewards-btn confirm-btn" id="confirm-reward-btn" disabled>Add to Deck</button>
                 <button class="rewards-btn skip-btn" id="skip-reward-btn">Skip</button>
+                <button class="rewards-btn remove-btn" id="remove-card-btn">Remove a Card</button>
             </div>
+        </div>
+    </div>
+
+    <!-- Deck List Overlay -->
+    <div class="deck-list-overlay" id="deck-list-overlay" style="display: none;">
+        <div class="deck-list-content">
+            <div class="deck-list-header">
+                <h2 class="deck-list-title" id="deck-list-title">Your Deck</h2>
+                <button class="deck-list-close" id="deck-list-close">&times;</button>
+            </div>
+            <div class="deck-list-cards" id="deck-list-cards">
+                <!-- Deck cards rendered here -->
+            </div>
+            <div class="deck-list-footer" id="deck-list-footer"></div>
         </div>
     </div>
 
@@ -367,11 +353,18 @@
         <!-- Audience Strip - members generated dynamically by JS -->
         <div class="audience-strip" id="audience-strip"></div>
 
-        <!-- Energy and End Turn -->
+        <!-- Energy, Deck Count, and End Turn -->
         <div class="controls-right">
-            <div class="energy-indicator">
-                <span class="energy-icon">&#x26A1;</span>
-                <span class="energy-value">3</span>
+            <div class="controls-top-row">
+                <div class="energy-indicator">
+                    <span class="energy-icon">&#x26A1;</span>
+                    <span class="energy-value">3</span>
+                </div>
+                <div class="deck-count-indicator" id="deck-count-indicator">
+                    <span class="deck-count-draw" id="deck-count-draw" title="Draw pile">0</span>
+                    <span class="deck-count-separator">/</span>
+                    <span class="deck-count-discard" id="deck-count-discard" title="Discard pile">0</span>
+                </div>
             </div>
             <button class="end-turn-btn" id="end-turn-btn">End Turn</button>
         </div>
@@ -380,17 +373,32 @@
 {% endblock %}
 
 {% block scripts %}
+<!-- Config files (no dependencies) -->
+<script src="/static/js/solo/curtain-call/config/speech-config.js"></script>
+<script src="/static/js/solo/curtain-call/config/animation-config.js"></script>
+<script src="/static/js/solo/curtain-call/config/enemy-speech.js"></script>
+<script src="/static/js/solo/curtain-call/config/protagonist-speech.js"></script>
+<script src="/static/js/solo/curtain-call/config/crowd-speech.js"></script>
 <!-- Data files (no dependencies) -->
 <script src="/static/js/solo/curtain-call/cards.js"></script>
 <script src="/static/js/solo/curtain-call/enemies.js"></script>
 <!-- Core class definition -->
 <script src="/static/js/solo/curtain-call/game.js"></script>
-<!-- Prototype extensions (require CurtainCallGame class) -->
-<script src="/static/js/solo/curtain-call/combat.js"></script>
+<!-- Combat system -->
+<script src="/static/js/solo/curtain-call/combat-turns.js"></script>
+<script src="/static/js/solo/curtain-call/combat-enemy.js"></script>
+<script src="/static/js/solo/curtain-call/combat-cards.js"></script>
+<script src="/static/js/solo/curtain-call/combat-keywords.js"></script>
+<!-- Rendering -->
+<script src="/static/js/solo/curtain-call/renderer-cards.js"></script>
 <script src="/static/js/solo/curtain-call/renderer.js"></script>
-<script src="/static/js/solo/curtain-call/ui.js"></script>
-<!-- Audience: data + prototype extensions -->
+<!-- UI -->
+<script src="/static/js/solo/curtain-call/ui-events.js"></script>
+<script src="/static/js/solo/curtain-call/ui-screens.js"></script>
+<script src="/static/js/solo/curtain-call/ui-scenes.js"></script>
+<!-- Audience: data + animations + speech -->
 <script src="/static/js/solo/curtain-call/audience.js"></script>
+<script src="/static/js/solo/curtain-call/audience-speech.js"></script>
 <!-- Instantiate after all extensions are loaded -->
 <script>const game = new CurtainCallGame();</script>
 {% endblock %}

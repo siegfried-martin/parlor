@@ -111,11 +111,11 @@ const CARD_DEFINITIONS = {
         cost: 1,
         type: 'defense',
         rarity: 'uncommon',
-        description: 'Gain 4 Block. Draw 1 card.',
+        description: 'Gain 5 Block. Draw 1 card.',
         owner: 'aldric',
         speechBubble: 'SHIELD UP!',
         effects: [
-            { type: 'block', value: 4 },
+            { type: 'block', value: 5 },
             { type: 'draw', value: 1 }
         ]
     },
@@ -125,26 +125,26 @@ const CARD_DEFINITIONS = {
         cost: 2,
         type: 'attack',
         rarity: 'uncommon',
-        description: 'Deal 12 damage. Gain 1 Burn.',
+        description: 'Deal 15 damage. Gain 2 Burn.',
         owner: 'aldric',
         speechBubble: 'FOR GLORY!',
         effects: [
-            { type: 'damage', value: 12 },
-            { type: 'selfInflict', keyword: 'burn', value: 1 }
+            { type: 'damage', value: 15 },
+            { type: 'selfInflict', keyword: 'burn', value: 2 }
         ]
     },
-    'enabling-strike': {
-        id: 'enabling-strike',
-        name: 'Enabling Strike',
+    'cooperative-strike': {
+        id: 'cooperative-strike',
+        name: 'Cooperative Strike',
         cost: 2,
         type: 'attack',
         rarity: 'uncommon',
-        description: 'Deal 8 damage. Draw 1 card.',
+        description: 'Deal 8 damage. Attack cards in hand from the other protagonist gain +4 attack.',
         owner: 'aldric',
-        speechBubble: 'OPENING!',
+        speechBubble: 'TOGETHER!',
         effects: [
             { type: 'damage', value: 8 },
-            { type: 'draw', value: 1 }
+            { type: 'buffOtherProtagonistAttacks', value: 4 }
         ]
     },
     'protective-stance': {
@@ -167,11 +167,12 @@ const CARD_DEFINITIONS = {
         cost: 0,
         type: 'action',
         rarity: 'uncommon',
-        description: 'Gain 2 Shield.',
+        description: 'Gain 2 Block and 2 Shield to target protagonist.',
         owner: 'aldric',
         speechBubble: 'I PROTECT!',
         targeting: 'protagonist',
         effects: [
+            { type: 'block', value: 2 },
             { type: 'shield', value: 2 }
         ]
     },
@@ -181,10 +182,10 @@ const CARD_DEFINITIONS = {
         cost: 2,
         type: 'defense',
         rarity: 'uncommon',
-        description: 'Gain 10 Block.',
+        description: 'Gain 12 Block.',
         owner: 'aldric',
         speechBubble: 'NOTHING GETS THROUGH!',
-        effects: [{ type: 'block', value: 10 }]
+        effects: [{ type: 'block', value: 12 }]
     },
     'true-strike': {
         id: 'true-strike',
@@ -192,19 +193,19 @@ const CARD_DEFINITIONS = {
         cost: 1,
         type: 'action',
         rarity: 'uncommon',
-        description: 'Gain 1 Piercing and 1 Accuracy.',
+        description: 'Target protagonist gains 2 Piercing and 2 Focus.',
         owner: 'aldric',
         speechBubble: 'PRECISION!',
         targeting: 'protagonist',
         effects: [
-            { type: 'piercing', value: 1 },
-            { type: 'accuracy', value: 1 }
+            { type: 'piercing', value: 2 },
+            { type: 'focus', value: 2 }
         ]
     },
     'inspirational-shout': {
         id: 'inspirational-shout',
         name: 'Inspirational Shout',
-        cost: 2,
+        cost: 1,
         type: 'action',
         rarity: 'uncommon',
         description: 'Convert Ovation to Inspire.',
@@ -217,10 +218,10 @@ const CARD_DEFINITIONS = {
     'cleanse': {
         id: 'cleanse',
         name: 'Cleanse',
-        cost: 2,
+        cost: 1,
         type: 'defense',
         rarity: 'uncommon',
-        description: 'Gain 5 Block. Remove all Burn and Poison from an ally.',
+        description: 'Gain 5 Block. Remove all Burn and Poison from target.',
         owner: 'aldric',
         speechBubble: 'PURIFIED!',
         targeting: 'ally',
@@ -235,11 +236,11 @@ const CARD_DEFINITIONS = {
         cost: 3,
         type: 'attack',
         rarity: 'uncommon',
-        description: 'Deal 14 damage. Inflict 1 Heckled.',
+        description: 'Deal 18 damage. Inflict 1 Heckled.',
         owner: 'aldric',
         speechBubble: 'SILENCE!',
         effects: [
-            { type: 'damage', value: 14 },
+            { type: 'damage', value: 18 },
             { type: 'inflict', keyword: 'heckled', value: 1 }
         ]
     },
@@ -249,26 +250,26 @@ const CARD_DEFINITIONS = {
         cost: 1,
         type: 'attack',
         rarity: 'rare',
-        description: 'Deal 1 damage. Gain 1 Ovation per damage dealt.',
+        description: 'Deal 2 damage. Gain 1 Ovation per damage dealt to target.',
         owner: 'aldric',
         speechBubble: 'WATCH THIS!',
         captivating: true,
         effects: [
-            { type: 'damage', value: 1 }
+            { type: 'damage', value: 2 }
         ]
     },
-    'stoic-resistance': {
-        id: 'stoic-resistance',
-        name: 'Stoic Resistance',
+    'heated-resistance': {
+        id: 'heated-resistance',
+        name: 'Heated Resistance',
         cost: 1,
         type: 'defense',
         rarity: 'rare',
-        description: 'Gain 3 Block. Gain additional Block equal to Ovation on draw.',
+        description: 'Gain 5 Block. Inflict 5 Burn.',
         owner: 'aldric',
-        speechBubble: 'ENDURE!',
-        blockOnDraw: true,
+        speechBubble: 'BURN BRIGHT!',
         effects: [
-            { type: 'block', value: 3 }
+            { type: 'block', value: 5 },
+            { type: 'inflict', keyword: 'burn', value: 5 }
         ]
     },
 
@@ -333,7 +334,7 @@ const CARD_DEFINITIONS = {
     'pips-cocktail': {
         id: 'pips-cocktail',
         name: "Pip's Cocktail",
-        cost: 1,
+        cost: 0,
         type: 'action',
         rarity: 'uncommon',
         description: 'Inflict 2 Poison and 2 Burn.',
@@ -362,7 +363,7 @@ const CARD_DEFINITIONS = {
     'stylish-dance': {
         id: 'stylish-dance',
         name: 'Stylish Dance',
-        cost: 3,
+        cost: 2,
         type: 'action',
         rarity: 'uncommon',
         description: 'Lose all Ovation. Inflict Stage Fright.',
@@ -408,12 +409,12 @@ const CARD_DEFINITIONS = {
         cost: 1,
         type: 'action',
         rarity: 'uncommon',
-        description: 'Inflict 1 Confused and 1 Forgetful.',
+        description: 'Inflict 2 Confused and 2 Forgetful.',
         owner: 'pip',
         speechBubble: 'CONFUSING, RIGHT?',
         effects: [
-            { type: 'inflict', keyword: 'confused', value: 1 },
-            { type: 'inflict', keyword: 'forgetful', value: 1 }
+            { type: 'inflict', keyword: 'confused', value: 2 },
+            { type: 'inflict', keyword: 'forgetful', value: 2 }
         ]
     },
     'ultimate-jeer': {
@@ -434,7 +435,7 @@ const CARD_DEFINITIONS = {
     'flirtatious-jeer': {
         id: 'flirtatious-jeer',
         name: 'Flirtatious Jeer',
-        cost: 2,
+        cost: 1,
         type: 'action',
         rarity: 'rare',
         description: 'Inflict 2 Weak, 2 Confused, and 2 Forgetful.',
@@ -445,20 +446,115 @@ const CARD_DEFINITIONS = {
             { type: 'inflict', keyword: 'confused', value: 2 },
             { type: 'inflict', keyword: 'forgetful', value: 2 }
         ]
+    },
+
+    // ===================================
+    // === Synergy Accelerator Cards ===
+    // ===================================
+
+    // --- Aldric Synergy ---
+    'battle-hymn': {
+        id: 'battle-hymn',
+        name: 'Battle Hymn',
+        cost: 1,
+        type: 'action',
+        rarity: 'uncommon',
+        description: 'Gain 1 Inspire and 1 Fortify.',
+        owner: 'aldric',
+        speechBubble: 'SING WITH ME!',
+        effects: [
+            { type: 'inspire', value: 1 },
+            { type: 'fortify', value: 1 }
+        ]
+    },
+    'shield-bash': {
+        id: 'shield-bash',
+        name: 'Shield Bash',
+        cost: 2,
+        type: 'attack',
+        rarity: 'uncommon',
+        description: 'Deal 6 damage twice.',
+        owner: 'aldric',
+        speechBubble: 'DOUBLE STRIKE!',
+        effects: [
+            { type: 'damage', value: 6 },
+            { type: 'damage', value: 6 }
+        ]
+    },
+    'stand-guard': {
+        id: 'stand-guard',
+        name: 'Stand Guard',
+        cost: 0,
+        type: 'defense',
+        rarity: 'uncommon',
+        description: 'Gain 3 Block. Gain 1 Fortify.',
+        owner: 'aldric',
+        speechBubble: 'ON GUARD!',
+        effects: [
+            { type: 'block', value: 3 },
+            { type: 'fortify', value: 1 }
+        ]
+    },
+
+    // --- Pip Synergy ---
+    'quick-draw': {
+        id: 'quick-draw',
+        name: 'Quick Draw',
+        cost: 1,
+        type: 'action',
+        rarity: 'uncommon',
+        description: 'Draw 2 cards. Gain 1 Luck.',
+        owner: 'pip',
+        speechBubble: 'FAST HANDS!',
+        effects: [
+            { type: 'draw', value: 2 },
+            { type: 'luck', value: 1 }
+        ]
+    },
+    'pepper-spray': {
+        id: 'pepper-spray',
+        name: 'Pepper Spray',
+        cost: 1,
+        type: 'attack',
+        rarity: 'uncommon',
+        description: 'Deal 2 damage 3 times.',
+        owner: 'pip',
+        speechBubble: 'TAKE THAT! AND THAT!',
+        effects: [
+            { type: 'damage', value: 2 },
+            { type: 'damage', value: 2 },
+            { type: 'damage', value: 2 }
+        ]
+    },
+    'mischief': {
+        id: 'mischief',
+        name: 'Mischief',
+        cost: 0,
+        type: 'action',
+        rarity: 'uncommon',
+        description: 'Inflict 1 Vulnerable. Draw 1 card.',
+        owner: 'pip',
+        speechBubble: 'OOPS!',
+        effects: [
+            { type: 'inflict', keyword: 'vulnerable', value: 1 },
+            { type: 'draw', value: 1 }
+        ]
     }
 };
 
 // Card pools for rewards (by protagonist + rarity)
 const CARD_POOLS = {
     aldric: [
-        'aegis', 'burning-devotion', 'enabling-strike', 'protective-stance',
+        'aegis', 'burning-devotion', 'cooperative-strike', 'protective-stance',
         'protect', 'iron-wall', 'true-strike', 'inspirational-shout',
-        'cleanse', 'aggressive-strike', 'captivating-strike', 'stoic-resistance'
+        'cleanse', 'aggressive-strike', 'captivating-strike', 'heated-resistance',
+        'battle-hymn', 'shield-bash', 'stand-guard'
     ],
     pip: [
         'good-fortune', 'create-opportunity', 'loaded-insult', 'coup-de-grace',
         'pips-cocktail', 'annoying-poke', 'stylish-dance', 'hit-where-it-hurts',
-        'vex', 'best-explanation', 'ultimate-jeer', 'flirtatious-jeer'
+        'vex', 'best-explanation', 'ultimate-jeer', 'flirtatious-jeer',
+        'quick-draw', 'pepper-spray', 'mischief'
     ]
 };
 
@@ -466,17 +562,19 @@ const CARD_POOLS = {
 const CARD_POOLS_BY_RARITY = {
     aldric: {
         uncommon: [
-            'aegis', 'burning-devotion', 'enabling-strike', 'protective-stance',
+            'aegis', 'burning-devotion', 'cooperative-strike', 'protective-stance',
             'protect', 'iron-wall', 'true-strike', 'inspirational-shout',
-            'cleanse', 'aggressive-strike'
+            'cleanse', 'aggressive-strike',
+            'battle-hymn', 'shield-bash', 'stand-guard'
         ],
-        rare: ['captivating-strike', 'stoic-resistance']
+        rare: ['captivating-strike', 'heated-resistance']
     },
     pip: {
         uncommon: [
             'good-fortune', 'create-opportunity', 'loaded-insult', 'coup-de-grace',
             'pips-cocktail', 'annoying-poke', 'stylish-dance', 'hit-where-it-hurts',
-            'vex', 'best-explanation'
+            'vex', 'best-explanation',
+            'quick-draw', 'pepper-spray', 'mischief'
         ],
         rare: ['ultimate-jeer', 'flirtatious-jeer']
     }
@@ -492,8 +590,8 @@ const BASIC_OPTIONS = {
 const STARTING_DECK = [
     'galvanize', 'galvanize', 'galvanize',
     'quick-jab', 'quick-jab', 'quick-jab',
-    'block', 'block', 'block',
-    'inspire'
+    'block', 'block',
+    'inspire', 'inspire'
 ];
 
 // Build a starting deck from chosen basics
@@ -501,8 +599,8 @@ function buildStartingDeck(aldricBasic, pipBasic) {
     return [
         aldricBasic, aldricBasic, aldricBasic,
         pipBasic, pipBasic, pipBasic,
-        'block', 'block', 'block',
-        'inspire'
+        'block', 'block',
+        'inspire', 'inspire'
     ];
 }
 
@@ -599,13 +697,13 @@ const KEYWORD_GLOSSARY = {
             "Piercing doesn't bypass Taunt or Distract!"
         ]
     },
-    accuracy: {
-        name: 'Accuracy',
+    focus: {
+        name: 'Focus',
         icon: '🎯',
         explanation: 'Attacks bypass Taunt/Distract and ignore Retaliate. Decays by 1.',
         hints: [
-            "Accuracy bypasses evasion defenses!",
-            "Accuracy doesn't bypass Block or Shield!",
+            "Focus bypasses evasion defenses!",
+            "Focus doesn't bypass Block or Shield!",
             "Complementary to Piercing!"
         ]
     },

@@ -1,6 +1,6 @@
 # Curtain Call — Code Architecture
 
-*Last updated: February 8, 2026. Post-refactor file layout.*
+*Last updated: February 21, 2026. Post-refactor file layout (11 prototype extension files).*
 
 ---
 
@@ -9,41 +9,79 @@
 All game files live under two directories:
 
 ```
-static/js/solo/curtain-call/    ← JavaScript (7 files)
-templates/solo/curtain-call.html ← HTML template (Jinja2)
+static/js/solo/curtain-call/         <- JavaScript (14 files + 5 config)
+static/js/solo/curtain-call/config/  <- Speech & animation config (5 files)
+templates/solo/curtain-call.html     <- HTML template (Jinja2)
 ```
 
 ### JavaScript Files
 
-| File | Lines | Role | Dependencies |
-|------|------:|------|-------------|
-| `cards.js` | 415 | Card definitions, card pools, starting deck, keyword glossary | None |
-| `enemies.js` | 82 | Enemy definitions, act structure | None |
-| `game.js` | 369 | **Core class:** constructor, init, setup, deck management, debug API | `cards.js`, `enemies.js` |
-| `combat.js` | 799 | Turn loop, enemy AI, card play, effect resolution, status effects | `game.js` (extends prototype) |
-| `renderer.js` | 628 | Card rendering, HP bars, speech bubbles, status effect display | `game.js` (extends prototype) |
-| `ui.js` | 757 | Events, menus, scene flow, curtain transitions, rewards, card zoom | `game.js` (extends prototype) |
-| `audience.js` | 429 | Audience type data + generation/animation prototype methods | `cards.js` (for KEYWORD_GLOSSARY), `game.js` (extends prototype) |
+| File | Lines | Role |
+|------|------:|------|
+| **Config** | | |
+| `config/speech-config.js` | 51 | Priority levels, cooldown, diminishing-returns curves |
+| `config/animation-config.js` | 57 | Animation timing constants |
+| `config/enemy-speech.js` | 153 | Per-enemy speech lines and trigger chances |
+| `config/protagonist-speech.js` | 145 | Per-protagonist speech lines and trigger chances |
+| `config/crowd-speech.js` | 81 | Crowd ambient dialogue, response pairs, game-event reactions |
+| **Data** | | |
+| `cards.js` | 862 | Card definitions, card pools, starting deck, keyword glossary |
+| `enemies.js` | 515 | Enemy definitions, act structure, passives |
+| **Core** | | |
+| `game.js` | 569 | Class constructor, init, setup, deck management, keywords, debug API |
+| **Combat** | | |
+| `combat-turns.js` | 445 | Turn lifecycle, keyword processing, ovation, victory/defeat |
+| `combat-enemy.js` | 670 | Enemy AI, actions, damage pipeline (enemy -> player), combat-start passives |
+| `combat-cards.js` | 370 | Card playability, card play pipeline, effect queue, executeCardEffects |
+| `combat-keywords.js` | 608 | Player -> enemy damage, keyword gains, debuffs, Fear/Frustration |
+| **Rendering** | | |
+| `renderer-cards.js` | 271 | Shared `_buildCardDOM` helper, hand/reward/zoomed card rendering |
+| `renderer.js` | 511 | Combat state display (HP, intent, status), energy, speech bubbles |
+| **UI** | | |
+| `ui-events.js` | 410 | Event binding, drag-to-play system, end-turn handler |
+| `ui-screens.js` | 736 | Card zoom, keyword explanations, rewards, deck list, menus, curtain transitions |
+| `ui-scenes.js` | 269 | Scene selection, enemy selection, combat setup, act progression |
+| **Audience** | | |
+| `audience.js` | 560 | Audience type data, generation, animations, reactions |
+| `audience-speech.js` | 393 | Speech priority engine, enemy/protagonist/crowd speech triggers |
 
 ### Load Order
 
 ```html
-<!-- 1. Data files (no dependencies, define global constants) -->
+<!-- 1. Config (global constants, no dependencies) -->
+<script src="config/speech-config.js"></script>
+<script src="config/animation-config.js"></script>
+<script src="config/enemy-speech.js"></script>
+<script src="config/protagonist-speech.js"></script>
+<script src="config/crowd-speech.js"></script>
+
+<!-- 2. Data files (global constants, no dependencies) -->
 <script src="cards.js"></script>
 <script src="enemies.js"></script>
 
-<!-- 2. Core class definition -->
+<!-- 3. Core class definition -->
 <script src="game.js"></script>
 
-<!-- 3. Prototype extensions (require CurtainCallGame class) -->
-<script src="combat.js"></script>
+<!-- 4. Combat system (extends prototype) -->
+<script src="combat-turns.js"></script>
+<script src="combat-enemy.js"></script>
+<script src="combat-cards.js"></script>
+<script src="combat-keywords.js"></script>
+
+<!-- 5. Rendering (extends prototype) -->
+<script src="renderer-cards.js"></script>
 <script src="renderer.js"></script>
-<script src="ui.js"></script>
 
-<!-- 4. Audience: data constants + prototype extensions -->
+<!-- 6. UI (extends prototype) -->
+<script src="ui-events.js"></script>
+<script src="ui-screens.js"></script>
+<script src="ui-scenes.js"></script>
+
+<!-- 7. Audience (extends prototype) -->
 <script src="audience.js"></script>
+<script src="audience-speech.js"></script>
 
-<!-- 5. Instantiate after everything is loaded -->
+<!-- 8. Instantiate after everything is loaded -->
 <script>const game = new CurtainCallGame();</script>
 ```
 
@@ -66,118 +104,160 @@ This lets us split a large class across files without ES modules. All methods sh
 
 ### Data Files
 
-`cards.js`, `enemies.js`, and `audience.js` (top portion) define global constants:
+`cards.js`, `enemies.js`, and the `config/` files define global constants:
 
 - `CARD_DEFINITIONS` — keyed by card ID, contains all card data
 - `CARD_POOLS` — arrays of card IDs per protagonist/neutral pool
 - `STARTING_DECK` — array of card IDs for initial deck
 - `KEYWORD_GLOSSARY` — keyword display info and tutorial hints
-- `ENEMY_DEFINITIONS` — keyed by enemy ID, contains HP/pattern/speech
+- `ENEMY_DEFINITIONS` — keyed by enemy ID, contains HP/pattern/speech/passives
 - `ACT_STRUCTURE` — scene and boss layout per act
-- `AUDIENCE_TYPES` — audience member visual data
-- `AUDIENCE_TYPE_LIST`, `ADULT_AUDIENCE_TYPES`, `CHILD_AUDIENCE_TYPES` — derived selection lists
+- `AUDIENCE_TYPES` — audience member visual data (in `audience.js`)
+- `SPEECH_CONFIG`, `ENEMY_SPEECH`, `PROTAGONIST_SPEECH`, `CROWD_*` — speech system config
 
 The constructor references these via `this.enemies = ENEMY_DEFINITIONS` etc.
+
+### Shared Card DOM Helper
+
+`renderer-cards.js` provides `_buildCardDOM(card, options)` — a shared helper that builds the full card DOM structure (rarity borders, energy blips, perforation, name, description, type badge, Aldric rivets). Three thin wrappers call it:
+
+- `createCardElement` — adds dataset attributes + playability classes for hand cards
+- `createZoomedCardElement` — adds `zoomed` class and extra rivets
+- `renderRewardCards` — adds `reward-card` class and dataset index
 
 ---
 
 ## Method Inventory
 
-### game.js (15 methods)
+### game.js — Core lifecycle & deck management
 
-Core lifecycle and deck management:
 - `constructor`, `init`, `setup`
 - `initializeDeck`, `shuffleDeck`, `drawCard`
+- `resetKeywords`, `renderKeywords`
 - `wait` (Promise-based delay utility)
-
-Debug API:
 - `exposeDebugAPI`, `restartCombat`
-- `setMacGuffinHP`, `setEnemyHP`, `setBlock`, `setIntent`, `setEnergy`, `resetEnergy`
+- Debug setters: `setMacGuffinHP`, `setEnemyHP`, `setBlock`, `setIntent`, `setEnergy`, `resetEnergy`
 
-### combat.js (31 methods)
+### combat-turns.js — Turn lifecycle & ovation
 
-Turn management:
 - `startTurn`, `drawToHandSize`, `endTurn`
+- `processStartOfTurnKeywords`, `_decayPlayerDebuffs`, `processEndOfTurnCurse`
+- `processEnemyTurnStartPassives`
+- `gainOvation`, `loseOvation`, `getOvationDamageBonus`, `renderOvationMeter`
+- `onEnemyDefeated`, `onDefeat`
 
-Enemy AI:
-- `executeEnemyTurn`, `enemyAttack`, `enemyBlock`, `enemyHeal`, `enemyBuff`, `enemyDebuff`
-- `setNextEnemyIntent`, `onDefeat`
+### combat-enemy.js — Enemy AI & damage pipeline (enemy -> player)
 
-Card play:
-- `onCardTap`, `canPlayCard`, `getEffectiveCardCost`, `playCard`, `executeCardEffects`
+- `getCurrentPattern`, `getCurrentPatternEntry`, `executeEnemyTurn`, `setNextEnemyIntent`
+- `checkBossPhaseTransition`
+- `enemyAttack`, `enemyAttackAoE`, `enemyBlock`, `enemyHeal`, `enemyGainKeyword`
+- `resolveDamageHit`, `getTargetElement`, `triggerAbsorbAnimation`
+- `applyCombatStartPassives`, `renderEnemyPassive`
 
-Effect resolution:
-- `dealDamageToEnemy`, `gainBlock`, `drawCards`, `healMacGuffin`, `gainEnergy`
-- `gainWard`, `gainOvation`, `gainCurtain`
-- `applyDebuffToEnemy`, `cleanseDeBufss`, `desperatePlea`, `grandFinale`
-- `onEnemyDefeated`
+### combat-cards.js — Card play & effect execution
 
-Status effects:
-- `tickStatusEffects`, `resetTurnEffects`
+- `canPlayCard`, `getEffectiveCardCost`, `playCard`
+- `_reindexHandCards`, `_debouncedReflow`
+- `_queueCardEffects`, `_processEffectQueue`, `_waitForEffectQueue`
+- `executeCardEffects` (the big switch over effect types)
 
-### renderer.js (22 methods)
+### combat-keywords.js — Keywords, debuffs & player -> enemy damage
 
-Card rendering:
+- `dealDamageToEnemy`
+- Keyword gains: `gainBlock`, `gainShield`, `gainTaunt`, `gainDistract`, `gainRetaliate`, `gainInspire`, `gainEnergy`, `drawCards`, `healProtagonists`
+- Debuffs: `applyDebuffToProtagonist`, `applyDebuffFromEnemy`, `inflictDebuffOnEnemy`
+- `checkFearFrustration`, `checkEnemyFearFrustration`, `resolveInflictTarget`
+
+### renderer-cards.js — Card DOM construction
+
+- `_buildCardDOM` (shared helper)
 - `renderHand`, `createCardElement`, `getCardType`, `createZoomedCardElement`
+- `renderRewardCards`, `renderEnemyChoices`
+- `updateCardPlayability`
 
-Combat display:
-- `renderCombatState`, `renderMacGuffinHP`, `renderMacGuffinBlock`, `renderEnemyHP`, `renderEnemyIntent`
-- `renderEnergy`, `renderStatusEffects`, `updateCardPlayability`, `updateCardSelection`
+### renderer.js — Combat state display & speech bubbles
 
-Speech bubbles:
-- `showSpeechBubble`, `showDamageBubble`, `showBlockBubble`, `showHealBubble`, `showAttackBubble`, `showCharacterBubble`
+- `renderCombatState`, `renderProtagonistHP`, `renderProtagonistDefenses`
+- `renderMacGuffinHP`, `renderMacGuffinBlock`
+- `renderEnemyHP`, `renderEnemyIntent`
+- `renderStatusEffects`, `renderProtagonistStatusIcons`, `renderEnemyStatusIcons`
+- `renderEnergy`, `renderDeckCount`
+- `showSpeechBubble`, `showDamageBubble`, `showBlockBubble`, `showHealBubble`
+- `showAttackBubble`, `showCharacterBubble`
+- `onPuppetTap`
 
-Other rendering:
-- `onPuppetTap`, `renderRewardCards`, `renderEnemyChoices`
+### ui-events.js — Input handling & drag-to-play
 
-### ui.js (32 methods)
-
-Event handling:
 - `bindEvents`, `titleToKeywordKey`, `onEndTurn`
+- Drag system: `_startDrag`, `_onDragMove`, `_onDragEnd`, `_snapBack`, `_dropOnTarget`, `_resumeReflow`
 
-Card zoom:
-- `startLongPress`, `cancelLongPress`, `showCardZoom`, `hideCardZoom`
-- `showKeywordExplanations`, `showExplanationPage`, `clearExplanationBubbles`, `clearKeywordExplanations`
+### ui-screens.js — Overlays, menus & explanations
 
-Audience interaction:
-- `getRandomAudienceMembers`, `showAudienceBubble`, `showAudienceExplanation`
+- Card zoom: `_extractCardKeywords`, `showCardZoom`, `hideCardZoom`
+- Keywords: `showKeywordExplanations`, `clearExplanationBubbles`, `clearKeywordExplanations`
+- Audience helpers: `getRandomAudienceMembers`, `showAudienceBubble`, `showAudienceExplanation`, `showEnemyPassiveExplanation`
+- Rewards: `showRewardsScreen`, `getRandomCardByRarity`, `selectReward`, `confirmReward`, `skipReward`, `hideRewardsScreen`
+- Deck list: `showDeckList`, `hideDeckList`, `showDeckListForRemoval`
+- Menus: `showTitleScreen`, `showCharacterSelect`, `startPerformance`
+- Curtains: `curtainTransition`, `curtainClose`, `curtainOpen`
 
-Rewards:
-- `showRewardsScreen`, `getRandomCardFromPool`, `selectReward`, `confirmReward`, `skipReward`, `hideRewardsScreen`
+### ui-scenes.js — Scene selection & act progression
 
-Menus:
-- `showTitleScreen`, `showCharacterSelect`, `startPerformance`
+- `showSceneSelection`, `selectEnemy`, `startCombatWithEnemy`
+- `startBossCombat`, `advanceScene`, `onActComplete`
+- `updateProgressIndicator`
 
-Curtain transitions:
-- `curtainTransition`, `curtainClose`, `curtainOpen`
+### audience.js — Audience data & animations
 
-Scene flow:
-- `showSceneSelection`, `selectEnemy`, `startCombatWithEnemy`, `startBossCombat`
-- `advanceScene`, `onActComplete`, `updateProgressIndicator`
+Data constants: `AUDIENCE_TYPES`, `AUDIENCE_TYPE_LIST`, `ADULT_AUDIENCE_TYPES`, `CHILD_AUDIENCE_TYPES`, `PROTAGONIST_LINES`, `AUDIENCE_REACTIONS`, `ENEMY_EXPANDED_LINES`
 
-### audience.js (8 prototype methods)
-
+Prototype methods:
 - `initializeAnimations`, `generateAudience`, `createAudienceMember`
 - `scheduleAudienceBob`, `scheduleAudienceWave`, `triggerAudienceWave`
 - `triggerRandomTutorialHint`, `triggerAudienceReaction`
 
+### audience-speech.js — Speech priority engine
+
+- `initSpeechSystem`, `resetSpeechForCombat`
+- Internal: `_canShowSpeech`, `_getDiminishedChance`, `_pickUnusedLine`, `_recordSpeech`
+- Core dispatcher: `trySpeech`
+- Triggers: `tryEnemySpeech`, `tryProtagonistSpeech`, `tryCrowdReaction`, `triggerCrowdAmbientDialogue`
+- Legacy wrappers: `initVoiceLines`, `getOvationTier`, `tryProtagonistLine`, `tryAudienceReaction`, `getEnemyLine`, `showBossPhaseTransition`
+
 ---
 
-## Editing Guide
+## Editing Guide — Which Files to Load
 
-**To modify combat mechanics:** Edit `combat.js`. You need ~800 lines of context.
+Each task below lists the minimum files an AI needs in context (plus `game.js` which is always relevant):
 
-**To change card rendering or speech bubbles:** Edit `renderer.js`. ~630 lines.
+| Task | Files to read |
+|------|--------------|
+| Change turn flow, ovation, or win/loss conditions | `combat-turns.js` |
+| Change enemy AI, attack patterns, or boss phases | `combat-enemy.js`, `enemies.js` |
+| Change card play logic or add new effect types | `combat-cards.js` |
+| Change keyword/debuff mechanics or player damage | `combat-keywords.js` |
+| Change card visual appearance | `renderer-cards.js` |
+| Change HP bars, intent display, or speech bubbles | `renderer.js` |
+| Change drag-to-play or event handlers | `ui-events.js` |
+| Change card zoom, rewards, deck list, or menus | `ui-screens.js` |
+| Change scene flow or act progression | `ui-scenes.js` |
+| Change audience visuals or animations | `audience.js` |
+| Change speech triggers, probabilities, or dialogue | `audience-speech.js`, `config/` files |
+| Add/change cards, enemies, or keywords | `cards.js`, `enemies.js` (pure data) |
 
-**To change menus, scene flow, or curtain transitions:** Edit `ui.js`. ~760 lines.
+### Cross-File Dependencies
 
-**To add/change cards, enemies, or keywords:** Edit the data files (`cards.js`, `enemies.js`). These are pure data — no logic.
+Methods frequently call across file boundaries. Key cross-file calls:
 
-**To change audience behavior:** Edit `audience.js`. Data at top, animation methods at bottom.
+- **combat-turns.js** calls: `renderCombatState` (renderer), `renderHand` (renderer-cards), `executeEnemyTurn` (combat-enemy), `updateCardPlayability` (renderer-cards), `renderOvationMeter` (self), `showRewardsScreen` (ui-screens)
+- **combat-enemy.js** calls: `resolveDamageHit` (self), `renderCombatState` (renderer), `showAttackBubble`/`showDamageBubble` (renderer), `tryEnemySpeech` (audience-speech), animation triggers (audience)
+- **combat-cards.js** calls: `executeCardEffects` (self), all keyword methods in `combat-keywords.js`, `renderHand` (renderer-cards), `renderCombatState` (renderer)
+- **combat-keywords.js** calls: `renderCombatState` (renderer), `showDamageBubble`/`showHealBubble`/`showBlockBubble` (renderer), `tryProtagonistSpeech`/`tryCrowdReaction` (audience-speech)
+- **ui-events.js** calls: `showCardZoom`/`hideCardZoom` (ui-screens), `playCard` (combat-cards), `endTurn` (combat-turns)
+- **ui-scenes.js** calls: `startTurn` (combat-turns), `renderCombatState` (renderer), `resetSpeechForCombat` (audience-speech), `curtainOpen`/`curtainClose` (ui-screens)
 
-**To change initialization, deck logic, or debug tools:** Edit `game.js`. ~370 lines.
+### Adding a New Prototype Extension File
 
-**To add a new prototype extension file:**
 1. Create the file with `Object.assign(CurtainCallGame.prototype, { ... })`
 2. Add a `<script>` tag in `curtain-call.html` between `game.js` and the instantiation line
 3. Ensure no method name collisions (last definition wins silently)

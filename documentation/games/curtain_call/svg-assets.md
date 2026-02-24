@@ -6,7 +6,7 @@ This document tracks all SVG assets needed for Curtain Call. Placeholder version
 
 | Asset | File | Status | Notes |
 |-------|------|--------|-------|
-| Bron | `/static/svg/bron.svg` | Placeholder | Needs proper silhouette |
+| Aldric | `/static/svg/bron.svg` | Placeholder | Needs proper silhouette |
 | Pip | `/static/svg/pip.svg` | Placeholder | Needs proper silhouette |
 | Enemy (generic) | `/static/svg/enemy-placeholder.svg` | Placeholder | Base enemy shape |
 | MacGuffin | `/static/svg/macguffin.svg` | Placeholder | Treasure chest shape |
@@ -21,7 +21,7 @@ This document tracks all SVG assets needed for Curtain Call. Placeholder version
 
 ## Protagonist Silhouettes
 
-### Bron, the Ironclad
+### Aldric, the Ironclad
 
 **File:** `/static/svg/bron.svg`
 **ViewBox:** `0 0 200 320` (body 200×250, stick extends 70px below)
@@ -55,15 +55,15 @@ This document tracks all SVG assets needed for Curtain Call. Placeholder version
 - Oversized pointy wizard/jester hat
 - Trailing scarf or cape element
 - Dagger or wand in hand
-- Spiky, angular silhouette (contrasts with Bron's roundness)
+- Spiky, angular silhouette (contrasts with Aldric's stockiness)
 - Clear puppet stick extending from bottom
 
 **Expression Cutouts:**
-- Eyes: Sharper/narrower than Bron's
+- Eyes: Sharper/narrower than Aldric's
 - Mouth: Can be more expressive (mischievous grin)
 - States needed: neutral, happy/smug, hurt, focused
 
-**Color:** Same as Bron
+**Color:** Same as Aldric
 
 ---
 
@@ -203,7 +203,7 @@ All assets should follow these principles from theme.md:
 ## Production Priority
 
 **Phase 1 (MVP):**
-1. Bron silhouette (replace placeholder)
+1. Aldric silhouette (replace placeholder)
 2. Pip silhouette (replace placeholder)
 3. Stage Rat enemy
 4. MacGuffin (polish existing)

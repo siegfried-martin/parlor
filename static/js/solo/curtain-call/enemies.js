@@ -28,7 +28,8 @@ const ENEMY_DEFINITIONS = {
     'stage-rat': {
         id: 'stage-rat',
         name: 'Stage Rat',
-        hp: 25,
+        svg: '/static/svg/enemies/stage-rat.svg',
+        hp: 22,
         gimmick: 'Straightforward attacker',
         passives: [],
         pattern: [
@@ -42,7 +43,8 @@ const ENEMY_DEFINITIONS = {
     'rusty-knight': {
         id: 'rusty-knight',
         name: 'Rusty Knight',
-        hp: 30,
+        svg: '/static/svg/enemies/rusty-knight.svg',
+        hp: 28,
         gimmick: 'Slow but armored',
         passives: [
             { id: 'rusty-armor', name: 'Rusty Armor', description: 'Starts with 3 Block' }
@@ -58,6 +60,7 @@ const ENEMY_DEFINITIONS = {
     'moth-swarm': {
         id: 'moth-swarm',
         name: 'Moth Swarm',
+        svg: '/static/svg/enemies/moth-swarm.svg',
         hp: 20,
         gimmick: 'Multi-hit attacks',
         passives: [
@@ -74,6 +77,7 @@ const ENEMY_DEFINITIONS = {
     'stagehand': {
         id: 'stagehand',
         name: 'Stagehand',
+        svg: '/static/svg/enemies/stagehand.svg',
         hp: 25,
         gimmick: 'Gets stronger over time',
         passives: [
@@ -90,6 +94,7 @@ const ENEMY_DEFINITIONS = {
     'the-critic': {
         id: 'the-critic',
         name: 'The Critic',
+        svg: '/static/svg/enemies/the-critic.svg',
         hp: 45,
         gimmick: 'Debuffs and self-healing boss',
         isBoss: true,
@@ -114,13 +119,13 @@ const ENEMY_DEFINITIONS = {
                 hpThreshold: 0.5,
                 transition: { block: 5 },
                 pattern: [
-                    { type: 'attack', value: 8, hits: 1 },
+                    { type: 'attack', value: 7, hits: 1 },
                     { type: 'debuff', value: 0,
                         actions: [
                             { type: 'inflict', keyword: 'vulnerable', value: 2, target: 'allAllies' }
                         ]
                     },
-                    { type: 'attack', value: 5, hits: 2 }
+                    { type: 'attack', value: 4, hits: 2 }
                 ]
             }
         ],
@@ -134,6 +139,7 @@ const ENEMY_DEFINITIONS = {
     'phantom-understudy': {
         id: 'phantom-understudy',
         name: 'Phantom Understudy',
+        svg: '/static/svg/enemies/phantom-understudy.svg',
         hp: 35,
         gimmick: 'Heals and regenerates',
         passives: [
@@ -156,7 +162,8 @@ const ENEMY_DEFINITIONS = {
     'prop-master': {
         id: 'prop-master',
         name: 'Prop Master',
-        hp: 40,
+        svg: '/static/svg/enemies/prop-master.svg',
+        hp: 38,
         gimmick: 'Heavy defenses and Weak',
         passives: [
             { id: 'stage-fortress', name: 'Stage Fortress', description: 'Block halves instead of fully resetting' }
@@ -178,6 +185,7 @@ const ENEMY_DEFINITIONS = {
     'shadow-mimic': {
         id: 'shadow-mimic',
         name: 'Shadow Mimic',
+        svg: '/static/svg/enemies/shadow-mimic.svg',
         hp: 30,
         gimmick: 'AoE-heavy, punishes attacks',
         passives: [
@@ -194,6 +202,7 @@ const ENEMY_DEFINITIONS = {
     'spotlight-phantom': {
         id: 'spotlight-phantom',
         name: 'Spotlight Phantom',
+        svg: '/static/svg/enemies/spotlight-phantom.svg',
         hp: 35,
         gimmick: 'Accuracy attacks, Fear/Frustration pressure',
         passives: [
@@ -225,6 +234,7 @@ const ENEMY_DEFINITIONS = {
     'the-director': {
         id: 'the-director',
         name: 'The Director',
+        svg: '/static/svg/enemies/the-director.svg',
         hp: 60,
         gimmick: 'Complex debuff layering boss',
         isBoss: true,
@@ -235,7 +245,7 @@ const ENEMY_DEFINITIONS = {
             {
                 // Phase 1: above 50% HP
                 pattern: [
-                    { type: 'attack', value: 8, hits: 1 },
+                    { type: 'attack', value: 7, hits: 1 },
                     { type: 'debuff', value: 0,
                         actions: [
                             { type: 'inflict', keyword: 'forgetful', value: 2, target: 'protagonistA' },
@@ -243,7 +253,7 @@ const ENEMY_DEFINITIONS = {
                         ]
                     },
                     { type: 'attack', value: 4, hits: 1, target: 'all' },
-                    { type: 'attack', value: 6, hits: 2 }
+                    { type: 'attack', value: 5, hits: 2 }
                 ]
             },
             {
@@ -251,7 +261,7 @@ const ENEMY_DEFINITIONS = {
                 hpThreshold: 0.5,
                 transition: { clearDebuffs: true, block: 8 },
                 pattern: [
-                    { type: 'attack', value: 10, hits: 1 },
+                    { type: 'attack', value: 9, hits: 1 },
                     { type: 'debuff', value: 0,
                         actions: [
                             { type: 'inflict', keyword: 'confused', value: 2, target: 'allAllies' },
@@ -259,10 +269,10 @@ const ENEMY_DEFINITIONS = {
                         ]
                     },
                     { type: 'attack', value: 5, hits: 1, target: 'all' },
-                    { type: 'attack', value: 7, hits: 1,
+                    { type: 'attack', value: 6, hits: 1,
                         actions: [
                             { type: 'inflict', keyword: 'frustration', value: 2, target: 'protagonistB' },
-                            { type: 'attack', value: 7 }
+                            { type: 'attack', value: 6 }
                         ]
                     }
                 ]
@@ -278,6 +288,7 @@ const ENEMY_DEFINITIONS = {
     'prima-donna': {
         id: 'prima-donna',
         name: 'Prima Donna',
+        svg: '/static/svg/enemies/prima-donna.svg',
         hp: 45,
         gimmick: 'DPS race with Retaliate',
         passives: [
@@ -300,6 +311,7 @@ const ENEMY_DEFINITIONS = {
     'comedy-tragedy-mask': {
         id: 'comedy-tragedy-mask',
         name: 'Comedy/Tragedy Mask',
+        svg: '/static/svg/enemies/comedy-tragedy-mask.svg',
         hp: 50,
         gimmick: 'Alternating states with different rules',
         passives: [
@@ -329,6 +341,7 @@ const ENEMY_DEFINITIONS = {
     'puppeteers-hand': {
         id: 'puppeteers-hand',
         name: "Puppeteer's Hand",
+        svg: '/static/svg/enemies/puppeteers-hand.svg',
         hp: 40,
         gimmick: 'AoE-heavy debuff stacker',
         passives: [
@@ -362,6 +375,7 @@ const ENEMY_DEFINITIONS = {
     'fallen-curtain': {
         id: 'fallen-curtain',
         name: 'Fallen Curtain',
+        svg: '/static/svg/enemies/fallen-curtain.svg',
         hp: 50,
         gimmick: 'Defensive wall with Curse',
         passives: [
@@ -374,9 +388,9 @@ const ENEMY_DEFINITIONS = {
                     { type: 'gain', keyword: 'regenerate', value: 1 }
                 ]
             },
-            { type: 'debuff', value: 8,
+            { type: 'debuff', value: 6,
                 actions: [
-                    { type: 'inflict', keyword: 'curse', value: 8, target: 'macguffin' },
+                    { type: 'inflict', keyword: 'curse', value: 6, target: 'macguffin' },
                     { type: 'block', value: 6 }
                 ]
             },
@@ -393,6 +407,7 @@ const ENEMY_DEFINITIONS = {
     'the-playwright': {
         id: 'the-playwright',
         name: 'The Playwright',
+        svg: '/static/svg/enemies/the-playwright.svg',
         hp: 80,
         gimmick: 'Three-phase final boss',
         isBoss: true,
@@ -454,7 +469,7 @@ const ENEMY_DEFINITIONS = {
                     { type: 'attack', value: 10, hits: 2,
                         actions: [
                             { type: 'attack', value: 10, hits: 2 },
-                            { type: 'heal', value: 8 }
+                            { type: 'heal', value: 6 }
                         ]
                     },
                     { type: 'attack', value: 5, hits: 1, target: 'all',

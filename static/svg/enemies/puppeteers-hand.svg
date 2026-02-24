@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 320">
+  <!-- Puppeteer's Hand - Disembodied Hand with Strings Shadow Puppet -->
+  <!-- No puppet stick - the hand IS the puppeteer -->
+
+  <!-- Tangled strings hanging from fingers -->
+  <!-- String from thumb -->
+  <path d="M42,115 Q38,160 45,200 Q40,240 50,290 Q48,300 52,315"
+        stroke="#F4E4C1" stroke-width="1.5" fill="none" opacity="0.6"/>
+  <!-- String from index -->
+  <path d="M72,48 Q65,100 70,150 Q68,200 75,250 Q72,280 78,320"
+        stroke="#F4E4C1" stroke-width="1.5" fill="none" opacity="0.6"/>
+  <!-- String from middle -->
+  <path d="M100,32 Q105,90 98,150 Q102,210 95,270 Q100,300 97,320"
+        stroke="#F4E4C1" stroke-width="1.5" fill="none" opacity="0.6"/>
+  <!-- String from ring -->
+  <path d="M125,50 Q130,110 122,170 Q128,220 120,280 Q125,305 118,320"
+        stroke="#F4E4C1" stroke-width="1.5" fill="none" opacity="0.6"/>
+  <!-- String from pinky -->
+  <path d="M148,68 Q155,130 145,190 Q150,240 142,295 Q148,310 140,320"
+        stroke="#F4E4C1" stroke-width="1.5" fill="none" opacity="0.6"/>
+
+  <!-- Extra tangled cross-strings -->
+  <path d="M55,200 Q90,185 120,210" stroke="#F4E4C1" stroke-width="1" fill="none" opacity="0.35"/>
+  <path d="M70,250 Q100,240 130,260" stroke="#F4E4C1" stroke-width="1" fill="none" opacity="0.35"/>
+  <path d="M60,170 Q95,160 135,175" stroke="#F4E4C1" stroke-width="1" fill="none" opacity="0.3"/>
+
+  <!-- Palm - main body of the hand -->
+  <path d="M45,120 Q40,150 42,180 Q44,200 55,210 Q70,220 100,222 Q130,220 145,210 Q156,200 158,180 Q160,150 155,120 Z"
+        fill="#1A1A2E"/>
+
+  <!-- Thumb - angled out to the left -->
+  <path d="M45,130 Q30,120 28,108 Q26,95 35,88 Q44,82 50,90 Q54,100 50,120 Z"
+        fill="#1A1A2E"/>
+  <!-- Thumb tip -->
+  <ellipse cx="34" cy="90" rx="10" ry="12" fill="#1A1A2E"/>
+
+  <!-- Index finger -->
+  <path d="M65,122 Q62,90 65,60 Q67,45 75,42 Q83,45 85,60 Q88,90 85,122 Z"
+        fill="#1A1A2E"/>
+  <!-- Index tip -->
+  <ellipse cx="75" cy="42" rx="10" ry="10" fill="#1A1A2E"/>
+
+  <!-- Middle finger - tallest -->
+  <path d="M88,122 Q86,82 88,48 Q90,28 100,25 Q110,28 112,48 Q114,82 112,122 Z"
+        fill="#1A1A2E"/>
+  <!-- Middle tip -->
+  <ellipse cx="100" cy="28" rx="12" ry="11" fill="#1A1A2E"/>
+
+  <!-- Ring finger -->
+  <path d="M112,122 Q114,90 118,60 Q120,45 128,42 Q136,45 135,60 Q132,90 130,122 Z"
+        fill="#1A1A2E"/>
+  <!-- Ring tip -->
+  <ellipse cx="128" cy="44" rx="10" ry="10" fill="#1A1A2E"/>
+
+  <!-- Pinky finger - shortest -->
+  <path d="M132,125 Q135,100 138,78 Q140,65 148,62 Q156,65 155,78 Q152,100 150,125 Z"
+        fill="#1A1A2E"/>
+  <!-- Pinky tip -->
+  <ellipse cx="148" cy="64" rx="9" ry="9" fill="#1A1A2E"/>
+
+  <!-- Eye cutouts on palm -->
+  <ellipse cx="82" cy="155" rx="10" ry="6" fill="#F4E4C1"/>
+  <ellipse cx="118" cy="155" rx="10" ry="6" fill="#F4E4C1"/>
+
+  <!-- Pupils -->
+  <circle cx="84" cy="155" r="3" fill="#1A1A2E"/>
+  <circle cx="120" cy="155" r="3" fill="#1A1A2E"/>
+
+  <!-- Mouth cutout on palm -->
+  <path d="M85,180 Q100,190 115,180" stroke="#F4E4C1" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+
+  <!-- Knuckle creases -->
+  <path d="M60,125 Q100,135 140,125" stroke="#0D0D1A" stroke-width="1.5" fill="none" opacity="0.4"/>
+  <path d="M65,140 Q100,147 135,140" stroke="#0D0D1A" stroke-width="1" fill="none" opacity="0.3"/>
+
+  <!-- Joint lines on fingers -->
+  <line x1="67" y1="80" x2="83" y2="80" stroke="#0D0D1A" stroke-width="1" opacity="0.3"/>
+  <line x1="90" y1="72" x2="112" y2="72" stroke="#0D0D1A" stroke-width="1" opacity="0.3"/>
+  <line x1="115" y1="80" x2="133" y2="80" stroke="#0D0D1A" stroke-width="1" opacity="0.3"/>
+  <line x1="135" y1="95" x2="152" y2="95" stroke="#0D0D1A" stroke-width="1" opacity="0.3"/>
+
+  <!-- Small string knots at fingertips -->
+  <circle cx="42" cy="115" r="2.5" fill="#F4E4C1" opacity="0.5"/>
+  <circle cx="72" cy="48" r="2.5" fill="#F4E4C1" opacity="0.5"/>
+  <circle cx="100" cy="32" r="2.5" fill="#F4E4C1" opacity="0.5"/>
+  <circle cx="125" cy="50" r="2.5" fill="#F4E4C1" opacity="0.5"/>
+  <circle cx="148" cy="68" r="2.5" fill="#F4E4C1" opacity="0.5"/>
+</svg>

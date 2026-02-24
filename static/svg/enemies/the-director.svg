@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 320">
+  <!-- Puppet Stick - boss has a thicker stick -->
+  <rect x="94" y="270" width="12" height="50" rx="3" fill="#3D2B1F"/>
+  <ellipse cx="100" cy="270" rx="14" ry="5" fill="#3D2B1F"/>
+
+  <!-- Left leg -->
+  <rect x="72" y="222" width="18" height="50" rx="3" fill="#1A1A2E"/>
+  <!-- Right leg -->
+  <rect x="110" y="222" width="18" height="50" rx="3" fill="#1A1A2E"/>
+
+  <!-- Left boot -->
+  <path d="M68,268 L68,278 Q68,282 72,282 L94,282 Q96,282 96,278 L96,268 Q96,264 92,264 L72,264 Q68,264 68,268 Z" fill="#1A1A2E"/>
+  <!-- Right boot -->
+  <path d="M106,268 L106,278 Q106,282 110,282 L132,282 Q134,282 134,278 L134,268 Q134,264 130,264 L110,264 Q106,264 106,268 Z" fill="#1A1A2E"/>
+
+  <!-- Tall commanding body - broad shoulders, tapered waist -->
+  <path d="M55,115 Q52,120 50,135 L48,180 Q48,195 55,210
+           L60,225 L140,225 L145,210 Q152,195 152,180
+           L150,135 Q148,120 145,115
+           Q140,108 130,105 L70,105 Q60,108 55,115 Z" fill="#1A1A2E"/>
+
+  <!-- Coat lapels / collar detail -->
+  <path d="M80,105 L90,140 L100,120 L110,140 L120,105" fill="none" stroke="#F4E4C1" stroke-width="1.5"/>
+
+  <!-- Coat buttons -->
+  <circle cx="100" cy="145" r="2" fill="#F4E4C1"/>
+  <circle cx="100" cy="162" r="2" fill="#F4E4C1"/>
+  <circle cx="100" cy="179" r="2" fill="#F4E4C1"/>
+
+  <!-- Belt -->
+  <rect x="55" y="195" width="90" height="6" rx="2" fill="#1A1A2E"/>
+  <rect x="95" y="193" width="10" height="10" rx="1" fill="#1A1A2E" stroke="#F4E4C1" stroke-width="1"/>
+
+  <!-- Left arm - holding megaphone -->
+  <path d="M55,120 Q42,125 35,135 Q30,145 28,155 Q26,162 28,165 Z" fill="#1A1A2E"/>
+
+  <!-- Megaphone -->
+  <polygon points="12,130 28,148 32,165 8,155" fill="#1A1A2E"/>
+  <ellipse cx="10" cy="142" rx="8" ry="14" fill="#1A1A2E"/>
+  <!-- Megaphone opening cutout -->
+  <ellipse cx="9" cy="142" rx="4" ry="8" fill="#F4E4C1"/>
+  <!-- Megaphone detail -->
+  <line x1="18" y1="135" x2="30" y2="150" stroke="#F4E4C1" stroke-width="0.8"/>
+
+  <!-- Right arm - holding baton, raised high -->
+  <path d="M145,118 Q155,112 162,100 Q168,88 172,75 Q175,65 178,58 Z" fill="#1A1A2E"/>
+
+  <!-- Baton -->
+  <line x1="175" y1="50" x2="185" y2="28" stroke="#1A1A2E" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="186" cy="26" r="4" fill="#1A1A2E"/>
+  <circle cx="175" cy="50" r="3" fill="#1A1A2E"/>
+
+  <!-- Broad shoulders - epaulettes -->
+  <ellipse cx="58" cy="112" rx="10" ry="6" fill="#1A1A2E"/>
+  <ellipse cx="142" cy="112" rx="10" ry="6" fill="#1A1A2E"/>
+  <!-- Shoulder fringe detail -->
+  <path d="M50,116 L48,122 L52,116 L50,122 L54,116 L52,122 L56,116 L54,122 L58,116 L56,122 L60,116 L58,122 L62,116 L60,122 L64,116 L62,122 L66,116" fill="none" stroke="#F4E4C1" stroke-width="0.8"/>
+  <path d="M134,116 L132,122 L136,116 L134,122 L138,116 L136,122 L140,116 L138,122 L142,116 L140,122 L144,116 L142,122 L146,116 L144,122 L148,116 L146,122 L150,116" fill="none" stroke="#F4E4C1" stroke-width="0.8"/>
+
+  <!-- Neck -->
+  <rect x="90" y="80" width="20" height="28" rx="4" fill="#1A1A2E"/>
+
+  <!-- Head - tall and angular for authority -->
+  <path d="M72,45 Q72,22 100,18 Q128,22 128,45 L128,75 Q128,88 100,90 Q72,88 72,75 Z" fill="#1A1A2E"/>
+
+  <!-- Beret -->
+  <path d="M68,42 Q68,20 100,16 Q132,20 132,42 L68,42 Z" fill="#1A1A2E"/>
+  <!-- Beret brim -->
+  <rect x="66" y="40" width="68" height="6" rx="3" fill="#1A1A2E"/>
+  <!-- Beret nub -->
+  <circle cx="100" cy="18" r="4" fill="#1A1A2E"/>
+  <!-- Beret detail line -->
+  <path d="M72,35 Q100,28 128,35" fill="none" stroke="#F4E4C1" stroke-width="0.8"/>
+
+  <!-- Stern rectangular eyes - imposing boss look -->
+  <rect x="80" y="55" width="12" height="7" rx="1" fill="#F4E4C1"/>
+  <rect x="108" y="55" width="12" height="7" rx="1" fill="#F4E4C1"/>
+
+  <!-- Stern eyebrow lines above eyes -->
+  <line x1="78" y1="51" x2="94" y2="52" stroke="#F4E4C1" stroke-width="1.2"/>
+  <line x1="106" y1="52" x2="122" y2="51" stroke="#F4E4C1" stroke-width="1.2"/>
+
+  <!-- Firm mouth line -->
+  <rect x="88" y="73" width="24" height="3" rx="1" fill="#F4E4C1"/>
+</svg>

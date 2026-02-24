@@ -10,7 +10,7 @@ Curtain Call is a single-player deck-building roguelike built as a solo game wit
 
 ## How It Plays
 
-1. Player selects two Protagonists (starting pair: Bron the bruiser, Pip the trickster)
+1. Player selects two Protagonists (starting pair: Aldric the ironclad, Pip the trickster)
 2. Receives a starting deck of 8 basic cards
 3. Progresses through 3 acts, each with 2 scenes (choose 1 of 2 enemies) and 1 boss
 4. After each scene: choose 1 of 3 new cards to add to the deck
@@ -69,8 +69,8 @@ The rules of the game and technical architecture. Read this to understand:
 
 The actual game content. Read this to understand:
 
-- **Protagonists:** Bron (heavy hitter, Charged affinity) and Pip (utility/control, Encore affinity) — stats, personality, speech bubbles, cross-protagonist banter
-- **Card pools:** Starting deck (8 cards), Bron's cards (8), Pip's cards (8), neutral cards (7) — all with costs, effects, keywords, upgrade versions, speech bubbles, and unlock tiers
+- **Protagonists:** Aldric (heavy hitter, Charged affinity) and Pip (utility/control, Encore affinity) — stats, personality, speech bubbles, cross-protagonist banter
+- **Card pools:** Starting deck (8 cards), Aldric's cards (8), Pip's cards (8), neutral cards (7) — all with costs, effects, keywords, upgrade versions, speech bubbles, and unlock tiers
 - **Enemies:** 12 scene enemies (4 per act) and 3 bosses — each with HP, gimmick hints, attack patterns, speech bubbles, and design intent explaining what they test
 - **The Playwright** as final boss: 3-phase, 100 HP endurance fight
 - **Unlock progression:** Tier 1 (clear Act I) and Tier 2 (win a run)
@@ -80,7 +80,7 @@ The actual game content. Read this to understand:
 
 The initial implementation targets the minimum viable experience:
 
-- 1 protagonist pair (Bron + Pip)
+- 1 protagonist pair (Aldric + Pip)
 - ~23 unique cards (including basics and unlockables)
 - 12 scene enemies + 3 bosses
 - 3-act run structure with card rewards and boss upgrades

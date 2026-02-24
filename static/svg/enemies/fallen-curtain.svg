@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 320">
+  <!-- Fallen Curtain - Living Curtain Shadow Puppet -->
+
+  <!-- Puppet stick -->
+  <rect x="95" y="272" width="10" height="48" rx="2" fill="#3D2B1F"/>
+  <ellipse cx="100" cy="272" rx="8" ry="3" fill="#3D2B1F"/>
+
+  <!-- Curtain rod across the top - like horns -->
+  <rect x="15" y="22" width="170" height="8" rx="3" fill="#1A1A2E"/>
+  <!-- Rod finials / horn tips -->
+  <circle cx="15" cy="26" r="10" fill="#1A1A2E"/>
+  <circle cx="185" cy="26" r="10" fill="#1A1A2E"/>
+  <!-- Horn point on left -->
+  <polygon points="8,18 3,10 15,20" fill="#1A1A2E"/>
+  <!-- Horn point on right -->
+  <polygon points="192,18 197,10 185,20" fill="#1A1A2E"/>
+
+  <!-- Curtain rings on rod -->
+  <circle cx="45" cy="26" r="5" fill="#1A1A2E" stroke="#0D0D1A" stroke-width="1"/>
+  <circle cx="75" cy="26" r="5" fill="#1A1A2E" stroke="#0D0D1A" stroke-width="1"/>
+  <circle cx="100" cy="26" r="5" fill="#1A1A2E" stroke="#0D0D1A" stroke-width="1"/>
+  <circle cx="125" cy="26" r="5" fill="#1A1A2E" stroke="#0D0D1A" stroke-width="1"/>
+  <circle cx="155" cy="26" r="5" fill="#1A1A2E" stroke="#0D0D1A" stroke-width="1"/>
+
+  <!-- Main curtain body - heavy draping fabric -->
+  <path d="M30,30
+           Q25,60 28,90
+           Q22,120 25,150
+           Q20,180 28,210
+           Q22,240 30,270
+           L170,270
+           Q178,240 175,210
+           Q180,180 172,150
+           Q178,120 175,90
+           Q180,60 170,30 Z"
+        fill="#1A1A2E"/>
+
+  <!-- Deep fabric folds - left side -->
+  <path d="M45,32 Q38,80 42,130 Q36,180 40,230 Q38,255 42,270"
+        stroke="#0D0D1A" stroke-width="3" fill="none" opacity="0.5"/>
+  <path d="M62,32 Q58,90 65,140 Q58,190 62,240 Q60,260 64,270"
+        stroke="#0D0D1A" stroke-width="2.5" fill="none" opacity="0.4"/>
+
+  <!-- Deep fabric folds - center -->
+  <path d="M82,32 Q78,70 85,120 Q80,170 84,220 Q80,250 85,270"
+        stroke="#0D0D1A" stroke-width="2.5" fill="none" opacity="0.4"/>
+  <path d="M100,32 Q105,80 98,130 Q104,180 100,230 Q102,255 100,270"
+        stroke="#0D0D1A" stroke-width="3" fill="none" opacity="0.5"/>
+  <path d="M118,32 Q122,75 115,125 Q120,175 116,225 Q120,255 118,270"
+        stroke="#0D0D1A" stroke-width="2.5" fill="none" opacity="0.4"/>
+
+  <!-- Deep fabric folds - right side -->
+  <path d="M138,32 Q142,90 135,140 Q142,190 138,240 Q140,260 136,270"
+        stroke="#0D0D1A" stroke-width="2.5" fill="none" opacity="0.4"/>
+  <path d="M158,32 Q162,80 155,130 Q162,180 158,230 Q162,255 158,270"
+        stroke="#0D0D1A" stroke-width="3" fill="none" opacity="0.5"/>
+
+  <!-- Eye cutouts peering through fabric folds -->
+  <!-- Left eye - angular, menacing -->
+  <path d="M62,110 L78,102 L82,110 L78,118 L62,118 Z" fill="#F4E4C1"/>
+  <!-- Pupil -->
+  <circle cx="73" cy="110" r="3.5" fill="#1A1A2E"/>
+
+  <!-- Right eye - angular, menacing -->
+  <path d="M118,110 L122,102 L138,110 L138,118 L122,118 Z" fill="#F4E4C1"/>
+  <!-- Pupil -->
+  <circle cx="128" cy="110" r="3.5" fill="#1A1A2E"/>
+
+  <!-- Mouth - jagged gap in the fabric -->
+  <path d="M72,160 L82,155 L92,162 L100,153 L108,162 L118,155 L128,160 L122,168 L112,163 L100,170 L88,163 L78,168 Z"
+        fill="#F4E4C1"/>
+
+  <!-- Bottom fringe / tassels -->
+  <path d="M30,268 Q35,278 32,285" stroke="#1A1A2E" stroke-width="4" fill="none"/>
+  <path d="M50,268 Q52,280 48,288" stroke="#1A1A2E" stroke-width="4" fill="none"/>
+  <path d="M70,268 Q72,278 68,285" stroke="#1A1A2E" stroke-width="4" fill="none"/>
+  <path d="M90,268 Q92,280 88,288" stroke="#1A1A2E" stroke-width="4" fill="none"/>
+  <path d="M110,268 Q112,278 108,285" stroke="#1A1A2E" stroke-width="4" fill="none"/>
+  <path d="M130,268 Q132,280 128,288" stroke="#1A1A2E" stroke-width="4" fill="none"/>
+  <path d="M150,268 Q152,278 148,285" stroke="#1A1A2E" stroke-width="4" fill="none"/>
+  <path d="M170,268 Q172,280 168,285" stroke="#1A1A2E" stroke-width="4" fill="none"/>
+
+  <!-- Subtle arm-like gatherings on the sides -->
+  <path d="M30,140 Q18,155 22,170 Q15,185 25,195" stroke="#1A1A2E" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <path d="M170,140 Q182,155 178,170 Q185,185 175,195" stroke="#1A1A2E" stroke-width="8" fill="none" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,127 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 320">
+  <!-- The Playwright - FINAL BOSS Shadow Puppet -->
+  <!-- Largest, most detailed, most imposing -->
+
+  <!-- Puppet stick -->
+  <rect x="95" y="285" width="10" height="35" rx="2" fill="#3D2B1F"/>
+  <ellipse cx="100" cy="285" rx="8" ry="3" fill="#3D2B1F"/>
+
+  <!-- Flowing robes - wide imposing base -->
+  <path d="M100,130
+           Q60,140 35,170
+           Q15,200 10,240
+           Q8,260 12,280
+           L188,280
+           Q192,260 190,240
+           Q185,200 165,170
+           Q140,140 100,130 Z"
+        fill="#1A1A2E"/>
+
+  <!-- Robe center panel -->
+  <path d="M85,135 L80,280 L120,280 L115,135 Z" fill="#1A1A2E"/>
+
+  <!-- Robe fold details -->
+  <path d="M40,175 Q35,220 30,280" stroke="#0D0D1A" stroke-width="2" fill="none" opacity="0.4"/>
+  <path d="M55,160 Q48,210 42,280" stroke="#0D0D1A" stroke-width="1.5" fill="none" opacity="0.35"/>
+  <path d="M70,145 Q65,200 60,280" stroke="#0D0D1A" stroke-width="1.5" fill="none" opacity="0.35"/>
+  <path d="M130,145 Q135,200 140,280" stroke="#0D0D1A" stroke-width="1.5" fill="none" opacity="0.35"/>
+  <path d="M145,160 Q152,210 158,280" stroke="#0D0D1A" stroke-width="1.5" fill="none" opacity="0.35"/>
+  <path d="M160,175 Q165,220 170,280" stroke="#0D0D1A" stroke-width="2" fill="none" opacity="0.4"/>
+
+  <!-- Left arm holding scroll -->
+  <path d="M65,140 Q30,155 20,175 Q15,185 18,190 Q22,195 28,188 Q35,175 55,160"
+        fill="#1A1A2E"/>
+  <!-- Left hand -->
+  <circle cx="18" cy="187" r="7" fill="#1A1A2E"/>
+
+  <!-- Scroll in left hand -->
+  <rect x="2" y="168" width="8" height="40" rx="4" fill="#1A1A2E"/>
+  <!-- Scroll top roll -->
+  <ellipse cx="6" cy="168" rx="8" ry="5" fill="#1A1A2E"/>
+  <!-- Scroll bottom roll -->
+  <ellipse cx="6" cy="208" rx="8" ry="5" fill="#1A1A2E"/>
+  <!-- Scroll face - parchment cutout -->
+  <rect x="3" y="173" width="6" height="30" rx="1" fill="#F4E4C1" opacity="0.4"/>
+  <!-- Writing lines on scroll -->
+  <line x1="4" y1="178" x2="8" y2="178" stroke="#1A1A2E" stroke-width="0.5" opacity="0.6"/>
+  <line x1="4" y1="182" x2="8" y2="182" stroke="#1A1A2E" stroke-width="0.5" opacity="0.6"/>
+  <line x1="4" y1="186" x2="8" y2="186" stroke="#1A1A2E" stroke-width="0.5" opacity="0.6"/>
+  <line x1="4" y1="190" x2="7" y2="190" stroke="#1A1A2E" stroke-width="0.5" opacity="0.6"/>
+  <line x1="4" y1="194" x2="8" y2="194" stroke="#1A1A2E" stroke-width="0.5" opacity="0.6"/>
+  <line x1="4" y1="198" x2="7" y2="198" stroke="#1A1A2E" stroke-width="0.5" opacity="0.6"/>
+
+  <!-- Right arm holding quill -->
+  <path d="M135,140 Q165,150 172,165 Q178,175 175,180 Q170,178 168,170 Q160,155 140,148"
+        fill="#1A1A2E"/>
+  <!-- Right hand -->
+  <circle cx="175" cy="177" r="7" fill="#1A1A2E"/>
+
+  <!-- Massive quill pen -->
+  <path d="M172,180 Q185,140 192,80 Q194,60 190,45 Q188,38 185,42 Q182,55 180,80"
+        fill="#1A1A2E"/>
+  <!-- Quill feather barbs -->
+  <path d="M192,80 Q198,72 196,60" stroke="#1A1A2E" stroke-width="3" fill="none"/>
+  <path d="M190,70 Q197,62 195,50" stroke="#1A1A2E" stroke-width="2.5" fill="none"/>
+  <path d="M188,60 Q195,52 192,42" stroke="#1A1A2E" stroke-width="2" fill="none"/>
+  <!-- Quill feather left side -->
+  <path d="M190,80 Q183,72 185,60" stroke="#1A1A2E" stroke-width="2.5" fill="none"/>
+  <path d="M188,68 Q182,58 184,48" stroke="#1A1A2E" stroke-width="2" fill="none"/>
+  <!-- Quill nib -->
+  <path d="M172,182 L170,192 L174,192 Z" fill="#F4E4C1" opacity="0.5"/>
+  <!-- Ink drip from nib -->
+  <circle cx="172" cy="196" r="2" fill="#1A1A2E"/>
+
+  <!-- High collar / shoulders -->
+  <path d="M60,125 Q100,115 140,125 Q145,130 140,135 Q100,125 60,135 Q55,130 60,125 Z"
+        fill="#1A1A2E"/>
+
+  <!-- Neck -->
+  <rect x="88" y="100" width="24" height="28" rx="3" fill="#1A1A2E"/>
+
+  <!-- Head - slightly elongated, stern -->
+  <ellipse cx="100" cy="75" rx="30" ry="32" fill="#1A1A2E"/>
+
+  <!-- Tall pointed crown/hat -->
+  <polygon points="100,2 72,55 128,55" fill="#1A1A2E"/>
+  <!-- Crown base band -->
+  <rect x="68" y="50" width="64" height="10" rx="2" fill="#1A1A2E"/>
+  <!-- Crown jewel/ornament cutout -->
+  <polygon points="100,36 96,42 100,48 104,42" fill="#F4E4C1" opacity="0.5"/>
+  <!-- Crown side points -->
+  <polygon points="72,50 65,38 75,48" fill="#1A1A2E"/>
+  <polygon points="128,50 135,38 125,48" fill="#1A1A2E"/>
+
+  <!-- Sharp angular eyes - menacing -->
+  <!-- Left eye -->
+  <polygon points="78,68 88,62 94,70 88,76 78,74" fill="#F4E4C1"/>
+  <!-- Left pupil - sharp diamond -->
+  <polygon points="86,68 84,70 86,72 88,70" fill="#1A1A2E"/>
+
+  <!-- Right eye -->
+  <polygon points="106,70 112,62 122,68 122,74 112,76" fill="#F4E4C1"/>
+  <!-- Right pupil - sharp diamond -->
+  <polygon points="112,68 114,70 112,72 110,70" fill="#1A1A2E"/>
+
+  <!-- Stern brow lines -->
+  <line x1="76" y1="62" x2="90" y2="58" stroke="#F4E4C1" stroke-width="1.5" opacity="0.4"/>
+  <line x1="110" y1="58" x2="124" y2="62" stroke="#F4E4C1" stroke-width="1.5" opacity="0.4"/>
+
+  <!-- Thin line mouth - disapproving -->
+  <line x1="85" y1="92" x2="115" y2="92" stroke="#F4E4C1" stroke-width="2" stroke-linecap="round"/>
+  <!-- Slight downturn at corners -->
+  <path d="M85,92 Q83,95 82,97" stroke="#F4E4C1" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <path d="M115,92 Q117,95 118,97" stroke="#F4E4C1" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+
+  <!-- Chin detail -->
+  <path d="M88,102 Q100,108 112,102" stroke="#0D0D1A" stroke-width="1" fill="none" opacity="0.3"/>
+
+  <!-- Robe hem ornamental line -->
+  <path d="M12,275 Q100,268 188,275" stroke="#F4E4C1" stroke-width="1" fill="none" opacity="0.25"/>
+  <path d="M15,278 Q100,272 185,278" stroke="#F4E4C1" stroke-width="0.5" fill="none" opacity="0.2"/>
+
+  <!-- Belt/sash across waist -->
+  <path d="M55,168 Q100,162 145,168" stroke="#0D0D1A" stroke-width="3" fill="none" opacity="0.5"/>
+  <path d="M55,172 Q100,166 145,172" stroke="#0D0D1A" stroke-width="2" fill="none" opacity="0.35"/>
+  <!-- Belt buckle -->
+  <rect x="93" y="162" width="14" height="12" rx="2" fill="#1A1A2E" stroke="#F4E4C1" stroke-width="1" opacity="0.4"/>
+</svg>

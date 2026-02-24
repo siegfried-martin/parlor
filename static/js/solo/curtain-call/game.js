@@ -46,7 +46,7 @@ class CurtainCallGame {
             inspire: 0,      // permanent, +1 damage per stack
             fortify: 0,      // decays by 1, +1 block per block gain
             piercing: 0,     // decays by 1, bypass enemy Block/Shield
-            accuracy: 0,     // decays by 1, bypass Taunt/Distract, no Retaliate
+            focus: 0,        // decays by 1, bypass Taunt/Distract, no Retaliate
             ward: 0,         // permanent, consumed on debuff
             luck: 0,         // decays by 1, 10% per stack for 1.5x
             flourish: 0,     // removed at start of turn
@@ -103,8 +103,8 @@ class CurtainCallGame {
         // Combat state (HP, per-turn defenses, enemy)
         this.combatState = {
             macguffin: {
-                currentHP: 50,
-                maxHP: 50
+                currentHP: 60,
+                maxHP: 60
             },
             aldric: {
                 currentHP: 20,
@@ -215,6 +215,16 @@ class CurtainCallGame {
             characterSelect: document.getElementById('character-select'),
             newPerformanceBtn: document.getElementById('new-performance-btn'),
             raiseCurtainBtn: document.getElementById('raise-curtain-btn'),
+            // Deck list & count
+            deckListOverlay: document.getElementById('deck-list-overlay'),
+            deckListCards: document.getElementById('deck-list-cards'),
+            deckListClose: document.getElementById('deck-list-close'),
+            deckListTitle: document.getElementById('deck-list-title'),
+            deckListFooter: document.getElementById('deck-list-footer'),
+            deckCountIndicator: document.getElementById('deck-count-indicator'),
+            deckCountDraw: document.getElementById('deck-count-draw'),
+            deckCountDiscard: document.getElementById('deck-count-discard'),
+            removeCardBtn: document.getElementById('remove-card-btn'),
         };
 
         // Rewards state
@@ -275,6 +285,19 @@ class CurtainCallGame {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
+    /**
+     * Play a one-shot Web Animations API animation on an element.
+     * Automatically overrides CSS idle animations during playback,
+     * then lets them resume when finished.
+     */
+    async playAnimation(element, animDef) {
+        const anim = element.animate(animDef.keyframes, {
+            duration: animDef.duration,
+            easing: animDef.easing || 'ease-out'
+        });
+        await anim.finished;
+    }
+
     // === Keyword Helpers ===
 
     /**
@@ -286,7 +309,7 @@ class CurtainCallGame {
         kw.inspire = 0;
         kw.fortify = 0;
         kw.piercing = 0;
-        kw.accuracy = 0;
+        kw.focus = 0;
         kw.ward = 0;
         kw.luck = 0;
         kw.flourish = 0;
@@ -424,7 +447,7 @@ class CurtainCallGame {
             this.keywords[keyword] = Math.max(0, value);
             this.renderStatusEffects();
         } else {
-            console.log('Valid keywords: inspire, fortify, piercing, accuracy, ward, luck, flourish, ovation, weak, confused, curse');
+            console.log('Valid keywords: inspire, fortify, piercing, focus, ward, luck, flourish, ovation, weak, confused, curse');
         }
     }
 
@@ -523,13 +546,13 @@ class CurtainCallGame {
 
     restartCombat() {
         this.combatState = {
-            macguffin: { currentHP: 50, maxHP: 50 },
+            macguffin: { currentHP: 60, maxHP: 60 },
             aldric: { currentHP: 20, maxHP: 20, knockedOut: false, shield: 0, taunt: 0 },
             pip: { currentHP: 10, maxHP: 10, knockedOut: false, shield: 0, taunt: 0 },
             block: 0, distract: 0, retaliate: 0,
             enemy: {
                 id: 'stage-rat', name: 'Stage Rat',
-                currentHP: 25, maxHP: 25,
+                currentHP: 22, maxHP: 22,
                 intent: { type: 'attack', value: 5, hits: 1 },
                 patternIndex: 0, currentPhase: 0,
                 speechBubbles: { attack: 'SQUEAK!', hurt: 'EEK!', defeated: '...squeak.' },
@@ -544,12 +567,13 @@ class CurtainCallGame {
         this.discardPile = [];
         this.isAnimating = false;
 
-        this.elements.enemyPuppet.classList.remove('enemy-defeat', 'enemy-hurt');
+        this.elements.enemyPuppet.classList.remove('enemy-defeat');
         this.elements.enemyPuppet.classList.add('enemy-idle');
         this.elements.heroAldric.classList.remove('knocked-out');
         this.elements.heroPip.classList.remove('knocked-out');
 
         this.initializeDeck();
+        this.resetSpeechForCombat();
         this.renderCombatState();
         this.startTurn();
 

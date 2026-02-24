@@ -1,8 +1,9 @@
 /**
- * Curtain Call — Renderer
+ * Curtain Call — Combat State Display & Speech Bubbles
  *
- * Card rendering, HP bars, speech bubbles, status effect display,
- * and all visual output methods.
+ * Full combat state rendering (HP bars, defenses, intent, energy,
+ * deck counts), status effect icons (player, protagonist, enemy),
+ * and speech bubble display system.
  *
  * Extends CurtainCallGame.prototype (loaded after game.js).
  */
@@ -10,260 +11,6 @@
 'use strict';
 
 Object.assign(CurtainCallGame.prototype, {
-
-    // === Card Rendering ===
-
-    renderHand() {
-        // Cancel any pending debounced reflow
-        if (this._reflowTimer) {
-            clearTimeout(this._reflowTimer);
-            this._reflowTimer = null;
-        }
-
-        // If user is mid-drag, defer the reflow
-        if (this._dragState && this._dragState.dragging) {
-            this._reflowPaused = true;
-            return;
-        }
-
-        const container = this.elements.handCards;
-        if (!container) return;
-
-        // Clear existing cards
-        container.innerHTML = '';
-
-        // Render each card in hand
-        this.hand.forEach((card, index) => {
-            const cardElement = this.createCardElement(card, index);
-            container.appendChild(cardElement);
-        });
-    },
-
-    createCardElement(card, index) {
-        const cardDiv = document.createElement('div');
-        cardDiv.className = 'game-card';
-        cardDiv.dataset.index = index;
-        cardDiv.dataset.cardId = card.id;
-        cardDiv.dataset.instanceId = card.instanceId;
-
-        // Add owner class for protagonist edge treatment
-        cardDiv.classList.add(`card-${card.owner}`);
-
-        // Add rarity class
-        const rarity = card.rarity || 'common';
-        cardDiv.classList.add(`rarity-${rarity}`);
-
-        // Check if card's protagonist is knocked out
-        const protagonistState = this.combatState[card.owner];
-        if (protagonistState && protagonistState.knockedOut) {
-            cardDiv.classList.add('ko-unplayable');
-        }
-
-        // Calculate effective cost
-        const effectiveCost = this.getEffectiveCardCost(card);
-        const isPlayable = this.canPlayCard(card);
-        if (!isPlayable && !cardDiv.classList.contains('ko-unplayable')) {
-            cardDiv.classList.add('unplayable');
-        }
-
-        // Top rarity border
-        const rarityTop = document.createElement('div');
-        rarityTop.className = 'card__rarity-top';
-        cardDiv.appendChild(rarityTop);
-
-        // Card content container
-        const content = document.createElement('div');
-        content.className = 'card__content';
-
-        // Stub with energy blips
-        const stub = document.createElement('div');
-        stub.className = 'card__stub';
-
-        const energyContainer = document.createElement('div');
-        energyContainer.className = 'card__energy';
-
-        // Add energy blips based on effective cost
-        for (let i = 0; i < effectiveCost; i++) {
-            const blip = document.createElement('div');
-            blip.className = `energy-blip energy-blip--${card.owner}`;
-            energyContainer.appendChild(blip);
-        }
-        stub.appendChild(energyContainer);
-        content.appendChild(stub);
-
-        // Perforation line
-        const perforation = document.createElement('div');
-        perforation.className = 'card__perforation';
-        content.appendChild(perforation);
-
-        // Card body
-        const body = document.createElement('div');
-        body.className = 'card__body';
-
-        // "PRESENTING" header
-        const presenting = document.createElement('div');
-        presenting.className = 'card__presenting';
-        presenting.textContent = '\u2014 PRESENTING \u2014';
-        body.appendChild(presenting);
-
-        // Card name
-        const nameSpan = document.createElement('div');
-        nameSpan.className = 'card__name';
-        nameSpan.textContent = card.name;
-        body.appendChild(nameSpan);
-
-        // Decorative rule
-        const rule = document.createElement('div');
-        rule.className = 'card__rule';
-        body.appendChild(rule);
-
-        // Card description
-        const descSpan = document.createElement('div');
-        descSpan.className = 'card__description';
-        descSpan.textContent = card.description;
-        body.appendChild(descSpan);
-
-        // Type badge (v2: read directly from card.type)
-        const cardType = this.getCardType(card);
-        const typeBadge = document.createElement('div');
-        typeBadge.className = `card__type-badge type-${cardType.lowercase}`;
-        typeBadge.textContent = `${cardType.icon}  ${cardType.label}`;
-        body.appendChild(typeBadge);
-
-        content.appendChild(body);
-
-        // Aldric edge with rivets
-        if (card.owner === 'aldric') {
-            const edge = document.createElement('div');
-            edge.className = 'card__edge';
-            for (let i = 0; i < 4; i++) {
-                const rivet = document.createElement('div');
-                rivet.className = 'card__rivet';
-                edge.appendChild(rivet);
-            }
-            content.appendChild(edge);
-        }
-
-        cardDiv.appendChild(content);
-
-        // Bottom rarity border
-        const rarityBottom = document.createElement('div');
-        rarityBottom.className = 'card__rarity-bottom';
-        cardDiv.appendChild(rarityBottom);
-
-        return cardDiv;
-    },
-
-    getCardType(card) {
-        // v2: use card.type directly
-        const type = card.type || 'action';
-        switch (type) {
-            case 'attack':
-                return { icon: '\u2694', label: 'ATTACK', lowercase: 'attack' };
-            case 'defense':
-                return { icon: '\uD83D\uDEE1', label: 'DEFENSE', lowercase: 'defense' };
-            case 'action':
-            default:
-                return { icon: '\u2726', label: 'ACTION', lowercase: 'action' };
-        }
-    },
-
-    createZoomedCardElement(card) {
-        const cardDiv = document.createElement('div');
-        cardDiv.className = `game-card zoomed card-${card.owner}`;
-
-        // Add rarity class
-        const rarity = card.rarity || 'common';
-        cardDiv.classList.add(`rarity-${rarity}`);
-
-        const effectiveCost = this.getEffectiveCardCost(card);
-
-        // Top rarity border
-        const rarityTop = document.createElement('div');
-        rarityTop.className = 'card__rarity-top';
-        cardDiv.appendChild(rarityTop);
-
-        // Card content container
-        const content = document.createElement('div');
-        content.className = 'card__content';
-
-        // Stub with energy blips
-        const stub = document.createElement('div');
-        stub.className = 'card__stub';
-
-        const energyContainer = document.createElement('div');
-        energyContainer.className = 'card__energy';
-
-        for (let i = 0; i < effectiveCost; i++) {
-            const blip = document.createElement('div');
-            blip.className = `energy-blip energy-blip--${card.owner}`;
-            energyContainer.appendChild(blip);
-        }
-        stub.appendChild(energyContainer);
-        content.appendChild(stub);
-
-        // Perforation line
-        const perforation = document.createElement('div');
-        perforation.className = 'card__perforation';
-        content.appendChild(perforation);
-
-        // Card body
-        const body = document.createElement('div');
-        body.className = 'card__body';
-
-        // "PRESENTING" header
-        const presenting = document.createElement('div');
-        presenting.className = 'card__presenting';
-        presenting.textContent = '\u2014 PRESENTING \u2014';
-        body.appendChild(presenting);
-
-        // Card name
-        const nameSpan = document.createElement('div');
-        nameSpan.className = 'card__name';
-        nameSpan.textContent = card.name;
-        body.appendChild(nameSpan);
-
-        // Decorative rule
-        const rule = document.createElement('div');
-        rule.className = 'card__rule';
-        body.appendChild(rule);
-
-        // Card description
-        const descSpan = document.createElement('div');
-        descSpan.className = 'card__description';
-        descSpan.textContent = card.description;
-        body.appendChild(descSpan);
-
-        // Type badge
-        const cardType = this.getCardType(card);
-        const typeBadge = document.createElement('div');
-        typeBadge.className = `card__type-badge type-${cardType.lowercase}`;
-        typeBadge.textContent = `${cardType.icon}  ${cardType.label}`;
-        body.appendChild(typeBadge);
-
-        content.appendChild(body);
-
-        // Aldric edge with rivets
-        if (card.owner === 'aldric') {
-            const edge = document.createElement('div');
-            edge.className = 'card__edge';
-            for (let i = 0; i < 5; i++) {
-                const rivet = document.createElement('div');
-                rivet.className = 'card__rivet';
-                edge.appendChild(rivet);
-            }
-            content.appendChild(edge);
-        }
-
-        cardDiv.appendChild(content);
-
-        // Bottom rarity border
-        const rarityBottom = document.createElement('div');
-        rarityBottom.className = 'card__rarity-bottom';
-        cardDiv.appendChild(rarityBottom);
-
-        return cardDiv;
-    },
 
     // === Combat State Display ===
 
@@ -280,6 +27,7 @@ Object.assign(CurtainCallGame.prototype, {
         this.renderEnemyIntent();
         this.renderOvationMeter();
         this.renderStatusEffects();
+        this.renderDeckCount();
     },
 
     renderProtagonistHP(protagonist) {
@@ -444,6 +192,17 @@ Object.assign(CurtainCallGame.prototype, {
         this.updateCardPlayability();
     },
 
+    // === Deck Count Display ===
+
+    renderDeckCount() {
+        if (this.elements.deckCountDraw) {
+            this.elements.deckCountDraw.textContent = this.deck.length;
+        }
+        if (this.elements.deckCountDiscard) {
+            this.elements.deckCountDiscard.textContent = this.discardPile.length;
+        }
+    },
+
     // === v2 Status Effects Display ===
 
     renderStatusEffects() {
@@ -478,8 +237,8 @@ Object.assign(CurtainCallGame.prototype, {
         if (kw.piercing > 0) {
             effects.push(this._statusIcon('buff', 'Piercing', '\uD83D\uDDE1\uFE0F', kw.piercing));
         }
-        if (kw.accuracy > 0) {
-            effects.push(this._statusIcon('buff', 'Accuracy', '\uD83C\uDFAF', kw.accuracy));
+        if (kw.focus > 0) {
+            effects.push(this._statusIcon('buff', 'Focus', '\uD83C\uDFAF', kw.focus));
         }
         if (kw.ward > 0) {
             effects.push(this._statusIcon('buff', 'Ward', '\uD83D\uDD2E', kw.ward));
@@ -516,7 +275,7 @@ Object.assign(CurtainCallGame.prototype, {
     },
 
     _statusIcon(type, title, icon, value) {
-        return `<span class="status-icon ${type}" title="${title}">${icon}${value}</span>`;
+        return `<span class="status-icon ${type}" title="${title}"><span class="status-emoji">${icon}</span><span class="status-value">${value}</span></span>`;
     },
 
     renderProtagonistDebuffs(protagonist) {
@@ -663,29 +422,6 @@ Object.assign(CurtainCallGame.prototype, {
         if (el) el.remove();
     },
 
-    updateCardPlayability() {
-        const cardElements = this.elements.handCards.querySelectorAll('.game-card');
-        cardElements.forEach((cardEl, index) => {
-            const card = this.hand[index];
-            if (card) {
-                // Check knockout state first
-                const protagonistState = this.combatState[card.owner];
-                if (protagonistState && protagonistState.knockedOut) {
-                    cardEl.classList.add('ko-unplayable');
-                    cardEl.classList.remove('unplayable');
-                    return;
-                }
-                cardEl.classList.remove('ko-unplayable');
-
-                if (this.canPlayCard(card)) {
-                    cardEl.classList.remove('unplayable');
-                } else {
-                    cardEl.classList.add('unplayable');
-                }
-            }
-        });
-    },
-
     // === Speech Bubbles ===
 
     /**
@@ -719,7 +455,7 @@ Object.assign(CurtainCallGame.prototype, {
         const offsetY = options.offsetY || 0;
 
         const left = targetRect.left - containerRect.left + targetRect.width / 2 + offsetX;
-        const top = targetRect.top - containerRect.top + offsetY;
+        const top = Math.max(0, targetRect.top - containerRect.top + offsetY);
 
         bubble.style.left = `${left}px`;
         bubble.style.top = `${top}px`;
@@ -727,11 +463,24 @@ Object.assign(CurtainCallGame.prototype, {
 
         this.elements.speechBubbles.appendChild(bubble);
 
-        // Remove bubble after animation completes
+        // Variable display duration based on text length
+        const wordCount = text.split(/\s+/).length;
+        const baseDuration = typeof SPEECH_CONFIG !== 'undefined'
+            ? SPEECH_CONFIG.displayDuration.min
+            : 1500;
+        const perWord = typeof SPEECH_CONFIG !== 'undefined'
+            ? SPEECH_CONFIG.displayDuration.perWordOver3
+            : 100;
+        const maxDuration = typeof SPEECH_CONFIG !== 'undefined'
+            ? SPEECH_CONFIG.displayDuration.max
+            : 2500;
+        const duration = Math.min(maxDuration, baseDuration + Math.max(0, wordCount - 3) * perWord);
+
+        // Remove bubble after display duration
         setTimeout(() => {
             bubble.remove();
             this.bubbleOffset = Math.max(0, this.bubbleOffset - 1);
-        }, 1500);
+        }, duration);
     },
 
     showDamageBubble(amount, targetElement) {
@@ -758,141 +507,5 @@ Object.assign(CurtainCallGame.prototype, {
         const id = puppet.id;
         console.log('Puppet tapped:', id);
         // Future: show stats popup
-    },
-
-    // === Reward & Enemy Choice Rendering ===
-
-    renderRewardCards() {
-        const container = this.elements.rewardsCards;
-        if (!container) return;
-
-        container.innerHTML = '';
-
-        this.rewardOptions.forEach((card, index) => {
-            if (!card) return;
-
-            const cardDiv = document.createElement('div');
-            cardDiv.className = `game-card reward-card card-${card.owner}`;
-            cardDiv.dataset.index = index;
-
-            // Add rarity class
-            const rarity = card.rarity || 'common';
-            cardDiv.classList.add(`rarity-${rarity}`);
-
-            // Top rarity border
-            const rarityTop = document.createElement('div');
-            rarityTop.className = 'card__rarity-top';
-            cardDiv.appendChild(rarityTop);
-
-            // Card content container
-            const content = document.createElement('div');
-            content.className = 'card__content';
-
-            // Stub with energy blips
-            const stub = document.createElement('div');
-            stub.className = 'card__stub';
-
-            const energyContainer = document.createElement('div');
-            energyContainer.className = 'card__energy';
-
-            for (let i = 0; i < card.cost; i++) {
-                const blip = document.createElement('div');
-                blip.className = `energy-blip energy-blip--${card.owner}`;
-                energyContainer.appendChild(blip);
-            }
-            stub.appendChild(energyContainer);
-            content.appendChild(stub);
-
-            // Perforation line
-            const perforation = document.createElement('div');
-            perforation.className = 'card__perforation';
-            content.appendChild(perforation);
-
-            // Card body
-            const body = document.createElement('div');
-            body.className = 'card__body';
-
-            // "PRESENTING" header
-            const presenting = document.createElement('div');
-            presenting.className = 'card__presenting';
-            presenting.textContent = '\u2014 PRESENTING \u2014';
-            body.appendChild(presenting);
-
-            // Card name
-            const nameSpan = document.createElement('div');
-            nameSpan.className = 'card__name';
-            nameSpan.textContent = card.name;
-            body.appendChild(nameSpan);
-
-            // Decorative rule
-            const rule = document.createElement('div');
-            rule.className = 'card__rule';
-            body.appendChild(rule);
-
-            // Card description
-            const descSpan = document.createElement('div');
-            descSpan.className = 'card__description';
-            descSpan.textContent = card.description;
-            body.appendChild(descSpan);
-
-            // Type badge
-            const cardType = this.getCardType(card);
-            const typeBadge = document.createElement('div');
-            typeBadge.className = `card__type-badge type-${cardType.lowercase}`;
-            typeBadge.textContent = `${cardType.icon}  ${cardType.label}`;
-            body.appendChild(typeBadge);
-
-            content.appendChild(body);
-
-            // Aldric edge with rivets
-            if (card.owner === 'aldric') {
-                const edge = document.createElement('div');
-                edge.className = 'card__edge';
-                for (let i = 0; i < 4; i++) {
-                    const rivet = document.createElement('div');
-                    rivet.className = 'card__rivet';
-                    edge.appendChild(rivet);
-                }
-                content.appendChild(edge);
-            }
-
-            cardDiv.appendChild(content);
-
-            // Bottom rarity border
-            const rarityBottom = document.createElement('div');
-            rarityBottom.className = 'card__rarity-bottom';
-            cardDiv.appendChild(rarityBottom);
-
-            container.appendChild(cardDiv);
-        });
-    },
-
-    renderEnemyChoices(enemyIds) {
-        const container = this.elements.enemyChoices;
-        if (!container) return;
-
-        container.innerHTML = '';
-
-        enemyIds.forEach(enemyId => {
-            const enemy = this.enemies[enemyId];
-            if (!enemy) return;
-
-            const choiceDiv = document.createElement('div');
-            choiceDiv.className = 'enemy-choice';
-            choiceDiv.dataset.enemyId = enemyId;
-
-            choiceDiv.innerHTML = `
-                <div class="enemy-choice-silhouette">
-                    <img src="/static/svg/enemy-placeholder.svg" alt="${enemy.name}">
-                </div>
-                <div class="enemy-choice-name">${enemy.name}</div>
-                <div class="enemy-choice-hp">HP: ${enemy.hp}</div>
-                <div class="enemy-choice-gimmick">${enemy.gimmick}</div>
-            `;
-
-            choiceDiv.addEventListener('click', () => this.selectEnemy(enemyId));
-
-            container.appendChild(choiceDiv);
-        });
     }
 });

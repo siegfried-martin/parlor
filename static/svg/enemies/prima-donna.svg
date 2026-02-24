@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 320">
+  <!-- Prima Donna - Dramatic Opera Singer Shadow Puppet -->
+
+  <!-- Puppet stick -->
+  <rect x="95" y="260" width="10" height="60" rx="2" fill="#3D2B1F"/>
+  <ellipse cx="100" cy="260" rx="8" ry="3" fill="#3D2B1F"/>
+
+  <!-- Wide gown/dress - dramatic bell shape -->
+  <polygon points="100,120 30,258 170,258" fill="#1A1A2E"/>
+  <ellipse cx="100" cy="258" rx="70" ry="8" fill="#1A1A2E"/>
+
+  <!-- Bodice / torso -->
+  <polygon points="75,100 125,100 135,140 65,140" fill="#1A1A2E"/>
+
+  <!-- Left arm - resting at side -->
+  <path d="M70,105 Q45,140 50,175 Q52,180 58,178 Q60,170 75,135" fill="#1A1A2E"/>
+
+  <!-- Right arm - dramatically raised high -->
+  <path d="M130,105 Q155,85 150,50 Q148,42 142,44 Q140,55 125,100" fill="#1A1A2E"/>
+  <!-- Right hand raised -->
+  <circle cx="149" cy="44" r="8" fill="#1A1A2E"/>
+
+  <!-- Neck -->
+  <rect x="90" y="80" width="20" height="22" rx="4" fill="#1A1A2E"/>
+
+  <!-- Head -->
+  <ellipse cx="100" cy="60" rx="28" ry="30" fill="#1A1A2E"/>
+
+  <!-- Big hair / updo -->
+  <ellipse cx="100" cy="28" rx="24" ry="18" fill="#1A1A2E"/>
+  <ellipse cx="100" cy="18" rx="16" ry="14" fill="#1A1A2E"/>
+  <ellipse cx="85" cy="38" rx="10" ry="14" fill="#1A1A2E"/>
+  <ellipse cx="115" cy="38" rx="10" ry="14" fill="#1A1A2E"/>
+  <!-- Hair bun on top -->
+  <circle cx="100" cy="8" r="10" fill="#1A1A2E"/>
+
+  <!-- Eye cutouts -->
+  <ellipse cx="88" cy="55" rx="6" ry="4" fill="#F4E4C1"/>
+  <ellipse cx="112" cy="55" rx="6" ry="4" fill="#F4E4C1"/>
+
+  <!-- Pupils -->
+  <circle cx="89" cy="55" r="2" fill="#1A1A2E"/>
+  <circle cx="113" cy="55" r="2" fill="#1A1A2E"/>
+
+  <!-- Open mouth - singing -->
+  <ellipse cx="100" cy="72" rx="10" ry="8" fill="#F4E4C1"/>
+
+  <!-- Teeth hint at top of mouth -->
+  <rect x="93" y="65" width="14" height="3" rx="1" fill="#1A1A2E"/>
+
+  <!-- Dress fold details -->
+  <line x1="80" y1="140" x2="55" y2="255" stroke="#0D0D1A" stroke-width="1.5" opacity="0.4"/>
+  <line x1="100" y1="140" x2="100" y2="255" stroke="#0D0D1A" stroke-width="1.5" opacity="0.4"/>
+  <line x1="120" y1="140" x2="145" y2="255" stroke="#0D0D1A" stroke-width="1.5" opacity="0.4"/>
+</svg>

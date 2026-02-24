@@ -700,10 +700,24 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    gap: 2px;
     padding: 2px 6px;
     border-radius: 8px;
     font-size: 12px;
     font-weight: bold;
+}
+
+.status-icon .status-emoji {
+    font-size: 11px;
+    line-height: 1;
+}
+
+.status-icon .status-value {
+    font-size: 11px;
+    font-weight: bold;
+    line-height: 1;
+    color: #FFF8E7;
+    text-shadow: 0 0 2px rgba(0, 0, 0, 0.6);
 }
 
 .status-icon.buff {
@@ -1772,18 +1786,7 @@
 
 /* === Animations === */
 /* Character-specific animations are in puppet-animations.css */
-/* Animation delays to desync the idle bobs */
-.hero-left {
-    animation-delay: 0s;
-}
-
-.hero-right {
-    animation-delay: -0.6s;
-}
-
-.enemy-puppet {
-    animation-delay: -1.2s;
-}
+/* Idle desync delays are baked into the idle animation shorthands */
 
 /* MacGuffin glow effect enhancement */
 .macguffin {
@@ -2227,6 +2230,264 @@
 
 .ovation-meter.ovation-max .ovation-value {
     color: #F5D060;
+}
+
+/* === Deck Count Indicator === */
+.controls-top-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.deck-count-indicator {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    background: rgba(30, 25, 15, 0.9);
+    padding: 6px 10px;
+    border-radius: 14px;
+    border: 2px solid #8B7030;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.deck-count-indicator:hover {
+    border-color: #D4A030;
+}
+
+.deck-count-draw {
+    color: #F4E4C1;
+}
+
+.deck-count-separator {
+    color: #8B7030;
+    font-size: 12px;
+}
+
+.deck-count-discard {
+    color: #A08060;
+}
+
+/* === Deck List Overlay === */
+.deck-list-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(26, 26, 46, 0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 120;
+    animation: fade-in 0.2s ease-out;
+}
+
+.deck-list-content {
+    background: var(--parchment-light);
+    border-radius: 12px;
+    padding: 16px;
+    width: 95%;
+    max-width: 380px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.deck-list-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.deck-list-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--silhouette-color);
+    margin: 0;
+}
+
+.deck-list-close {
+    background: none;
+    border: none;
+    font-size: 28px;
+    color: var(--silhouette-color);
+    cursor: pointer;
+    padding: 0 4px;
+    line-height: 1;
+    opacity: 0.7;
+    transition: opacity 0.15s ease;
+}
+
+.deck-list-close:hover {
+    opacity: 1;
+}
+
+.deck-list-cards {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-right: 4px;
+}
+
+/* Deck list card entry */
+.deck-list-entry {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    background: rgba(244, 228, 193, 0.6);
+    border: 1.5px solid #D4C0A0;
+    border-radius: 8px;
+    cursor: default;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.deck-list-entry.removable {
+    cursor: pointer;
+}
+
+.deck-list-entry.removable:hover {
+    background: rgba(231, 76, 60, 0.1);
+    border-color: var(--attack-red);
+}
+
+.deck-list-entry.removal-selected {
+    background: rgba(231, 76, 60, 0.15);
+    border-color: var(--attack-red);
+    box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.3);
+}
+
+.deck-list-entry-cost {
+    display: flex;
+    gap: 2px;
+    flex-shrink: 0;
+    min-width: 20px;
+}
+
+.deck-list-entry-cost .energy-blip {
+    width: 8px;
+    height: 8px;
+}
+
+.deck-list-entry-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.deck-list-entry-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #3D2B1F;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.deck-list-entry-desc {
+    font-family: 'IM Fell English', serif;
+    font-size: 10px;
+    color: #6B5A40;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.deck-list-entry-owner {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 4px;
+    flex-shrink: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.deck-list-entry-owner.owner-aldric {
+    background: rgba(245, 176, 65, 0.2);
+    color: #C07820;
+    border: 1px solid #C07820;
+}
+
+.deck-list-entry-owner.owner-pip {
+    background: rgba(231, 76, 60, 0.15);
+    color: #A03020;
+    border: 1px solid #A03020;
+}
+
+.deck-list-entry-owner.owner-macguffin {
+    background: rgba(140, 140, 130, 0.15);
+    color: #707060;
+    border: 1px solid #707060;
+}
+
+.deck-list-entry-location {
+    font-size: 8px;
+    color: #A08060;
+    flex-shrink: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.deck-list-footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 12px;
+    min-height: 40px;
+    flex-wrap: wrap;
+}
+
+.deck-list-footer .rewards-btn {
+    padding: 8px 16px;
+    font-size: 13px;
+}
+
+.deck-list-count {
+    width: 100%;
+    text-align: center;
+    font-size: 11px;
+    color: #8B7030;
+    margin-top: 4px;
+}
+
+/* Remove card button on reward screen */
+.remove-btn {
+    background: transparent;
+    color: var(--attack-red);
+    border: 2px solid var(--attack-red);
+    transition: background 0.15s ease;
+}
+
+.remove-btn:hover {
+    background: rgba(231, 76, 60, 0.1);
+}
+
+/* Group headers in deck list */
+.deck-list-group {
+    font-family: 'Playfair Display', serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: #8B7030;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 4px 0 2px 4px;
+    border-bottom: 1px solid #D4C0A0;
+    margin-top: 4px;
+}
+
+.deck-list-group:first-child {
+    margin-top: 0;
 }
 
 /* === Protagonist Debuffs === */

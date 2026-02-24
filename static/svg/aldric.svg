@@ -1,44 +1,69 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 320">
-  <!-- Bron, the Ironclad - Stocky hammer-wielding puppet -->
+  <!-- Aldric, the Ironclad - Stocky knight with hammer and shield -->
 
-  <!-- Puppet stick (extends below the figure) -->
+  <!-- Puppet stick -->
   <rect x="94" y="255" width="12" height="65" fill="#3D2B1F" rx="2"/>
 
-  <!-- Body - stocky and round -->
-  <ellipse cx="100" cy="180" rx="50" ry="45" fill="#1A1A2E"/>
+  <!-- Left leg - short and planted -->
+  <path d="M70 215 L65 252 L85 252 L82 215 Z" fill="#1A1A2E"/>
+  <!-- Right leg -->
+  <path d="M118 215 L115 252 L135 252 L130 215 Z" fill="#1A1A2E"/>
+  <!-- Boots -->
+  <path d="M60 248 L88 248 L88 258 L55 258 Z" fill="#1A1A2E"/>
+  <path d="M112 248 L140 248 L145 258 L112 258 Z" fill="#1A1A2E"/>
 
-  <!-- Head - large and round (cutesy proportions) -->
-  <circle cx="100" cy="95" r="55" fill="#1A1A2E"/>
+  <!-- Body - stocky barrel torso -->
+  <path d="M60 120 Q55 170 65 220 L135 220 Q145 170 140 120 Z" fill="#1A1A2E"/>
 
-  <!-- Helmet crest/ridge -->
-  <ellipse cx="100" cy="50" rx="15" ry="10" fill="#1A1A2E"/>
+  <!-- Belt (cutout detail) -->
+  <rect x="62" y="178" width="76" height="6" rx="2" fill="#F4E4C1" opacity="0.4"/>
+  <!-- Belt buckle cutout -->
+  <rect x="90" y="174" width="20" height="14" rx="3" fill="#F4E4C1"/>
 
-  <!-- Left arm -->
-  <ellipse cx="45" cy="165" rx="18" ry="30" fill="#1A1A2E"/>
+  <!-- Pauldrons (shoulder armor extending wide) -->
+  <ellipse cx="52" cy="125" rx="20" ry="14" fill="#1A1A2E"/>
+  <ellipse cx="148" cy="125" rx="20" ry="14" fill="#1A1A2E"/>
+  <!-- Pauldron rivets (cutouts) -->
+  <circle cx="52" cy="125" r="3" fill="#F4E4C1" opacity="0.4"/>
+  <circle cx="148" cy="125" r="3" fill="#F4E4C1" opacity="0.4"/>
 
-  <!-- Right arm (holding hammer) -->
-  <ellipse cx="155" cy="155" rx="18" ry="35" fill="#1A1A2E"/>
+  <!-- Shield arm (left) - extended outward holding round shield -->
+  <path d="M42 130 Q28 155 30 180 Q31 188 38 184 Q40 170 45 155 Z" fill="#1A1A2E"/>
+  <!-- Shield - round with boss -->
+  <circle cx="22" cy="168" r="28" fill="#1A1A2E"/>
+  <!-- Shield boss cutout -->
+  <circle cx="22" cy="168" r="8" fill="#F4E4C1"/>
+  <!-- Shield rim cutout -->
+  <circle cx="22" cy="168" r="24" fill="none" stroke="#F4E4C1" stroke-width="1.5" opacity="0.3"/>
 
-  <!-- Hammer head -->
-  <rect x="160" y="110" width="35" height="25" rx="3" fill="#1A1A2E"/>
+  <!-- Hammer arm (right) - raised holding hammer -->
+  <path d="M155 130 Q170 115 172 90 L162 88 Q158 110 148 125 Z" fill="#1A1A2E"/>
   <!-- Hammer handle -->
-  <rect x="150" y="125" width="15" height="45" rx="2" fill="#1A1A2E"/>
+  <rect x="158" y="40" width="8" height="55" rx="2" fill="#1A1A2E"/>
+  <!-- Hammer head - clearly extends beyond body -->
+  <rect x="148" y="28" width="30" height="20" rx="4" fill="#1A1A2E"/>
+  <!-- Hammer face cutout -->
+  <rect x="152" y="33" width="8" height="10" rx="1" fill="#F4E4C1" opacity="0.3"/>
 
-  <!-- Legs - short and stubby -->
-  <ellipse cx="75" cy="235" rx="20" ry="25" fill="#1A1A2E"/>
-  <ellipse cx="125" cy="235" rx="20" ry="25" fill="#1A1A2E"/>
+  <!-- Neck -->
+  <rect x="85" y="95" width="30" height="28" rx="6" fill="#1A1A2E"/>
 
-  <!-- Eye cutouts (backlight showing through) -->
+  <!-- Helmet - rounded with flat visor -->
+  <ellipse cx="100" cy="65" rx="34" ry="38" fill="#1A1A2E"/>
+  <!-- Helmet crest/plume extending up -->
+  <path d="M95 28 Q100 8 105 28 Q108 18 112 30 Q100 5 88 30 Q92 18 95 28" fill="#1A1A2E"/>
+  <!-- Visor slit (eye cutout) - single horizontal bar -->
   <g id="aldric-eyes">
-    <ellipse cx="80" cy="90" rx="8" ry="6" fill="#F4E4C1"/>
-    <ellipse cx="120" cy="90" rx="8" ry="6" fill="#F4E4C1"/>
+    <rect x="70" y="62" width="60" height="8" rx="2" fill="#F4E4C1"/>
+    <!-- Dark divider in visor -->
+    <rect x="98" y="62" width="4" height="8" fill="#1A1A2E"/>
   </g>
-
-  <!-- Mouth cutout -->
+  <!-- Visor lower ventilation (mouth area cutout) -->
   <g id="aldric-mouth">
-    <ellipse cx="100" cy="115" rx="12" ry="6" fill="#F4E4C1"/>
+    <rect x="82" y="80" width="36" height="3" rx="1" fill="#F4E4C1" opacity="0.5"/>
+    <rect x="85" y="86" width="30" height="3" rx="1" fill="#F4E4C1" opacity="0.4"/>
   </g>
 
-  <!-- Belt buckle cutout (decorative) -->
-  <rect x="90" y="175" width="20" height="15" rx="2" fill="#F4E4C1"/>
+  <!-- Chest emblem cutout (cross/crest) -->
+  <path d="M96 145 L104 145 L104 152 L110 152 L110 158 L104 158 L104 168 L96 168 L96 158 L90 158 L90 152 L96 152 Z" fill="#F4E4C1" opacity="0.5"/>
 </svg>
