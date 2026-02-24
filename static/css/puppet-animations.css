@@ -1,0 +1,241 @@
+/* Puppet Animations for Curtain Call
+ * All animations use CSS transforms on whole SVG elements (puppet-style, not skeletal)
+ *
+ * Combat one-shot animations (attack, hurt, block) are handled by the
+ * Web Animations API in JS — see config/animation-config.js + game.playAnimation().
+ */
+
+/* ========================================
+   IDLE ANIMATIONS
+   ======================================== */
+
+/* Generic idle bob - subtle breathing effect */
+.puppet-idle {
+    animation: puppet-bob 2s ease-in-out infinite;
+}
+
+@keyframes puppet-bob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+}
+
+/* Aldric-specific idle - heavier, slower sway with shadow skew */
+/* Asymmetric: lingers left, quicker return right */
+.aldric-idle {
+    animation: aldric-sway 5s ease-in-out 0s infinite;
+    transform-origin: center bottom;
+}
+
+@keyframes aldric-sway {
+    0% { transform: translateX(0) translateY(0) rotate(0deg) skewX(0deg); }
+    40% { transform: translateX(-5px) translateY(-2px) rotate(-1deg) skewX(1deg); }
+    60% { transform: translateX(4px) translateY(-3px) rotate(0.8deg) skewX(-0.5deg); }
+    100% { transform: translateX(0) translateY(0) rotate(0deg) skewX(0deg); }
+}
+
+/* Pip-specific idle - quicker, bouncier sway with shadow skew */
+/* Asymmetric: quick to the right, slow drift back left */
+.pip-idle {
+    animation: pip-sway 3.5s ease-in-out -0.6s infinite;
+    transform-origin: center bottom;
+}
+
+@keyframes pip-sway {
+    0% { transform: translateX(0) translateY(0) rotate(0deg) skewX(0deg); }
+    25% { transform: translateX(5px) translateY(-4px) rotate(1deg) skewX(-1deg); }
+    70% { transform: translateX(-4px) translateY(-2px) rotate(-0.8deg) skewX(0.5deg); }
+    100% { transform: translateX(0) translateY(0) rotate(0deg) skewX(0deg); }
+}
+
+/* Enemy idle - larger menacing sway with shadow skew */
+/* Asymmetric: slow creep left, pause, then sweep right */
+.enemy-idle {
+    animation: enemy-sway 4.2s ease-in-out -1.2s infinite;
+    transform-origin: center bottom;
+}
+
+@keyframes enemy-sway {
+    0% { transform: translateX(0) translateY(0) rotate(0deg) skewX(0deg); }
+    35% { transform: translateX(-8px) translateY(-2px) rotate(-1.2deg) skewX(1deg); }
+    55% { transform: translateX(-6px) translateY(-1px) rotate(-0.8deg) skewX(0.5deg); }
+    80% { transform: translateX(7px) translateY(-2px) rotate(1deg) skewX(-1deg); }
+    100% { transform: translateX(0) translateY(0) rotate(0deg) skewX(0deg); }
+}
+
+/* MacGuffin idle - gentle glow pulse (using scale) */
+.macguffin-idle {
+    animation: macguffin-pulse 2s ease-in-out infinite;
+}
+
+@keyframes macguffin-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+}
+
+/* ========================================
+   DEFEAT ANIMATIONS
+   ======================================== */
+
+/* Generic defeat - fall over and sink */
+.puppet-defeat {
+    animation: puppet-fall 0.8s ease-in forwards;
+}
+
+@keyframes puppet-fall {
+    0% { transform: rotate(0) translateY(0); opacity: 1; }
+    100% { transform: rotate(45deg) translateY(80px); opacity: 0; }
+}
+
+/* Aldric defeat - heavy topple */
+.aldric-defeat {
+    animation: aldric-fall 1s ease-in forwards;
+}
+
+@keyframes aldric-fall {
+    0% { transform: rotate(0) translateY(0); opacity: 1; }
+    100% { transform: rotate(60deg) translateY(100px); opacity: 0; }
+}
+
+/* Pip defeat - flutter down */
+.pip-defeat {
+    animation: pip-fall 0.7s ease-in forwards;
+}
+
+@keyframes pip-fall {
+    0% { transform: rotate(0) translateY(0) scale(1); opacity: 1; }
+    50% { transform: rotate(-20deg) translateY(30px) scale(0.9); opacity: 0.8; }
+    100% { transform: rotate(30deg) translateY(70px) scale(0.7); opacity: 0; }
+}
+
+/* Enemy defeat - dramatic collapse */
+.enemy-defeat {
+    animation: enemy-fall 0.9s ease-in forwards;
+}
+
+@keyframes enemy-fall {
+    0% { transform: rotate(0) translateY(0) scale(1); opacity: 1; }
+    30% { transform: rotate(-10deg) translateY(-20px) scale(1.05); opacity: 1; }
+    100% { transform: rotate(-45deg) translateY(100px) scale(0.8); opacity: 0; }
+}
+
+/* ========================================
+   AUDIENCE ANIMATIONS
+   ======================================== */
+
+/* Single bob animation - triggered by JS at random intervals */
+.audience-member.audience-bob {
+    animation: audience-single-bob 0.4s ease-out;
+}
+
+@keyframes audience-single-bob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+
+/* Multi-bob animation - some members do 2-3 bobs */
+.audience-member.audience-multi-bob {
+    animation: audience-multi-bob 0.8s ease-out;
+}
+
+@keyframes audience-multi-bob {
+    0%, 100% { transform: translateY(0); }
+    25% { transform: translateY(-8px); }
+    50% { transform: translateY(0); }
+    75% { transform: translateY(-6px); }
+}
+
+/* Wave animation - staggered via animation-delay set by JS */
+.audience-member.audience-wave {
+    animation: audience-wave-motion 0.6s ease-out;
+    animation-delay: var(--wave-delay, 0s);
+}
+
+@keyframes audience-wave-motion {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px) scale(1.1); }
+}
+
+/* Audience excited - quick jump */
+.audience-member.audience-excited {
+    animation: audience-jump 0.4s ease-out;
+}
+
+@keyframes audience-jump {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+}
+
+/* Audience worried - slump down */
+.audience-member.audience-worried {
+    animation: audience-slump 0.5s ease-out forwards;
+}
+
+@keyframes audience-slump {
+    0% { transform: translateY(0) rotate(0); }
+    100% { transform: translateY(5px) rotate(-5deg); }
+}
+
+/* ========================================
+   ABSORB ANIMATIONS (Block/Shield)
+   ======================================== */
+
+/* Block absorb - blue flash */
+.block-absorb {
+    animation: block-flash 0.35s ease-out;
+}
+
+@keyframes block-flash {
+    0% { filter: drop-shadow(0 0 0px #3498DB); }
+    30% { filter: drop-shadow(0 0 12px #3498DB) brightness(1.3); }
+    100% { filter: none; }
+}
+
+/* Shield absorb - gold flash */
+.shield-absorb {
+    animation: shield-flash 0.35s ease-out;
+}
+
+@keyframes shield-flash {
+    0% { filter: drop-shadow(0 0 0px #F5D060); }
+    30% { filter: drop-shadow(0 0 12px #F5D060) brightness(1.3); }
+    100% { filter: none; }
+}
+
+/* ========================================
+   UTILITY CLASSES
+   ======================================== */
+
+/* Glow effect for buffs/heals */
+.puppet-glow {
+    filter: drop-shadow(0 0 8px #F5B041);
+    animation: glow-pulse 0.5s ease-out;
+}
+
+@keyframes glow-pulse {
+    0% { filter: drop-shadow(0 0 0px #F5B041); }
+    50% { filter: drop-shadow(0 0 15px #F5B041); }
+    100% { filter: drop-shadow(0 0 8px #F5B041); }
+}
+
+/* Debuff effect - purple tint */
+.puppet-debuffed {
+    filter: drop-shadow(0 0 5px #8E44AD);
+}
+
+/* ========================================
+   PERSISTENT STATE ANIMATIONS
+   ======================================== */
+
+/* MacGuffin low-HP danger wobble (<30% HP) */
+/* Faster and more erratic than normal idle — signals danger without text */
+.macguffin-low-hp {
+    animation: macguffin-danger-wobble 1.8s ease-in-out infinite !important;
+}
+
+@keyframes macguffin-danger-wobble {
+    0%, 100% { transform: translateX(0) rotate(0deg); }
+    15% { transform: translateX(-3px) rotate(-2deg); }
+    35% { transform: translateX(4px) rotate(1.5deg); }
+    55% { transform: translateX(-2px) rotate(-1deg); }
+    75% { transform: translateX(3px) rotate(2deg); }
+}

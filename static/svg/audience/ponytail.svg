@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 70">
+  <!-- Person with side ponytail connected to head -->
+  <path d="M5 68 Q5 48 25 44 Q45 48 45 68 Z" fill="#1A1A2E"/>
+  <circle cx="25" cy="32" r="13" fill="#1A1A2E"/>
+  <!-- Hair on top -->
+  <ellipse cx="25" cy="20" rx="11" ry="5" fill="#1A1A2E"/>
+  <!-- Ponytail flowing from right side, connected -->
+  <path d="M36 24 Q42 22 44 28 Q46 38 42 44 Q40 36 38 30 Z" fill="#1A1A2E"/>
+</svg>

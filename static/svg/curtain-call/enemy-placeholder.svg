@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 70 80">
+  <!-- Generic Enemy - Placeholder Silhouette -->
+  <!-- Angular, menacing shape with horns and claws -->
+
+  <g fill="#1A1A2E">
+    <!-- Head with horns -->
+    <ellipse cx="35" cy="18" rx="12" ry="10"/>
+    <!-- Left horn -->
+    <path d="M25 12 L18 2 L22 10 Z"/>
+    <!-- Right horn -->
+    <path d="M45 12 L52 2 L48 10 Z"/>
+
+    <!-- Angular body -->
+    <path d="M20 26
+             L15 35
+             L12 50
+             L18 55
+             L22 65
+             Q20 68, 22 70
+             L30 70
+             Q32 68, 30 65
+             L28 58
+             L42 58
+             L40 65
+             Q38 68, 40 70
+             L48 70
+             Q50 68, 48 65
+             L52 55
+             L58 50
+             L55 35
+             L50 26
+             Z"/>
+
+    <!-- Left arm with claw -->
+    <path d="M15 35
+             Q8 38, 5 45
+             L2 50
+             L0 48
+             L3 52
+             L1 55
+             L5 52
+             L8 48
+             L12 45
+             Z"/>
+
+    <!-- Right arm with claw -->
+    <path d="M55 35
+             Q62 38, 65 45
+             L68 50
+             L70 48
+             L67 52
+             L69 55
+             L65 52
+             L62 48
+             L58 45
+             Z"/>
+
+    <!-- Spiky shoulder pads -->
+    <path d="M18 28 L10 24 L16 30 Z"/>
+    <path d="M52 28 L60 24 L54 30 Z"/>
+
+    <!-- Puppet stick -->
+    <rect x="33.5" y="70" width="3" height="10" fill="#3D2B1F"/>
+  </g>
+</svg>

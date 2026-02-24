@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 70">
+  <!-- Basic audience member - plain head and connected shoulders -->
+  <path d="M5 68 Q5 48 25 44 Q45 48 45 68 Z" fill="#1A1A2E"/>
+  <circle cx="25" cy="30" r="14" fill="#1A1A2E"/>
+</svg>

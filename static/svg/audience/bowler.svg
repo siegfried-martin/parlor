@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 70">
+  <!-- Classic bowler hat - short rounded dome -->
+  <path d="M5 68 Q5 48 25 44 Q45 48 45 68 Z" fill="#1A1A2E"/>
+  <circle cx="25" cy="34" r="13" fill="#1A1A2E"/>
+  <!-- Hat brim -->
+  <ellipse cx="25" cy="22" rx="17" ry="4" fill="#1A1A2E"/>
+  <!-- Short rounded dome -->
+  <ellipse cx="25" cy="18" rx="11" ry="6" fill="#1A1A2E"/>
+</svg>

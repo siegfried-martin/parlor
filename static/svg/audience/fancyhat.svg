@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 55 70">
+  <!-- Elegant person with wide-brimmed hat and feather -->
+  <path d="M7 68 Q7 48 27 44 Q47 48 47 68 Z" fill="#1A1A2E"/>
+  <circle cx="27" cy="36" r="12" fill="#1A1A2E"/>
+  <!-- Wide hat brim -->
+  <ellipse cx="27" cy="26" rx="22" ry="5" fill="#1A1A2E"/>
+  <!-- Hat dome -->
+  <ellipse cx="27" cy="20" rx="11" ry="7" fill="#1A1A2E"/>
+  <!-- Single clean feather -->
+  <path d="M40 22 Q48 14 46 4 Q43 12 40 18" fill="#1A1A2E"/>
+</svg>

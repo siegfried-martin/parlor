@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 320">
+  <!-- Pip, the Nimble - Small trickster with oversized hat, scarf, and daggers -->
+
+  <!-- Puppet stick -->
+  <rect x="94" y="252" width="10" height="68" fill="#3D2B1F" rx="2"/>
+
+  <!-- Left leg - thin, dynamic stance -->
+  <path d="M78 210 L72 248 L86 248 L84 210 Z" fill="#1A1A2E"/>
+  <!-- Right leg - stepped forward -->
+  <path d="M116 208 L120 248 L134 248 L122 208 Z" fill="#1A1A2E"/>
+  <!-- Shoes - pointy-toed -->
+  <path d="M68 244 L89 244 L89 254 L58 254 Z" fill="#1A1A2E"/>
+  <path d="M117 244 L137 244 L145 254 L117 254 Z" fill="#1A1A2E"/>
+
+  <!-- Body - slim and small -->
+  <path d="M72 130 Q68 170 75 215 L125 215 Q132 170 128 130 Z" fill="#1A1A2E"/>
+
+  <!-- Vest cutout details -->
+  <path d="M90 145 L100 175 L110 145" fill="none" stroke="#F4E4C1" stroke-width="1.5" opacity="0.3"/>
+  <!-- Buttons -->
+  <circle cx="100" cy="155" r="2.5" fill="#F4E4C1" opacity="0.5"/>
+  <circle cx="100" cy="168" r="2.5" fill="#F4E4C1" opacity="0.5"/>
+
+  <!-- Scarf - flowing dramatically to the right -->
+  <path d="M120 120 Q148 125 160 140 Q168 150 162 165 Q155 175 145 168 Q152 155 145 142 Q138 132 120 128" fill="#1A1A2E"/>
+  <!-- Scarf tail -->
+  <path d="M162 165 Q172 180 165 195 Q160 202 155 196 Q158 185 155 175" fill="#1A1A2E"/>
+
+  <!-- Left arm - holding dagger out to the left -->
+  <path d="M72 135 Q52 148 42 165 Q40 170 46 170 Q55 158 68 148 Z" fill="#1A1A2E"/>
+  <!-- Left hand -->
+  <circle cx="42" cy="166" r="6" fill="#1A1A2E"/>
+  <!-- Dagger blade - extending down-left -->
+  <path d="M38 172 L28 200 L34 198 L42 174 Z" fill="#1A1A2E"/>
+  <!-- Dagger cross-guard cutout -->
+  <rect x="33" y="170" width="14" height="3" rx="1" fill="#F4E4C1" opacity="0.4"/>
+
+  <!-- Right arm - gesturing/throwing -->
+  <path d="M128 135 Q145 125 158 118 Q162 116 160 122 Q150 132 135 140 Z" fill="#1A1A2E"/>
+  <!-- Right hand -->
+  <circle cx="160" cy="118" r="6" fill="#1A1A2E"/>
+  <!-- Throwing star/card in right hand (cutout detail) -->
+  <polygon points="168,108 172,116 168,124 162,118" fill="#1A1A2E"/>
+  <!-- Star cutout -->
+  <circle cx="168" cy="116" r="2" fill="#F4E4C1" opacity="0.5"/>
+
+  <!-- Neck -->
+  <rect x="90" y="108" width="20" height="24" rx="5" fill="#1A1A2E"/>
+
+  <!-- Head - smaller than Aldric, rounder -->
+  <circle cx="100" cy="88" r="28" fill="#1A1A2E"/>
+
+  <!-- Big pointy hat (oversized, floppy) -->
+  <path d="M68 82 Q62 76 60 68 L100 15 Q102 12 104 15 L140 68 Q138 76 132 82 Z" fill="#1A1A2E"/>
+  <!-- Hat brim curving up at sides -->
+  <path d="M55 82 Q100 92 145 82 Q100 100 55 82 Z" fill="#1A1A2E"/>
+  <!-- Hat band cutout -->
+  <path d="M68 78 Q100 86 132 78" fill="none" stroke="#F4E4C1" stroke-width="2.5" opacity="0.4"/>
+  <!-- Star on hat (cutout) -->
+  <polygon points="100,35 103,43 112,43 105,48 108,57 100,52 92,57 95,48 88,43 97,43" fill="#F4E4C1"/>
+  <!-- Hat tip - floppy curve -->
+  <path d="M100 15 Q115 10 125 18 Q130 24 128 30" fill="#1A1A2E"/>
+  <!-- Jingle bell at hat tip -->
+  <circle cx="128" cy="28" r="5" fill="#1A1A2E"/>
+  <circle cx="128" cy="28" r="2" fill="#F4E4C1" opacity="0.5"/>
+
+  <!-- Eye cutouts - large and expressive -->
+  <g id="pip-eyes">
+    <circle cx="88" cy="84" r="7" fill="#F4E4C1"/>
+    <circle cx="112" cy="84" r="7" fill="#F4E4C1"/>
+    <!-- Pupils (looking to the side, mischievous) -->
+    <circle cx="90" cy="84" r="3" fill="#1A1A2E"/>
+    <circle cx="114" cy="84" r="3" fill="#1A1A2E"/>
+  </g>
+
+  <!-- Mouth - cheeky grin (cutout) -->
+  <g id="pip-mouth">
+    <path d="M90 98 Q100 106 110 98" fill="none" stroke="#F4E4C1" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+</svg>

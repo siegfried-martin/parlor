@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 320">
+  <!-- The Critic - BOSS: Snobbish figure with monocle, pen, haughty posture -->
+  <!-- Compressed vertically to fit enemy puppet area -->
+
+  <!-- Puppet stick (slightly thicker for boss) -->
+  <rect x="92" y="262" width="14" height="58" fill="#3D2B1F" rx="2"/>
+
+  <!-- Legs - shorter, elegant -->
+  <rect x="78" y="225" width="14" height="35" rx="4" fill="#1A1A2E"/>
+  <rect x="108" y="223" width="14" height="37" rx="4" fill="#1A1A2E"/>
+
+  <!-- Pointed shoes -->
+  <path d="M73 255 L96 255 L96 264 L63 264 Z" fill="#1A1A2E"/>
+  <path d="M104 255 L127 255 L137 264 L104 264 Z" fill="#1A1A2E"/>
+
+  <!-- Long coat/cloak - swept dramatically (shorter) -->
+  <path d="M55 130 L50 255 L150 255 L145 130 Z" fill="#1A1A2E"/>
+
+  <!-- Coat tails (flared out for dramatic effect) -->
+  <path d="M50 230 L35 260 L68 252 Z" fill="#1A1A2E"/>
+  <path d="M150 230 L165 260 L132 252 Z" fill="#1A1A2E"/>
+
+  <!-- High collar (stands up around neck, imposing) -->
+  <polygon points="68,125 78,100 88,120" fill="#1A1A2E"/>
+  <polygon points="132,125 122,100 112,120" fill="#1A1A2E"/>
+
+  <!-- Collar cutout detail -->
+  <polygon points="78,112 83,103 88,112" fill="#F4E4C1" opacity="0.5"/>
+  <polygon points="122,112 117,103 112,112" fill="#F4E4C1" opacity="0.5"/>
+
+  <!-- Body/vest -->
+  <rect x="72" y="125" width="56" height="60" rx="5" fill="#1A1A2E"/>
+
+  <!-- Vest buttons (cutout details) -->
+  <circle cx="100" cy="138" r="3" fill="#F4E4C1"/>
+  <circle cx="100" cy="152" r="3" fill="#F4E4C1"/>
+  <circle cx="100" cy="166" r="3" fill="#F4E4C1"/>
+
+  <!-- Left arm (tucked behind back, haughty) -->
+  <path d="M62 140 Q44 165 48 195 Q50 205 56 198 Q58 182 65 165 Z" fill="#1A1A2E"/>
+
+  <!-- Right arm (extended, holding pen up) -->
+  <path d="M138 140 Q162 155 160 180 Q160 186 154 180 Q152 168 142 158 Z" fill="#1A1A2E"/>
+  <!-- Right hand -->
+  <circle cx="160" cy="180" r="8" fill="#1A1A2E"/>
+
+  <!-- Pen/quill (held in right hand, pointing up) -->
+  <rect x="157" y="130" width="4" height="52" rx="1" fill="#1A1A2E" transform="rotate(5 159 156)"/>
+  <!-- Pen nib -->
+  <polygon points="155,128 161,128 158,118" fill="#1A1A2E"/>
+  <!-- Ink drip (cutout) -->
+  <circle cx="158" cy="120" r="2.5" fill="#F4E4C1"/>
+
+  <!-- Notepad (in left hand area, peeking out from behind) -->
+  <rect x="32" y="178" width="24" height="28" rx="2" fill="#1A1A2E"/>
+  <!-- Notepad lines (cutouts) -->
+  <rect x="36" y="184" width="16" height="2" fill="#F4E4C1" opacity="0.5"/>
+  <rect x="36" y="190" width="16" height="2" fill="#F4E4C1" opacity="0.5"/>
+  <rect x="36" y="196" width="11" height="2" fill="#F4E4C1" opacity="0.5"/>
+
+  <!-- Thin neck -->
+  <rect x="90" y="82" width="20" height="18" fill="#1A1A2E"/>
+
+  <!-- Head - elongated and thin, haughty -->
+  <ellipse cx="100" cy="58" rx="30" ry="32" fill="#1A1A2E"/>
+
+  <!-- Pointed nose (prominent, snobbish) -->
+  <polygon points="128,55 145,60 128,64" fill="#1A1A2E"/>
+
+  <!-- Thin eyebrows raised (cutouts) -->
+  <rect x="78" y="42" width="14" height="3" rx="1" fill="#F4E4C1" transform="rotate(-8 85 43)"/>
+  <rect x="108" y="40" width="14" height="3" rx="1" fill="#F4E4C1" transform="rotate(8 115 41)"/>
+
+  <!-- Pince-nez glasses cutout for eyes -->
+  <g id="critic-eyes">
+    <circle cx="86" cy="52" r="8" fill="#F4E4C1"/>
+    <circle cx="86" cy="54" r="3" fill="#1A1A2E"/>
+    <circle cx="114" cy="50" r="10" fill="#F4E4C1"/>
+    <circle cx="114" cy="52" r="3.5" fill="#1A1A2E"/>
+    <path d="M94 51 Q100 47 104 50" fill="none" stroke="#1A1A2E" stroke-width="2"/>
+    <!-- Monocle chain -->
+    <path d="M121 58 Q128 68 124 82 Q122 88 118 95" fill="none" stroke="#F4E4C1" stroke-width="1.5" opacity="0.6"/>
+  </g>
+
+  <!-- Mouth cutout - thin, disapproving frown -->
+  <g id="critic-mouth">
+    <path d="M88 70 Q100 74 112 70" fill="none" stroke="#F4E4C1" stroke-width="3" stroke-linecap="round"/>
+  </g>
+
+  <!-- Top hat -->
+  <rect x="74" y="18" width="52" height="18" rx="4" fill="#1A1A2E"/>
+  <!-- Hat brim -->
+  <ellipse cx="100" cy="36" rx="38" ry="7" fill="#1A1A2E"/>
+  <!-- Hat band (cutout) -->
+  <rect x="76" y="32" width="48" height="4" rx="1" fill="#F4E4C1" opacity="0.5"/>
+
+  <!-- Star/badge of authority on chest (cutout) -->
+  <polygon points="100,175 103,183 112,183 105,188 108,197 100,192 92,197 95,188 88,183 97,183" fill="#F4E4C1"/>
+</svg>

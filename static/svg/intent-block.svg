@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Intent Icon: Block (Shield) -->
+  <!-- Simple shield silhouette for enemy block intent -->
+  <!-- Color: near-black #1A1A2E to match puppet theater aesthetic -->
+
+  <!-- Shield body - classic heater shield shape -->
+  <path d="M16 2
+           C8 2, 4 6, 4 10
+           L4 16
+           C4 22, 10 28, 16 30
+           C22 28, 28 22, 28 16
+           L28 10
+           C28 6, 24 2, 16 2 Z"
+        fill="#1A1A2E"/>
+
+  <!-- Inner highlight/detail - subtle emblem cutout -->
+  <ellipse cx="16" cy="14" rx="4" ry="5" fill="#F4E4C1"/>
+</svg>

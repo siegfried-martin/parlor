@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 70">
+  <!-- Dapper person with oversized bowtie extending past shoulders -->
+  <path d="M8 68 Q8 50 25 46 Q42 50 42 68 Z" fill="#1A1A2E"/>
+  <circle cx="25" cy="30" r="13" fill="#1A1A2E"/>
+  <!-- Oversized bowtie wings extending past narrow shoulders -->
+  <path d="M0 44 L22 48 L0 52 Z" fill="#1A1A2E"/>
+  <path d="M50 44 L28 48 L50 52 Z" fill="#1A1A2E"/>
+  <circle cx="25" cy="48" r="3" fill="#1A1A2E"/>
+</svg>

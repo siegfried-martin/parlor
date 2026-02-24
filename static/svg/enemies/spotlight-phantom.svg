@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 320">
+  <!-- Puppet Stick - floating gap between body and stick -->
+  <rect x="96" y="265" width="8" height="55" rx="2" fill="#3D2B1F"/>
+  <ellipse cx="100" cy="265" rx="10" ry="4" fill="#3D2B1F"/>
+
+  <!-- Light beam rays extending outward from body -->
+  <!-- Left far ray -->
+  <polygon points="60,80 10,220 20,225" fill="#1A1A2E" opacity="0.6"/>
+  <!-- Left ray -->
+  <polygon points="65,90 25,230 38,235" fill="#1A1A2E" opacity="0.7"/>
+  <!-- Right ray -->
+  <polygon points="135,90 162,235 175,230" fill="#1A1A2E" opacity="0.7"/>
+  <!-- Right far ray -->
+  <polygon points="140,80 180,225 190,220" fill="#1A1A2E" opacity="0.6"/>
+  <!-- Center-left ray -->
+  <polygon points="80,100 55,245 68,248" fill="#1A1A2E" opacity="0.5"/>
+  <!-- Center-right ray -->
+  <polygon points="120,100 132,248 145,245" fill="#1A1A2E" opacity="0.5"/>
+
+  <!-- Main triangular spotlight cone body -->
+  <polygon points="100,35 40,240 160,240" fill="#1A1A2E"/>
+
+  <!-- Floating effect - gap between body bottom and stick -->
+  <!-- Small shadow dots to suggest floating -->
+  <circle cx="90" cy="256" r="2" fill="#1A1A2E" opacity="0.4"/>
+  <circle cx="100" cy="258" r="2.5" fill="#1A1A2E" opacity="0.5"/>
+  <circle cx="110" cy="256" r="2" fill="#1A1A2E" opacity="0.4"/>
+
+  <!-- Spotlight housing/head at top -->
+  <ellipse cx="100" cy="42" rx="18" ry="12" fill="#1A1A2E"/>
+  <rect x="85" y="30" width="30" height="8" rx="4" fill="#1A1A2E"/>
+
+  <!-- Bright eye cutouts - positioned high in the cone -->
+  <ellipse cx="88" cy="72" rx="7" ry="8" fill="#F4E4C1"/>
+  <ellipse cx="112" cy="72" rx="7" ry="8" fill="#F4E4C1"/>
+
+  <!-- Inner eye glow detail -->
+  <circle cx="88" cy="70" r="3" fill="#F4E4C1"/>
+  <circle cx="112" cy="70" r="3" fill="#F4E4C1"/>
+
+  <!-- Thin spectral mouth -->
+  <path d="M90,95 Q100,102 110,95" fill="none" stroke="#F4E4C1" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Light streak details on body -->
+  <line x1="85" y1="120" x2="75" y2="170" stroke="#F4E4C1" stroke-width="0.8" opacity="0.5"/>
+  <line x1="115" y1="120" x2="125" y2="170" stroke="#F4E4C1" stroke-width="0.8" opacity="0.5"/>
+  <line x1="100" y1="110" x2="100" y2="200" stroke="#F4E4C1" stroke-width="0.5" opacity="0.3"/>
+
+  <!-- Small light cutouts scattered on the cone body -->
+  <circle cx="80" cy="140" r="2" fill="#F4E4C1" opacity="0.6"/>
+  <circle cx="120" cy="140" r="2" fill="#F4E4C1" opacity="0.6"/>
+  <circle cx="70" cy="185" r="1.5" fill="#F4E4C1" opacity="0.4"/>
+  <circle cx="130" cy="185" r="1.5" fill="#F4E4C1" opacity="0.4"/>
+  <circle cx="100" cy="160" r="1.5" fill="#F4E4C1" opacity="0.5"/>
+</svg>

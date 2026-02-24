@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 70">
+  <!-- Cowboy with clean wide-brimmed hat -->
+  <path d="M5 68 Q5 48 25 44 Q45 48 45 68 Z" fill="#1A1A2E"/>
+  <circle cx="25" cy="36" r="12" fill="#1A1A2E"/>
+  <!-- Wide hat brim -->
+  <path d="M2 26 Q12 30 25 30 Q38 30 48 26 Q40 22 25 22 Q10 22 2 26 Z" fill="#1A1A2E"/>
+  <!-- Hat crown -->
+  <path d="M13 22 Q14 10 25 6 Q36 10 37 22 Z" fill="#1A1A2E"/>
+</svg>

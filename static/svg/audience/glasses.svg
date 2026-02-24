@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 70">
+  <!-- Person with glasses - seen from behind, arms and ear hooks visible -->
+  <path d="M5 68 Q5 48 25 44 Q45 48 45 68 Z" fill="#1A1A2E"/>
+  <circle cx="25" cy="32" r="13" fill="#1A1A2E"/>
+  <!-- Hair -->
+  <ellipse cx="25" cy="20" rx="11" ry="4" fill="#1A1A2E"/>
+  <!-- Glasses arms extending from sides of head -->
+  <rect x="2" y="30" width="12" height="3" rx="1" fill="#1A1A2E"/>
+  <rect x="36" y="30" width="12" height="3" rx="1" fill="#1A1A2E"/>
+  <!-- Ear hooks curving down -->
+  <path d="M2 30 Q0 30 0 33 Q0 38 3 40" stroke="#1A1A2E" stroke-width="2.5" fill="none"/>
+  <path d="M48 30 Q50 30 50 33 Q50 38 47 40" stroke="#1A1A2E" stroke-width="2.5" fill="none"/>
+</svg>

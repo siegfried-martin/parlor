@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 70">
+  <!-- Person with long flowing hair connected to head and shoulders -->
+  <path d="M5 68 Q5 48 25 44 Q45 48 45 68 Z" fill="#1A1A2E"/>
+  <circle cx="25" cy="30" r="13" fill="#1A1A2E"/>
+  <!-- Hair on top -->
+  <ellipse cx="25" cy="18" rx="13" ry="5" fill="#1A1A2E"/>
+  <!-- Long hair flowing down sides, overlapping shoulders -->
+  <path d="M12 22 Q6 24 4 36 Q2 50 8 58 Q10 46 12 36 Z" fill="#1A1A2E"/>
+  <path d="M38 22 Q44 24 46 36 Q48 50 42 58 Q40 46 38 36 Z" fill="#1A1A2E"/>
+</svg>

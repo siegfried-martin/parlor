@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 45 65">
+  <!-- Pip, the Nimble - Placeholder Silhouette -->
+  <!-- Small, wiry figure with oversized pointy hat and trailing scarf -->
+
+  <g fill="#1A1A2E">
+    <!-- Oversized pointy hat -->
+    <path d="M22.5 0
+             L32 22
+             L13 22
+             Z"/>
+    <!-- Hat brim -->
+    <ellipse cx="22.5" cy="22" rx="12" ry="3"/>
+
+    <!-- Small round head -->
+    <ellipse cx="22.5" cy="27" rx="7" ry="6"/>
+
+    <!-- Scarf trailing to the right -->
+    <path d="M29 28
+             Q35 30, 40 28
+             Q42 32, 38 35
+             Q34 33, 30 35
+             L28 32
+             Z"/>
+
+    <!-- Slim body -->
+    <path d="M17 32
+             L15 42
+             L13 50
+             Q11 52, 13 54
+             L18 54
+             Q20 52, 18 50
+             L19 44
+             L26 44
+             L27 50
+             Q25 52, 27 54
+             L32 54
+             Q34 52, 32 50
+             L30 42
+             L28 32
+             Z"/>
+
+    <!-- Left arm -->
+    <path d="M15 34
+             Q10 36, 8 40
+             L6 42
+             Q5 44, 7 44
+             L10 42
+             L14 38
+             Z"/>
+
+    <!-- Right arm with wand -->
+    <path d="M30 34
+             Q35 36, 38 34
+             L40 30
+             Q42 28, 40 28
+             L36 32
+             L30 36
+             Z"/>
+
+    <!-- Wand -->
+    <line x1="38" y1="28" x2="42" y2="20" stroke="#1A1A2E" stroke-width="2"/>
+    <!-- Star on wand tip -->
+    <path d="M42 18 L43 20 L45 20 L43.5 21.5 L44 24 L42 22.5 L40 24 L40.5 21.5 L39 20 L41 20 Z"/>
+
+    <!-- Puppet stick -->
+    <rect x="21" y="54" width="3" height="11" fill="#3D2B1F"/>
+  </g>
+</svg>

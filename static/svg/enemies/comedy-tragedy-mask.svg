@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 320">
+  <!-- Comedy-Tragedy Mask - Two-Faced Theater Mask Shadow Puppet -->
+
+  <!-- Puppet stick -->
+  <rect x="95" y="260" width="10" height="60" rx="2" fill="#3D2B1F"/>
+  <ellipse cx="100" cy="260" rx="8" ry="3" fill="#3D2B1F"/>
+
+  <!-- Draped body / cloak -->
+  <path d="M60,160 Q55,200 50,255 L150,255 Q145,200 140,160 Z" fill="#1A1A2E"/>
+  <!-- Cloak folds -->
+  <path d="M70,170 Q65,210 62,250" stroke="#0D0D1A" stroke-width="1.5" fill="none" opacity="0.4"/>
+  <path d="M100,165 L100,250" stroke="#0D0D1A" stroke-width="1.5" fill="none" opacity="0.4"/>
+  <path d="M130,170 Q135,210 138,250" stroke="#0D0D1A" stroke-width="1.5" fill="none" opacity="0.4"/>
+
+  <!-- Draped shoulders -->
+  <path d="M50,155 Q100,175 150,155 Q145,165 100,180 Q55,165 50,155 Z" fill="#1A1A2E"/>
+
+  <!-- Neck -->
+  <rect x="88" y="138" width="24" height="22" rx="3" fill="#1A1A2E"/>
+
+  <!-- Main mask head shape - large, slightly wider than normal -->
+  <ellipse cx="100" cy="85" rx="52" ry="58" fill="#1A1A2E"/>
+
+  <!-- Forehead ridge -->
+  <path d="M52,70 Q100,55 148,70" stroke="#0D0D1A" stroke-width="2" fill="none" opacity="0.3"/>
+
+  <!-- Dividing line down the middle -->
+  <line x1="100" y1="28" x2="100" y2="142" stroke="#F4E4C1" stroke-width="1.5" opacity="0.6"/>
+
+  <!-- LEFT SIDE - Comedy (happy) -->
+
+  <!-- Happy eye - upward crescent -->
+  <path d="M70,72 Q78,62 86,72" stroke="#F4E4C1" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <!-- Happy eye lower fill -->
+  <path d="M70,72 Q78,78 86,72 Q78,62 70,72 Z" fill="#F4E4C1"/>
+
+  <!-- Happy eyebrow - raised -->
+  <path d="M66,60 Q78,52 90,58" stroke="#F4E4C1" stroke-width="2" fill="none" stroke-linecap="round"/>
+
+  <!-- Comedy mouth - big smile -->
+  <path d="M60,105 Q78,128 98,105" stroke="#F4E4C1" stroke-width="2.5" fill="#F4E4C1"/>
+
+  <!-- Cheek dimple -->
+  <circle cx="68" cy="98" r="3" fill="#F4E4C1" opacity="0.4"/>
+
+  <!-- RIGHT SIDE - Tragedy (sad) -->
+
+  <!-- Sad eye - downward shape -->
+  <path d="M114,72 Q122,82 130,72" stroke="#F4E4C1" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <!-- Sad eye upper fill -->
+  <path d="M114,72 Q122,66 130,72 Q122,82 114,72 Z" fill="#F4E4C1"/>
+
+  <!-- Sad eyebrow - angled down toward center -->
+  <path d="M110,58 Q122,52 134,60" stroke="#F4E4C1" stroke-width="2" fill="none" stroke-linecap="round"/>
+
+  <!-- Tragedy mouth - deep frown -->
+  <path d="M102,115 Q120,92 140,115" stroke="#F4E4C1" stroke-width="2.5" fill="#F4E4C1"/>
+
+  <!-- Tear drop -->
+  <path d="M126,88 Q128,95 126,100 Q124,95 126,88 Z" fill="#F4E4C1" opacity="0.6"/>
+
+  <!-- Nose - shared, center -->
+  <polygon points="100,80 96,95 104,95" fill="#F4E4C1" opacity="0.5"/>
+</svg>

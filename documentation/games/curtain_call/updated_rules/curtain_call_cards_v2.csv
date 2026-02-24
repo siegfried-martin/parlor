@@ -1,0 +1,42 @@
+Protagonist,Name,Cost,Rarity,Type,Description,Notes
+Pip,Quick Jab,1,Basic,Attack,Inflict 2 random debuff. Deal 2 per unique debuff on enemy,changed v3: removed base damage; added random debuff inflict
+Pip,Lucky Shot,1,Basic,Attack,Deal 3 damage. Gain 2 Luck,changed v3: luck 1 -> 2
+Aldric,Galvanize,1,Basic,Attack,Deal 3 damage. Gain 1 Taunt,changed v3: heal -> taunt
+Aldric,Bulwark,1,Basic,Defense,Gain 5 Block and 1 Retaliate,changed v3: reworked from 2-cost attack to 1-cost defense
+MacGuffin,Block,0,Basic,Defense,Gain 3 Block,changed v3: cost 1 -> 0
+MacGuffin,Inspire,0,Basic,Action,Gain 1 Inspire,changed v3: cost 1 -> 0; inspire 2 -> 1; deck count 2 -> 1
+,,,,,,
+Aldric,Aegis,1,Uncommon,Defense,Gain 5 Block. Draw 1 card,changed
+Aldric,Burning Devotion,2,Uncommon,Attack,Deal 15 damage. Gain 2 Burn,changed
+Aldric,Cooperative Strike,2,Uncommon,Attack,Deal 8 damage. Attack cards in hand from the other protagonist gain +4 attack,"changed, renamed from Enabling Strike"
+Aldric,Protective Stance,1,Uncommon,Action,Gain Taunt equal to Ovation. Gain Shield equal to Ovation,
+Aldric,Protect,0,Uncommon,Action,Gain 3 Block and 3 Shield to target protagonist,changed v3: 2/2 -> 3/3
+Aldric,Iron Wall,2,Uncommon,Defense,Gain 10 Block. Gain 1 Fortify,changed v3: 12 block -> 10 block + 1 fortify
+Aldric,True Strike,1,Uncommon,Action,Target protagonist gains 2 Piercing and 2 Focus,change ability name from Accuracy to Focus
+Aldric,Inspirational Shout,1,Uncommon,Action,Convert Ovation to Inspire,changed
+Aldric,Cleanse,1,Uncommon,Defense,Gain 5 Block. Remove all Burn and Poison from target,changed
+Aldric,Aggressive Strike,3,Uncommon,Attack,Deal 20 damage. Inflict 1 Heckled,changed v3: 18 -> 20 damage
+Aldric,Captivating Strike,1,Rare,Attack,Deal 2 damage. Gain 1 Ovation per damage dealt to target,changed
+Aldric,Heated Resistance,1,Rare,Defense,Gain 5 Block. Inflict 5 Burn,"changed, renamed from Stoic Resistance"
+,,,,,,
+Pip,Good Fortune,1,Uncommon,Action,Convert Ovation to Luck,
+Pip,Create Opportunity,1,Uncommon,Attack,Deal 3 damage. Reduce the cost of a random card in hand by 1,
+Pip,Loaded Insult,1,Uncommon,Defense,"Gain 1 Taunt, 1 Distract, and 2 Shield",changed v3: added 2 shield
+Pip,Coup de Grace,2,Uncommon,Attack,Deal 5 + [Ovation x 2] damage,
+Pip,Pip's Cocktail,0,Uncommon,Action,Inflict 2 Poison and 2 Burn,changed
+Pip,Annoying Poke,1,Uncommon,Attack,Deal 2 damage. Inflict 1 Frustration. Gain 1 Distract,changed v3: 1 -> 2 damage
+Pip,Stylish Dance,2,Uncommon,Action,Lose all Ovation. Inflict Stage Fright. Gain 1 Energy,changed v3: added gain 1 energy
+Pip,Hit Where It Hurts,1,Uncommon,Attack,Deal 3 damage. Inflict 2 Vulnerable,
+Pip,Vex,2,Uncommon,Defense,"Gain 2 Taunt and 2 Shield. Inflict 2 Frustration and 1 Forgetful",changed v3: added 2 shield
+Pip,Best Explanation,1,Uncommon,Action,Inflict 2 Confused and 2 Forgetful,changed
+Pip,Ultimate Jeer,2,Rare,Attack,Deal [Ovation] damage. Gain [Ovation] Taunt. Inflict [Ovation] Frustration,
+Pip,Flirtatious Jeer,1,Rare,Action,"Inflict 2 Weak, 2 Confused, and 2 Forgetful",changed
+,,,,,,
+Aldric,Battle Hymn,1,Uncommon,Action,Gain 1 Inspire and 1 Fortify,
+Aldric,Shield Bash,2,Uncommon,Attack,Deal 6 damage twice,
+Aldric,Stand Guard,0,Uncommon,Defense,Gain 3 Block. Gain 1 Fortify,
+Aldric,Stalwart,1,Uncommon,Defense,Gain 2 Taunt and 4 Shield,new v3
+Pip,Quick Draw,1,Uncommon,Action,Draw 2 cards. Gain 1 Luck,
+Pip,Pepper Spray,1,Uncommon,Attack,Deal 2 damage 3 times. Inflict 1 Burn,changed v3: added inflict 1 burn
+Pip,Mischief,0,Uncommon,Action,Inflict 1 Vulnerable. Draw 1 card,
+Pip,Twist the Knife,1,Uncommon,Attack,Deal 1 damage per total debuff stack on enemy,new v3

@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 320">
+  <!-- Stagehand - Practical worker with cap, overalls, and wrench -->
+
+  <!-- Puppet stick -->
+  <rect x="93" y="255" width="12" height="65" fill="#3D2B1F" rx="2"/>
+
+  <!-- Legs - sturdy work boots -->
+  <rect x="70" y="225" width="22" height="35" rx="4" fill="#1A1A2E"/>
+  <rect x="108" y="225" width="22" height="35" rx="4" fill="#1A1A2E"/>
+
+  <!-- Boots -->
+  <rect x="65" y="248" width="30" height="14" rx="4" fill="#1A1A2E"/>
+  <rect x="105" y="248" width="30" height="14" rx="4" fill="#1A1A2E"/>
+
+  <!-- Body - practical, solid build -->
+  <rect x="60" y="140" width="80" height="90" rx="10" fill="#1A1A2E"/>
+
+  <!-- Overall straps (cutout lines to suggest overalls) -->
+  <rect x="75" y="140" width="8" height="50" fill="#F4E4C1" opacity="0.5"/>
+  <rect x="117" y="140" width="8" height="50" fill="#F4E4C1" opacity="0.5"/>
+
+  <!-- Overall bib pocket (cutout) -->
+  <rect x="85" y="160" width="30" height="20" rx="3" fill="#F4E4C1" opacity="0.4"/>
+
+  <!-- Left arm (at side) -->
+  <ellipse cx="50" cy="175" rx="14" ry="30" fill="#1A1A2E"/>
+  <!-- Left hand -->
+  <circle cx="48" cy="205" r="8" fill="#1A1A2E"/>
+
+  <!-- Right arm (holding wrench, raised slightly) -->
+  <ellipse cx="150" cy="168" rx="14" ry="28" fill="#1A1A2E"/>
+  <!-- Right hand gripping wrench -->
+  <circle cx="155" cy="145" r="9" fill="#1A1A2E"/>
+
+  <!-- Wrench -->
+  <rect x="152" y="95" width="7" height="55" rx="2" fill="#1A1A2E"/>
+  <!-- Wrench jaw (open end) -->
+  <path d="M148 85 L148 100 L142 100 L142 92 L148 85 Z" fill="#1A1A2E"/>
+  <path d="M163 85 L163 100 L169 100 L169 92 L163 85 Z" fill="#1A1A2E"/>
+  <!-- Wrench jaw opening (cutout to show the gap) -->
+  <rect x="149" y="88" width="13" height="12" rx="1" fill="#F4E4C1"/>
+  <!-- Inner wrench (dark) to define the shape -->
+  <rect x="151" y="90" width="9" height="8" rx="1" fill="#1A1A2E"/>
+
+  <!-- Neck -->
+  <rect x="87" y="120" width="26" height="25" fill="#1A1A2E"/>
+
+  <!-- Head - round, practical -->
+  <circle cx="100" cy="85" r="38" fill="#1A1A2E"/>
+
+  <!-- Cap - flat working cap -->
+  <ellipse cx="100" cy="55" rx="42" ry="14" fill="#1A1A2E"/>
+  <!-- Cap top -->
+  <path d="M60 55 Q60 35 100 30 Q140 35 140 55 Z" fill="#1A1A2E"/>
+  <!-- Cap brim (extends forward) -->
+  <path d="M55 55 L145 55 L150 62 L50 62 Z" fill="#1A1A2E"/>
+
+  <!-- Eye cutouts - small, no-nonsense -->
+  <g id="stagehand-eyes">
+    <ellipse cx="86" cy="82" rx="6" ry="5" fill="#F4E4C1"/>
+    <ellipse cx="114" cy="82" rx="6" ry="5" fill="#F4E4C1"/>
+  </g>
+
+  <!-- Mouth cutout - neutral straight line -->
+  <g id="stagehand-mouth">
+    <rect x="88" y="100" width="24" height="5" rx="2" fill="#F4E4C1"/>
+  </g>
+</svg>

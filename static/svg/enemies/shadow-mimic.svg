@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 320">
+  <!-- Puppet Stick -->
+  <rect x="96" y="255" width="8" height="65" rx="2" fill="#3D2B1F"/>
+  <ellipse cx="100" cy="255" rx="10" ry="4" fill="#3D2B1F"/>
+
+  <!-- Main amorphous blob body -->
+  <path d="M100,40
+           Q130,38 150,55 Q168,72 172,100
+           Q175,120 170,140 Q168,155 172,170
+           Q178,190 170,210 Q165,225 155,238
+           Q148,248 135,255 Q120,262 100,264
+           Q80,262 65,255 Q52,248 45,238
+           Q35,225 30,210 Q22,190 28,170
+           Q32,155 30,140 Q25,120 28,100
+           Q32,72 50,55 Q70,38 100,40 Z" fill="#1A1A2E"/>
+
+  <!-- Tendril - top left -->
+  <path d="M55,70 Q40,55 30,45 Q22,38 18,42 Q15,48 22,55 Q30,62 42,72 Z" fill="#1A1A2E"/>
+
+  <!-- Tendril - top right -->
+  <path d="M145,70 Q160,55 170,45 Q178,38 182,42 Q185,48 178,55 Q170,62 158,72 Z" fill="#1A1A2E"/>
+
+  <!-- Tendril - left side -->
+  <path d="M30,150 Q18,145 10,148 Q4,152 8,158 Q14,162 24,158 Z" fill="#1A1A2E"/>
+
+  <!-- Tendril - right side -->
+  <path d="M170,150 Q182,145 190,148 Q196,152 192,158 Q186,162 176,158 Z" fill="#1A1A2E"/>
+
+  <!-- Tendril - bottom left -->
+  <path d="M55,245 Q42,255 35,265 Q30,272 35,275 Q40,276 45,270 Q50,260 58,250 Z" fill="#1A1A2E"/>
+
+  <!-- Tendril - bottom right -->
+  <path d="M145,245 Q158,255 165,265 Q170,272 165,275 Q160,276 155,270 Q150,260 142,250 Z" fill="#1A1A2E"/>
+
+  <!-- Tendril - lower left -->
+  <path d="M38,200 Q25,208 18,218 Q14,225 18,228 Q24,230 28,222 Q34,212 42,205 Z" fill="#1A1A2E"/>
+
+  <!-- Tendril - lower right -->
+  <path d="M162,200 Q175,208 182,218 Q186,225 182,228 Q176,230 172,222 Q166,212 158,205 Z" fill="#1A1A2E"/>
+
+  <!-- Multiple scattered eye cutouts - eerie and alien -->
+  <!-- Central large eyes -->
+  <ellipse cx="82" cy="110" rx="6" ry="5" fill="#F4E4C1"/>
+  <ellipse cx="118" cy="110" rx="6" ry="5" fill="#F4E4C1"/>
+
+  <!-- Upper small eyes -->
+  <circle cx="100" cy="70" r="3" fill="#F4E4C1"/>
+  <circle cx="72" cy="80" r="2.5" fill="#F4E4C1"/>
+  <circle cx="128" cy="80" r="2.5" fill="#F4E4C1"/>
+
+  <!-- Middle scattered eyes -->
+  <circle cx="65" cy="130" r="2" fill="#F4E4C1"/>
+  <circle cx="135" cy="130" r="2" fill="#F4E4C1"/>
+  <ellipse cx="100" cy="145" rx="4" ry="3" fill="#F4E4C1"/>
+
+  <!-- Lower scattered eyes -->
+  <circle cx="80" cy="175" r="2.5" fill="#F4E4C1"/>
+  <circle cx="120" cy="175" r="2.5" fill="#F4E4C1"/>
+  <circle cx="100" cy="200" r="2" fill="#F4E4C1"/>
+  <circle cx="90" cy="220" r="1.5" fill="#F4E4C1"/>
+  <circle cx="110" cy="220" r="1.5" fill="#F4E4C1"/>
+
+  <!-- Outer edge tiny eyes -->
+  <circle cx="50" cy="105" r="1.5" fill="#F4E4C1"/>
+  <circle cx="150" cy="105" r="1.5" fill="#F4E4C1"/>
+  <circle cx="55" cy="190" r="1.5" fill="#F4E4C1"/>
+  <circle cx="145" cy="190" r="1.5" fill="#F4E4C1"/>
+</svg>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 30">
+  <!-- Audience Member 1 - Simple head with round shape -->
+  <g fill="#1A1A2E">
+    <!-- Round head -->
+    <ellipse cx="10" cy="10" rx="7" ry="7"/>
+    <!-- Shoulders -->
+    <path d="M2 30 Q2 20, 10 18 Q18 20, 18 30 Z"/>
+  </g>
+</svg>

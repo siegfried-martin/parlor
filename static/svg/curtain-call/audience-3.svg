@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 30">
+  <!-- Audience Member 3 - Head with ponytail -->
+  <g fill="#1A1A2E">
+    <!-- Head -->
+    <ellipse cx="10" cy="11" rx="6" ry="6"/>
+    <!-- Ponytail to the side -->
+    <path d="M15 8 Q20 10, 19 16 Q18 14, 16 12 Z"/>
+    <!-- Hair bun on top -->
+    <ellipse cx="10" cy="5" rx="4" ry="3"/>
+    <!-- Shoulders -->
+    <path d="M2 30 Q2 21, 10 19 Q18 21, 18 30 Z"/>
+  </g>
+</svg>
