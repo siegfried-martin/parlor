@@ -133,7 +133,7 @@ Object.assign(CurtainCallGame.prototype, {
         // Display the bubble
         if (bubbleType === 'audience') {
             this.showAudienceBubble(line, element);
-            setTimeout(() => this.clearExplanationBubbles(), 3000);
+            setTimeout(() => this.clearExplanationBubbles(), 4500);
         } else if (bubbleType === 'attack') {
             this.showAttackBubble(line, element);
         } else {
@@ -320,7 +320,7 @@ Object.assign(CurtainCallGame.prototype, {
             );
             if (pair) {
                 this.showAudienceBubble(pair.response, member);
-                setTimeout(() => this.clearExplanationBubbles(), 3000);
+                setTimeout(() => this.clearExplanationBubbles(), 4500);
                 ss.lastCrowdSpeaker = memberType;
                 ss.lastCrowdLine = pair.response;
                 this._recordSpeech(SPEECH_CONFIG.priority.crowdAmbient, 'crowd:ambient');

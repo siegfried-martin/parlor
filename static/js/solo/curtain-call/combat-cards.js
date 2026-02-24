@@ -319,10 +319,26 @@ Object.assign(CurtainCallGame.prototype, {
                     break;
                 }
 
+                // Inflict a random debuff on enemy (Quick Jab)
+                case 'inflictRandomDebuff': {
+                    const debuffPool = ['vulnerable', 'poison', 'burn', 'weak'];
+                    const chosen = debuffPool[Math.floor(Math.random() * debuffPool.length)];
+                    await this.inflictDebuffOnEnemy(chosen, effect.value, card);
+                    break;
+                }
+
                 // Damage per enemy debuff count (Quick Jab)
                 case 'damagePerDebuff': {
                     const debuffCount = this.getEnemyDebuffCount();
                     const totalDmg = effect.base + (debuffCount * effect.perDebuff);
+                    await this.dealDamageToEnemy(totalDmg, card);
+                    break;
+                }
+
+                // Damage per total debuff stacks on enemy (Twist the Knife)
+                case 'damagePerTotalDebuff': {
+                    const totalStacks = this.getEnemyTotalDebuffStacks();
+                    const totalDmg = totalStacks * effect.perStack;
                     await this.dealDamageToEnemy(totalDmg, card);
                     break;
                 }

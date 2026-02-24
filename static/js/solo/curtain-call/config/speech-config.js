@@ -14,9 +14,9 @@ const SPEECH_CONFIG = {
 
     // Display duration range (scaled by word count)
     displayDuration: {
-        min: 1500,
-        max: 2500,
-        perWordOver3: 100   // +100ms per word beyond 3
+        min: 2500,
+        max: 4000,
+        perWordOver3: 150   // +150ms per word beyond 3
     },
 
     // ms pause after animation before speech bubble appears

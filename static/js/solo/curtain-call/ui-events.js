@@ -196,13 +196,6 @@ Object.assign(CurtainCallGame.prototype, {
             });
         }
 
-        // Remove a Card button on rewards screen
-        if (this.elements.removeCardBtn) {
-            this.elements.removeCardBtn.addEventListener('click', () => {
-                this.showDeckListForRemoval();
-            });
-        }
-
         // Deck count indicator — tap to open deck list (view mode)
         if (this.elements.deckCountIndicator) {
             this.elements.deckCountIndicator.addEventListener('click', () => {

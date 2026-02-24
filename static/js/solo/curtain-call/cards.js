@@ -25,26 +25,26 @@ const CARD_DEFINITIONS = {
         cost: 1,
         type: 'attack',
         rarity: 'basic',
-        description: 'Deal 3 damage. Heal each protagonist by 1.',
+        description: 'Deal 3 damage. Gain 1 Taunt.',
         owner: 'aldric',
         speechBubble: 'RALLY!',
         effects: [
             { type: 'damage', value: 3 },
-            { type: 'healProtagonists', value: 1 }
+            { type: 'taunt', value: 1 }
         ]
     },
     'bulwark': {
         id: 'bulwark',
         name: 'Bulwark',
-        cost: 2,
-        type: 'attack',
+        cost: 1,
+        type: 'defense',
         rarity: 'basic',
-        description: 'Deal 5 damage. Reduce the cost of Defense cards in hand by 1.',
+        description: 'Gain 5 Block and 1 Retaliate.',
         owner: 'aldric',
         speechBubble: 'STAND FIRM!',
         effects: [
-            { type: 'damage', value: 5 },
-            { type: 'reduceCostType', cardType: 'defense', amount: 1 }
+            { type: 'block', value: 5 },
+            { type: 'retaliate', value: 1 }
         ]
     },
 
@@ -55,11 +55,12 @@ const CARD_DEFINITIONS = {
         cost: 1,
         type: 'attack',
         rarity: 'basic',
-        description: 'Deal 2 damage + 2 per unique debuff on enemy.',
+        description: 'Inflict 2 random debuff. Deal 2 per unique debuff on enemy.',
         owner: 'pip',
         speechBubble: 'THWIP!',
         effects: [
-            { type: 'damagePerDebuff', base: 2, perDebuff: 2 }
+            { type: 'inflictRandomDebuff', value: 2 },
+            { type: 'damagePerDebuff', base: 0, perDebuff: 2 }
         ]
     },
     'lucky-shot': {
@@ -68,12 +69,12 @@ const CARD_DEFINITIONS = {
         cost: 1,
         type: 'attack',
         rarity: 'basic',
-        description: 'Deal 3 damage. Gain 1 Luck.',
+        description: 'Deal 3 damage. Gain 2 Luck.',
         owner: 'pip',
         speechBubble: 'FEELING LUCKY!',
         effects: [
             { type: 'damage', value: 3 },
-            { type: 'luck', value: 1 }
+            { type: 'luck', value: 2 }
         ]
     },
 
@@ -81,7 +82,7 @@ const CARD_DEFINITIONS = {
     'block': {
         id: 'block',
         name: 'Block',
-        cost: 1,
+        cost: 0,
         type: 'defense',
         rarity: 'basic',
         description: 'Gain 3 Block.',
@@ -92,13 +93,13 @@ const CARD_DEFINITIONS = {
     'inspire': {
         id: 'inspire',
         name: 'Inspire',
-        cost: 1,
+        cost: 0,
         type: 'action',
         rarity: 'basic',
-        description: 'Gain 2 Inspire.',
+        description: 'Gain 1 Inspire.',
         owner: 'macguffin',
         speechBubble: 'TOGETHER!',
-        effects: [{ type: 'inspire', value: 2 }]
+        effects: [{ type: 'inspire', value: 1 }]
     },
 
     // ===========================
@@ -167,13 +168,13 @@ const CARD_DEFINITIONS = {
         cost: 0,
         type: 'action',
         rarity: 'uncommon',
-        description: 'Gain 2 Block and 2 Shield to target protagonist.',
+        description: 'Gain 3 Block and 3 Shield to target protagonist.',
         owner: 'aldric',
         speechBubble: 'I PROTECT!',
         targeting: 'protagonist',
         effects: [
-            { type: 'block', value: 2 },
-            { type: 'shield', value: 2 }
+            { type: 'block', value: 3 },
+            { type: 'shield', value: 3 }
         ]
     },
     'iron-wall': {
@@ -182,10 +183,13 @@ const CARD_DEFINITIONS = {
         cost: 2,
         type: 'defense',
         rarity: 'uncommon',
-        description: 'Gain 12 Block.',
+        description: 'Gain 10 Block. Gain 1 Fortify.',
         owner: 'aldric',
         speechBubble: 'NOTHING GETS THROUGH!',
-        effects: [{ type: 'block', value: 12 }]
+        effects: [
+            { type: 'block', value: 10 },
+            { type: 'fortify', value: 1 }
+        ]
     },
     'true-strike': {
         id: 'true-strike',
@@ -236,11 +240,11 @@ const CARD_DEFINITIONS = {
         cost: 3,
         type: 'attack',
         rarity: 'uncommon',
-        description: 'Deal 18 damage. Inflict 1 Heckled.',
+        description: 'Deal 20 damage. Inflict 1 Heckled.',
         owner: 'aldric',
         speechBubble: 'SILENCE!',
         effects: [
-            { type: 'damage', value: 18 },
+            { type: 'damage', value: 20 },
             { type: 'inflict', keyword: 'heckled', value: 1 }
         ]
     },
@@ -310,12 +314,13 @@ const CARD_DEFINITIONS = {
         cost: 1,
         type: 'defense',
         rarity: 'uncommon',
-        description: 'Gain 1 Taunt and 1 Distract.',
+        description: 'Gain 1 Taunt, 1 Distract, and 2 Shield.',
         owner: 'pip',
         speechBubble: 'HEY UGLY!',
         effects: [
             { type: 'taunt', value: 1 },
-            { type: 'distract', value: 1 }
+            { type: 'distract', value: 1 },
+            { type: 'shield', value: 2 }
         ]
     },
     'coup-de-grace': {
@@ -351,11 +356,11 @@ const CARD_DEFINITIONS = {
         cost: 1,
         type: 'attack',
         rarity: 'uncommon',
-        description: 'Deal 1 damage. Inflict 1 Frustration. Gain 1 Distract.',
+        description: 'Deal 2 damage. Inflict 1 Frustration. Gain 1 Distract.',
         owner: 'pip',
         speechBubble: '*POKE*',
         effects: [
-            { type: 'damage', value: 1 },
+            { type: 'damage', value: 2 },
             { type: 'inflict', keyword: 'frustration', value: 1 },
             { type: 'distract', value: 1 }
         ]
@@ -366,12 +371,13 @@ const CARD_DEFINITIONS = {
         cost: 2,
         type: 'action',
         rarity: 'uncommon',
-        description: 'Lose all Ovation. Inflict Stage Fright.',
+        description: 'Lose all Ovation. Inflict Stage Fright. Gain 1 Energy.',
         owner: 'pip',
         speechBubble: 'DANCE BREAK!',
         effects: [
             { type: 'loseAllOvation' },
-            { type: 'inflict', keyword: 'stageFright', value: 1 }
+            { type: 'inflict', keyword: 'stageFright', value: 1 },
+            { type: 'energy', value: 1 }
         ]
     },
     'hit-where-it-hurts': {
@@ -394,11 +400,12 @@ const CARD_DEFINITIONS = {
         cost: 2,
         type: 'defense',
         rarity: 'uncommon',
-        description: 'Gain 2 Taunt. Inflict 2 Frustration and 1 Forgetful.',
+        description: 'Gain 2 Taunt and 2 Shield. Inflict 2 Frustration and 1 Forgetful.',
         owner: 'pip',
         speechBubble: 'OVER HERE!',
         effects: [
             { type: 'taunt', value: 2 },
+            { type: 'shield', value: 2 },
             { type: 'inflict', keyword: 'frustration', value: 2 },
             { type: 'inflict', keyword: 'forgetful', value: 1 }
         ]
@@ -495,6 +502,20 @@ const CARD_DEFINITIONS = {
             { type: 'fortify', value: 1 }
         ]
     },
+    'stalwart': {
+        id: 'stalwart',
+        name: 'Stalwart',
+        cost: 1,
+        type: 'defense',
+        rarity: 'uncommon',
+        description: 'Gain 2 Taunt and 4 Shield.',
+        owner: 'aldric',
+        speechBubble: 'HOLD THE LINE!',
+        effects: [
+            { type: 'taunt', value: 2 },
+            { type: 'shield', value: 4 }
+        ]
+    },
 
     // --- Pip Synergy ---
     'quick-draw': {
@@ -517,13 +538,14 @@ const CARD_DEFINITIONS = {
         cost: 1,
         type: 'attack',
         rarity: 'uncommon',
-        description: 'Deal 2 damage 3 times.',
+        description: 'Deal 2 damage 3 times. Inflict 1 Burn.',
         owner: 'pip',
         speechBubble: 'TAKE THAT! AND THAT!',
         effects: [
             { type: 'damage', value: 2 },
             { type: 'damage', value: 2 },
-            { type: 'damage', value: 2 }
+            { type: 'damage', value: 2 },
+            { type: 'inflict', keyword: 'burn', value: 1 }
         ]
     },
     'mischief': {
@@ -539,6 +561,19 @@ const CARD_DEFINITIONS = {
             { type: 'inflict', keyword: 'vulnerable', value: 1 },
             { type: 'draw', value: 1 }
         ]
+    },
+    'twist-the-knife': {
+        id: 'twist-the-knife',
+        name: 'Twist the Knife',
+        cost: 1,
+        type: 'attack',
+        rarity: 'uncommon',
+        description: 'Deal 1 damage per total debuff stack on enemy.',
+        owner: 'pip',
+        speechBubble: 'FEEL THAT?',
+        effects: [
+            { type: 'damagePerTotalDebuff', perStack: 1 }
+        ]
     }
 };
 
@@ -548,13 +583,13 @@ const CARD_POOLS = {
         'aegis', 'burning-devotion', 'cooperative-strike', 'protective-stance',
         'protect', 'iron-wall', 'true-strike', 'inspirational-shout',
         'cleanse', 'aggressive-strike', 'captivating-strike', 'heated-resistance',
-        'battle-hymn', 'shield-bash', 'stand-guard'
+        'battle-hymn', 'shield-bash', 'stand-guard', 'stalwart'
     ],
     pip: [
         'good-fortune', 'create-opportunity', 'loaded-insult', 'coup-de-grace',
         'pips-cocktail', 'annoying-poke', 'stylish-dance', 'hit-where-it-hurts',
         'vex', 'best-explanation', 'ultimate-jeer', 'flirtatious-jeer',
-        'quick-draw', 'pepper-spray', 'mischief'
+        'quick-draw', 'pepper-spray', 'mischief', 'twist-the-knife'
     ]
 };
 
@@ -565,7 +600,7 @@ const CARD_POOLS_BY_RARITY = {
             'aegis', 'burning-devotion', 'cooperative-strike', 'protective-stance',
             'protect', 'iron-wall', 'true-strike', 'inspirational-shout',
             'cleanse', 'aggressive-strike',
-            'battle-hymn', 'shield-bash', 'stand-guard'
+            'battle-hymn', 'shield-bash', 'stand-guard', 'stalwart'
         ],
         rare: ['captivating-strike', 'heated-resistance']
     },
@@ -574,7 +609,7 @@ const CARD_POOLS_BY_RARITY = {
             'good-fortune', 'create-opportunity', 'loaded-insult', 'coup-de-grace',
             'pips-cocktail', 'annoying-poke', 'stylish-dance', 'hit-where-it-hurts',
             'vex', 'best-explanation',
-            'quick-draw', 'pepper-spray', 'mischief'
+            'quick-draw', 'pepper-spray', 'mischief', 'twist-the-knife'
         ],
         rare: ['ultimate-jeer', 'flirtatious-jeer']
     }
@@ -591,7 +626,7 @@ const STARTING_DECK = [
     'galvanize', 'galvanize', 'galvanize',
     'quick-jab', 'quick-jab', 'quick-jab',
     'block', 'block',
-    'inspire', 'inspire'
+    'inspire'
 ];
 
 // Build a starting deck from chosen basics
@@ -600,7 +635,7 @@ function buildStartingDeck(aldricBasic, pipBasic) {
         aldricBasic, aldricBasic, aldricBasic,
         pipBasic, pipBasic, pipBasic,
         'block', 'block',
-        'inspire', 'inspire'
+        'inspire'
     ];
 }
 

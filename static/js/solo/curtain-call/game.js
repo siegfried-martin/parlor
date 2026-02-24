@@ -224,7 +224,7 @@ class CurtainCallGame {
             deckCountIndicator: document.getElementById('deck-count-indicator'),
             deckCountDraw: document.getElementById('deck-count-draw'),
             deckCountDiscard: document.getElementById('deck-count-discard'),
-            removeCardBtn: document.getElementById('remove-card-btn'),
+            // removeCardBtn reserved for future post-boss card removal
         };
 
         // Rewards state
@@ -368,6 +368,17 @@ class CurtainCallGame {
         if (e.frustration > 0) count++;
         if (e.curse > 0) count++;
         return count;
+    }
+
+    /**
+     * Sum all debuff stacks on the enemy (for Twist the Knife).
+     */
+    getEnemyTotalDebuffStacks() {
+        const e = this.keywords.enemy;
+        return (e.poison || 0) + (e.burn || 0) + (e.stageFright || 0) +
+            (e.heckled || 0) + (e.forgetful || 0) + (e.vulnerable || 0) +
+            (e.weak || 0) + (e.confused || 0) + (e.fear || 0) +
+            (e.frustration || 0) + (e.curse || 0);
     }
 
     /**
