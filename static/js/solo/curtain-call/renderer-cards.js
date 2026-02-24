@@ -166,11 +166,33 @@ Object.assign(CurtainCallGame.prototype, {
         // Clear existing cards
         container.innerHTML = '';
 
-        // Render each card in hand
+        // Create two columns
+        const leftCol = document.createElement('div');
+        leftCol.className = 'hand-column';
+        const rightCol = document.createElement('div');
+        rightCol.className = 'hand-column';
+
+        let leftCount = 0;
+        let rightCount = 0;
+
+        // Distribute cards: fewest-first, ties go left
         this.hand.forEach((card, index) => {
             const cardElement = this.createCardElement(card, index);
-            container.appendChild(cardElement);
+            if (leftCount <= rightCount) {
+                leftCol.appendChild(cardElement);
+                leftCount++;
+            } else {
+                rightCol.appendChild(cardElement);
+                rightCount++;
+            }
         });
+
+        // Add overlap class when columns get tall
+        if (leftCount >= 4) leftCol.classList.add('overlap');
+        if (rightCount >= 4) rightCol.classList.add('overlap');
+
+        container.appendChild(leftCol);
+        container.appendChild(rightCol);
     },
 
     createCardElement(card, index) {

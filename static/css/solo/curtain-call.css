@@ -820,45 +820,28 @@
 }
 
 .hand-cards {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 6px;
     padding: 0;
-    justify-content: flex-start;
-    align-content: flex-start;
     max-width: 350px;
     overflow: hidden;
     touch-action: none;
 }
 
-/* Z-index stacking - later cards on top (max 16 cards) */
-.hand-cards .game-card { z-index: 1; }
-.hand-cards .game-card:nth-child(n+3) { z-index: 3; }
-.hand-cards .game-card:nth-child(n+5) { z-index: 5; }
-.hand-cards .game-card:nth-child(n+7) { z-index: 7; }
-.hand-cards .game-card:nth-child(n+9) { z-index: 9; }
-.hand-cards .game-card:nth-child(n+11) { z-index: 11; }
-.hand-cards .game-card:nth-child(n+13) { z-index: 13; }
-.hand-cards .game-card:nth-child(n+15) { z-index: 15; }
-
-/* When 7+ cards, overlap vertically */
-.hand-cards:has(.game-card:nth-child(7)) {
-    row-gap: 0;
-    column-gap: 6px;
+/* Each column is a vertical stack; cards within a column flow top-to-bottom */
+.hand-column {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
 }
 
-.hand-cards:has(.game-card:nth-child(7)) .game-card {
+/* When 7+ cards per column, overlap vertically */
+.hand-column.overlap .game-card {
     margin-bottom: -35px;
 }
 
-/* When 9+ cards, more overlap */
-.hand-cards:has(.game-card:nth-child(9)) .game-card {
-    margin-bottom: -45px;
-}
-
-/* Only the very last card gets no overlap margin - must come after other margin rules */
-.hand-cards:has(.game-card:nth-child(7)) .game-card:last-child {
+.hand-column.overlap .game-card:last-child {
     margin-bottom: 0;
 }
 
@@ -1341,7 +1324,7 @@
     right: 12px;
     display: flex;
     gap: 6px;
-    z-index: 50;
+    z-index: 5;
 }
 
 .progress-dot {
@@ -1616,7 +1599,7 @@
 .rewards-buttons {
     display: flex;
     gap: 12px;
-    margin-top: 8px;
+    margin-bottom: 8px;
 }
 
 .rewards-btn {
@@ -2103,7 +2086,7 @@
 @media (min-width: 420px) {
     .hand-cards {
         max-width: 374px;
-        column-gap: 12px;
+        gap: 12px;
     }
 
     .game-card {
@@ -2127,7 +2110,7 @@
 @media (min-width: 500px) {
     .hand-cards {
         max-width: 404px;
-        column-gap: 14px;
+        gap: 14px;
     }
 
     .enemy-svg {
