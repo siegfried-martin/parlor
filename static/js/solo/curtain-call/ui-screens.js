@@ -294,6 +294,17 @@ Object.assign(CurtainCallGame.prototype, {
         if (this.elements.confirmRewardBtn) {
             this.elements.confirmRewardBtn.disabled = false;
         }
+
+        // Show keyword explanations via audience
+        const selectedCard = this.rewardOptions[index];
+        if (selectedCard) {
+            const keywords = this._extractCardKeywords(selectedCard);
+            if (keywords.length > 0) {
+                this.showKeywordExplanations(keywords);
+            } else {
+                this.clearExplanationBubbles();
+            }
+        }
     },
 
     confirmReward() {
@@ -319,6 +330,8 @@ Object.assign(CurtainCallGame.prototype, {
     },
 
     hideRewardsScreen() {
+        this.clearExplanationBubbles();
+
         if (this.elements.rewardsOverlay) {
             this.elements.rewardsOverlay.style.display = 'none';
         }

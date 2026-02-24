@@ -90,10 +90,10 @@ Object.assign(CurtainCallGame.prototype, {
         rule.className = 'card__rule';
         body.appendChild(rule);
 
-        // Card description
+        // Card description (with keyword emojis)
         const descSpan = document.createElement('div');
         descSpan.className = 'card__description';
-        descSpan.textContent = card.description;
+        descSpan.textContent = this._injectKeywordEmojis(card.description);
         body.appendChild(descSpan);
 
         // Type badge
@@ -125,6 +125,24 @@ Object.assign(CurtainCallGame.prototype, {
         cardDiv.appendChild(rarityBottom);
 
         return cardDiv;
+    },
+
+    /**
+     * Prepend keyword emoji icons into a card description string.
+     * e.g. "Gain 5 Block" → "Gain 5 🛡️ Block"
+     */
+    _injectKeywordEmojis(description) {
+        if (typeof KEYWORD_GLOSSARY === 'undefined') return description;
+        for (const key in KEYWORD_GLOSSARY) {
+            const entry = KEYWORD_GLOSSARY[key];
+            if (!entry.icon) continue;
+            // Match the keyword name as a whole word (case-sensitive)
+            const regex = new RegExp(`\\b${entry.name}\\b`, 'g');
+            if (regex.test(description)) {
+                description = description.replace(regex, `${entry.icon} ${entry.name}`);
+            }
+        }
+        return description;
     },
 
     // === Card Rendering ===

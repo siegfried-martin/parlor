@@ -44,6 +44,13 @@ Object.assign(CurtainCallGame.prototype, {
         const now = Date.now();
         const ss = this._speechState;
 
+        // Suppress speech while overlay screens are visible
+        const rewardsUp = this.elements.rewardsOverlay &&
+            this.elements.rewardsOverlay.style.display !== 'none';
+        const sceneUp = this.elements.sceneSelectOverlay &&
+            this.elements.sceneSelectOverlay.style.display !== 'none';
+        if (rewardsUp || sceneUp) return false;
+
         // Guaranteed lines bypass cooldown
         if (!guaranteed) {
             if (now - ss.lastBubbleTime < SPEECH_CONFIG.cooldown) return false;
