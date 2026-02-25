@@ -27,22 +27,49 @@ This platform is intentionally simple. With only two concurrent users expected, 
 ├── static/
 │   ├── css/
 │   │   ├── common.css          # Shared styles
+│   │   ├── puppet-animations.css # CSS animations for Curtain Call puppets
 │   │   ├── games/              # Multiplayer game styles
 │   │   └── solo/               # Single-player game styles
 │   └── js/
 │       ├── game-client.js      # WebSocket wrapper and game lifecycle (multiplayer)
 │       ├── game-utils.js       # Shared UI utilities
 │       └── solo/               # Single-player game scripts
+│           └── curtain-call/   # Curtain Call (19 JS files, see curtain_call docs)
 ├── templates/
 │   ├── base.html               # Base template with common head/scripts
 │   ├── index.html              # Game selection landing page
 │   ├── games/                  # Multiplayer game templates
-│   │   └── rps.html
+│   │   ├── rps.html
+│   │   ├── image-reveal.html
+│   │   └── event-dash.html
 │   └── solo/                   # Single-player game templates
-└── games/
-    ├── base.py                 # Abstract base class for multiplayer games
-    └── rps.py                  # Rock Paper Scissors implementation
+│       ├── curtain-call.html
+│       └── eldrow.html
+├── games/
+│   ├── base.py                 # Abstract base class for multiplayer games
+│   ├── rps.py                  # Rock Paper Scissors
+│   ├── image_reveal.py         # Image Reveal
+│   └── event_dash.py           # Event Dash
+└── documentation/
+    └── games/                  # Per-game design docs and rules
 ```
+
+## Games
+
+### Multiplayer
+
+| Game | Route | Description |
+|------|-------|-------------|
+| Rock Paper Scissors | `/game/rps` | Classic RPS with continuous rounds and running score |
+| Image Reveal | `/game/image-reveal` | Co-op puzzle — one player uploads an image and gives hints, the other guesses as tiles reveal on an 8×8 grid |
+| Event Dash | `/game/event-dash` | Competitive scavenger hunt — find restaurants and activities in a random US city using Google Maps (requires `GOOGLE_MAPS_API_KEY`) |
+
+### Solo
+
+| Game | Route | Description |
+|------|-------|-------------|
+| Curtain Call | `/solo/curtain-call` | Shadow puppet deck-builder roguelike — two protagonists defend a shared MacGuffin across 3 acts. See `documentation/games/curtain_call/` for full docs |
+| Eldrow | `/solo/eldrow` | Configurable word puzzle (Wordle variant) with adjustable word length, board count, and guess limit |
 
 ## URL Structure
 

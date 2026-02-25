@@ -27,13 +27,24 @@ Mechanically, the two-Protagonist system creates natural synergy tensions. Each 
 
 ## Technical Notes
 
-- **Client-side game logic:** All combat, deck management, and turn flow runs in vanilla JavaScript in the browser. The server is not involved during gameplay.
-- **Server-side persistence:** SQLite database tracks player unlocks and run history. Username-based identity (no auth). FastAPI serves pages and exposes simple API endpoints.
-- **Event bus architecture:** Keywords, status effects, and triggered abilities register as listeners on a central event system rather than being hardcoded into the combat loop. This makes new mechanics composable without touching core code.
-- **Mobile-first layout:** Portrait orientation, thumb-friendly tap targets, horizontally scrollable card hand.
-- **Art pipeline:** SVG silhouettes, CSS-only animations (transforms, transitions, keyframes), no external animation libraries.
+- **Client-side game logic:** All combat, deck management, and turn flow runs in vanilla JavaScript in the browser. The server only serves the HTML page — no backend game logic, no persistence.
+- **Prototype extension pattern:** A single `CurtainCallGame` class is split across 14 JS files via `Object.assign(CurtainCallGame.prototype, { ... })`. No ES modules or build step.
+- **Mobile-first layout:** Portrait orientation, thumb-friendly tap targets, two-column card hand with drag-to-play.
+- **Art pipeline:** SVG silhouettes, Web Animations API for combat effects, CSS transitions for UI, no external animation libraries. See [theme.md](theme.md) for full artistic direction.
+- **Speech priority engine:** Cooldown-based system with diminishing returns governs enemy, protagonist, and crowd speech bubbles so dialogue feels natural without flooding the screen.
 
 ## Documentation Map
+
+### [architecture.md](architecture.md)
+
+Code architecture and file layout. Read this to understand:
+
+- All 19 JavaScript files with line counts and roles
+- Script load order and dependencies
+- Class + prototype extension pattern
+- Complete method inventory by file
+- Cross-file dependency map
+- Editing guide (which files to load for each type of change)
 
 ### [theme.md](theme.md)
 
@@ -43,49 +54,34 @@ The artistic identity of the game. Read this to understand:
 - Silhouette design guidelines (shape language, cutesy tone, eye/mouth cutouts)
 - Speech bubble system — how combat feedback is communicated visually
 - Audience behavior and reactions
-- Animation philosophy (CSS transforms on whole puppets, no skeletal animation)
+- Animation philosophy (Web Animations API for combat, CSS transitions for UI)
 - Mobile screen layout breakdown
 - Color palette (with deuteranomaly-accessible color choices), typography, and art asset checklist
 
-### [core.md](core.md)
+### [card-ui-spec.md](card-ui-spec.md)
 
-The rules of the game and technical architecture. Read this to understand:
+Visual design spec for the ticket-stub card UI.
 
-- Complete run structure (3 acts × 2 scenes + 1 boss)
-- Turn-by-turn combat flow with event hook points
-- Energy system (3 per turn, cards cost 0-3)
-- All defensive mechanics: Block, Ward, Deflect, Ovation, Curtain
-- All keywords: Charged, Fortify, Piercing, Persistent, Encore, Sweeping
-- All debuffs: Stage Fright, Heckled, Weakness, Forgetfulness (directional — some enemy→hero only)
-- Buffs: Standing Ovation, Rehearsed
-- Event bus architecture with full event catalog, mutable context pattern, and priority system
-- Card and enemy data structures
-- Status effect system
-- Between-encounter flow (card rewards, boss upgrades, enemy selection)
-- Meta-progression: SQLite schema, unlock system, what persists vs. what resets
-- Integration with Parlor platform (routes, file structure, client-server split)
+### [verification_guide.md](verification_guide.md)
 
-### [assets.md](assets.md)
+Checklist for verifying the game works correctly after changes.
 
-The actual game content. Read this to understand:
+### [updated_rules/](updated_rules/)
 
-- **Protagonists:** Aldric (heavy hitter, Charged affinity) and Pip (utility/control, Encore affinity) — stats, personality, speech bubbles, cross-protagonist banter
-- **Card pools:** Starting deck (8 cards), Aldric's cards (8), Pip's cards (8), neutral cards (7) — all with costs, effects, keywords, upgrade versions, speech bubbles, and unlock tiers
-- **Enemies:** 12 scene enemies (4 per act) and 3 bosses — each with HP, gimmick hints, attack patterns, speech bubbles, and design intent explaining what they test
-- **The Playwright** as final boss: 3-phase, 100 HP endurance fight
-- **Unlock progression:** Tier 1 (clear Act I) and Tier 2 (win a run)
-- **Balance notes:** Starting assumptions for HP, damage numbers, and things to watch in playtesting
+CSV files with current card definitions and balance data. The canonical source of truth for card stats is `cards.js`, but these CSVs are useful for review and planning.
 
 ## Current Scope
 
-The initial implementation targets the minimum viable experience:
+The current alpha implementation:
 
 - 1 protagonist pair (Aldric + Pip)
-- ~23 unique cards (including basics and unlockables)
-- 12 scene enemies + 3 bosses
-- 3-act run structure with card rewards and boss upgrades
-- SQLite persistence for unlocks and run history
-- No shops, artifacts, events, or between-encounter healing (intentionally deferred)
+- ~30 unique cards across common/uncommon/rare rarities
+- 12 scene enemies + 3 bosses with unique attack patterns and passives
+- 3-act run structure with card rewards after each combat
+- Keyword system: 11+ buffs/keywords, 11+ debuffs, Ovation meter
+- Drag-to-play card interface with two-column hand layout
+- Audience members that react to combat and explain keywords on card zoom
+- No persistence — each page load is a fresh run (intentionally deferred)
 
 ## Future Considerations (Parked)
 

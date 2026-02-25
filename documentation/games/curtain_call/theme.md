@@ -68,14 +68,16 @@ All audience animations are simple CSS transforms — translateY, rotate, scale.
 
 ### No Skeletal Animation
 
-Puppets do not have independently moving parts. They are single rigid shapes. All animation is applied to the _whole_ silhouette via CSS transforms:
+Puppets do not have independently moving parts. They are single rigid shapes. All combat animation is applied to the _whole_ silhouette via the **Web Animations API** (`element.animate()`), with CSS transitions for UI state changes:
 
-- **Idle:** Subtle vertical bob or slow scale pulse (breathing). `transform: translateY()` oscillating 2-3px.
-- **Attack:** Quick lunge toward enemy (translateX) and snap back. Maybe 200-300ms total.
-- **Taking damage:** Shake (rapid small translateX oscillations). Classic screen-shake but applied to the puppet.
-- **Blocking:** Brief scale-up or a slight backward lean (rotate a few degrees).
+- **Idle:** Subtle vertical bob or slow scale pulse (breathing). CSS `transform: translateY()` oscillating 2-3px.
+- **Attack:** Quick lunge toward enemy (translateX) and snap back. ~200-300ms total. Web Animations API.
+- **Taking damage:** Shake (rapid small translateX oscillations). Classic screen-shake but applied to the puppet. Web Animations API.
+- **Blocking/absorb:** Brief scale-up pulse. Web Animations API.
 - **Defeat:** Rotate to one side (puppet falling over) + translateY downward (sinking below stage). Stick goes limp.
-- **Buff/heal:** Brief upward float + subtle glow (CSS box-shadow or filter).
+- **Buff/heal:** Brief upward float + subtle glow (CSS box-shadow or filter). Web Animations API.
+
+Animation configs (timing, keyframes, variants) live in `config/animation-config.js`. The `playAnimation(element, name)` helper in `game.js` returns a Promise via `anim.finished` so effects can be sequenced.
 
 ### Speech Bubbles as Core Feedback
 
@@ -104,10 +106,11 @@ This is the most important visual system in the game. Speech bubbles and comic-b
 
 **Technical approach:**
 
-- Bubbles are absolutely-positioned divs that appear, animate in (scale from 0 + slight rotation), hold for ~800ms, then fade out.
+- Bubbles are absolutely-positioned divs that appear, animate in (scale from 0 + slight rotation), hold for 2500-4000ms (scaled by word count), then fade out.
 - Multiple bubbles can overlap — this creates visual energy during big turns.
-- Font choice matters: bold, slightly rough display font for attacks. Something more elegant for buffs/healing.
+- Font: `Bangers` display font for attack/damage text, `system-ui` for audience/crowd bubbles.
 - Color coding within the bubble text: red for damage dealt, blue/gray for defense, gold for healing, purple for debuffs.
+- A speech priority engine with cooldowns and diminishing returns prevents dialogue from flooding the screen. Config lives in `config/speech-config.js`.
 
 ### Screen Transitions
 
@@ -127,15 +130,16 @@ The game is designed for portrait-mode mobile play. All tap targets must be comf
 ┌─────────────────────────┐
 │     ENEMY AREA          │  ~25% of screen
 │  [enemy silhouette]     │  Intent icon + number above enemy
-│  [enemy HP bar]         │
+│  [enemy HP bar]         │  Progress indicator (act/scene dots)
 ├─────────────────────────┤
 │     STAGE               │  ~30% of screen
 │  [hero]  [MGF]  [hero]  │  MacGuffin centered, heroes flanking
 │          [HP bar]       │  Speech bubbles appear here
 ├─────────────────────────┤
 │     HAND                │  ~30% of screen
-│  [card][card][card]...  │  Horizontally scrollable
-│                         │  Cards are tall enough to read
+│  [card] [card]          │  Two-column grid layout
+│  [card] [card]          │  Cards tall enough to read
+│  [card]                 │  Drag-to-play onto stage
 ├─────────────────────────┤
 │  [👤👤👤] [⚡3] [END]  │  ~15% of screen
 │   audience  energy  btn │  Audience + energy + end turn
@@ -144,12 +148,12 @@ The game is designed for portrait-mode mobile play. All tap targets must be comf
 
 ### Interaction Model
 
-- **Tap a card:** Select it (lifts up slightly, glows). Tap again to confirm play, or tap another card to switch selection. Alternatively: tap to select, tap a valid target if targeting is needed (future complexity — for now all attacks hit the single enemy and all buffs apply to the MacGuffin/shared pool).
-- **Tap a Protagonist:** Puppet steps forward, speech bubble shows current stats (HP contribution isn't shown since it's shared, but attack modifier, keyword status, active buffs/debuffs).
-- **Tap an enemy:** Similar stat reveal — current HP, active statuses, intent for this turn.
-- **Tap a keyword icon:** An audience member holds up a sign with a brief explanation. Keeps the UI thematic and avoids tooltip clutter.
-- **Swipe hand area:** Scroll through cards if more than ~4-5 in hand.
-- **End Turn button:** Prominent, bottom-right. Should be satisfying to press.
+- **Drag a card to stage:** Drag upward past the hand area to play it. Cards snap back if released too early or if unplayable. An 8px threshold distinguishes taps from drags.
+- **Tap a card:** Opens a zoomed view of the card. Audience members explain the card's keywords via speech bubbles.
+- **Tap a Protagonist:** Shows current stats — HP, active buffs/debuffs, keyword status.
+- **Tap an enemy:** Shows current HP, active statuses, intent for this turn.
+- **Keyword emojis in card text:** Card descriptions display keyword emoji icons (from `KEYWORD_GLOSSARY`) inline, helping players learn keyword associations.
+- **End Turn button:** Prominent, bottom-right.
 
 ## Color Palette
 
@@ -182,16 +186,19 @@ Not in initial scope but noting for later:
 - A simple musical theme per act — could be public domain classical arrangements
 - Sound effects for speech bubble appearances (pop/whoosh)
 
-## Art Asset Checklist (Initial Implementation)
+## Art Asset Status
 
-These are needed for the minimum viable game:
+Current state of visual assets:
 
-- [ ] 2 Protagonist silhouettes (idle pose each) — SVG
-- [ ] 1 MacGuffin silhouette — SVG
-- [ ] 6-8 enemy silhouettes (including 3 boss variants, larger) — SVG
-- [ ] 6-8 audience member head silhouettes — SVG or pure CSS shapes
-- [ ] Curtain side decorations — SVG or CSS gradient
-- [ ] Card frame design — CSS/SVG hybrid
-- [ ] Speech bubble shapes (attack burst, defense bubble, buff sparkle) — CSS
-- [ ] Keyword icons (small, simple) — SVG or emoji as placeholder
-- [ ] Background texture — CSS gradient (no image dependency initially)
+- [x] 2 Protagonist silhouettes (Aldric, Pip) — SVG with eye/mouth cutouts
+- [x] 1 MacGuffin silhouette — SVG
+- [x] Enemy silhouettes — SVG (mix of custom and placeholders in `static/svg/enemies/`)
+- [x] 8 audience member types (adults + children) — CSS-drawn silhouettes with colored accessories
+- [x] Curtain transitions — CSS gradient curtains that close/open between scenes
+- [x] Card frame design — CSS ticket-stub style with rarity borders, energy blips, perforation line
+- [x] Speech bubble shapes — CSS (attack burst, defense, buff, heal, debuff variants)
+- [x] Keyword icons — emoji from `KEYWORD_GLOSSARY`, displayed in card descriptions and audience explanations
+- [x] Background — CSS radial gradient (warm parchment center, darker edges)
+- [ ] More unique enemy SVGs (some still use placeholders)
+- [ ] Defeat/victory pose variants for protagonists
+- [ ] MacGuffin damage states
