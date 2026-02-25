@@ -599,10 +599,53 @@ Object.assign(CurtainCallGame.prototype, {
             this.elements.characterSelect.style.display = 'none';
         }
 
-        // Bind button (use onclick to avoid duplicate listeners)
-        if (this.elements.newPerformanceBtn) {
-            this.elements.newPerformanceBtn.onclick = () => this.showCharacterSelect();
+        // Show/hide continue button based on saved run data
+        if (this.elements.continuePerformanceBtn) {
+            if (this._savedRunData) {
+                this.elements.continuePerformanceBtn.style.display = '';
+                this.elements.continuePerformanceBtn.onclick = () => this.continuePerformance();
+            } else {
+                this.elements.continuePerformanceBtn.style.display = 'none';
+            }
         }
+
+        // Bind "New Performance" — abandon existing run first if present
+        if (this.elements.newPerformanceBtn) {
+            this.elements.newPerformanceBtn.onclick = () => {
+                if (this._savedRunData) {
+                    this.abandonRun();
+                    this._savedRunData = null;
+                }
+                this.showCharacterSelect();
+            };
+        }
+    },
+
+    continuePerformance() {
+        if (!this._savedRunData) return;
+
+        // Hide title screen
+        if (this.elements.titleScreen) {
+            this.elements.titleScreen.style.display = 'none';
+        }
+
+        // Restore state from payload
+        this.restoreFromPayload(this._savedRunData);
+        this._savedRunData = null;
+
+        // Show game UI behind closed curtains
+        this.elements.container.classList.remove('game-ui-hidden');
+
+        // Initialize animations and voice lines
+        this.initializeAnimations();
+        this.initVoiceLines();
+
+        // Update progress indicator and combat state display
+        this.updateProgressIndicator();
+        this.renderCombatState();
+
+        // Go to scene selection
+        this.showSceneSelection();
     },
 
     showCharacterSelect() {
@@ -644,6 +687,9 @@ Object.assign(CurtainCallGame.prototype, {
         this.selectedPipBasic = pipOption?.dataset.card || 'quick-jab';
 
         console.log(`Starting deck: ${this.selectedAldricBasic} + ${this.selectedPipBasic}`);
+
+        // Start new persistence run
+        this.startNewRun();
 
         // Rebuild deck with selections
         this.initializeDeck();

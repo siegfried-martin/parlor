@@ -15,6 +15,9 @@ Object.assign(CurtainCallGame.prototype, {
     // === Scene Selection System ===
 
     showSceneSelection() {
+        // Save run at scene selection (all state is finalized here)
+        this.saveRun();
+
         const act = this.actStructure[this.runState.currentAct];
         if (!act) return;
 
@@ -207,6 +210,9 @@ Object.assign(CurtainCallGame.prototype, {
             }
 
             console.log('All acts complete! Victory!');
+
+            // Clean up saved run
+            this.deleteCompletedRun();
         }
     },
 

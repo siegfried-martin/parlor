@@ -455,5 +455,8 @@ Object.assign(CurtainCallGame.prototype, {
             this.elements.endTurnBtn.disabled = true;
             this.elements.endTurnBtn.textContent = 'Defeated';
         }
+
+        // Clean up saved run
+        this.deleteCompletedRun();
     }
 });

@@ -226,6 +226,7 @@ class CurtainCallGame {
             deckCountDraw: document.getElementById('deck-count-draw'),
             deckCountDiscard: document.getElementById('deck-count-discard'),
             // removeCardBtn reserved for future post-boss card removal
+            continuePerformanceBtn: document.getElementById('continue-performance-btn'),
         };
 
         // Rewards state
@@ -245,11 +246,13 @@ class CurtainCallGame {
         // Expose debug API
         this.exposeDebugAPI();
 
-        // Start with curtains closed and title screen
+        // Start with curtains closed; check for existing run before showing title
         this.elements.container.classList.add('curtain-closed', 'game-ui-hidden');
-        this.showTitleScreen();
-
-        console.log('Curtain Call: Ready');
+        this.checkForExistingRun().then(savedData => {
+            this._savedRunData = savedData;
+            this.showTitleScreen();
+            console.log('Curtain Call: Ready');
+        });
     }
 
     // === Deck Management ===
