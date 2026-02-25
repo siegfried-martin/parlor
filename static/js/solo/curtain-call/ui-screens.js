@@ -242,6 +242,13 @@ Object.assign(CurtainCallGame.prototype, {
         this._rewardRefreshesLeft = 1;
         this._rewardSeenIds = new Set();
 
+        // Boss reward starts the 3-phase boss reward flow
+        if (type === 'boss') {
+            this._bossRewardPhase = 'card';
+        } else {
+            this._bossRewardPhase = null;
+        }
+
         this._generateRewardOptions(type);
 
         this.selectedRewardIndex = null;
@@ -420,6 +427,11 @@ Object.assign(CurtainCallGame.prototype, {
         if (this._openingReward) {
             this._openingReward = false;
             this.showSceneSelection();
+        } else if (this._bossRewardPhase === 'card') {
+            // Boss reward phase 2: card removal
+            this._bossRewardPhase = 'removal';
+            this._removalFromBoss = true;
+            this.showDeckList('remove');
         } else {
             this.advanceScene();
         }
@@ -651,6 +663,12 @@ Object.assign(CurtainCallGame.prototype, {
         if (this._removalFromRewards) {
             this._removalFromRewards = false;
             this.hideRewardsScreen();
+        } else if (this._removalFromBoss) {
+            this._removalFromBoss = false;
+            // Boss reward phase 3: stage prop selection
+            this.showStagePropSelection(() => {
+                this.advanceScene();
+            });
         }
     },
 
@@ -719,6 +737,7 @@ Object.assign(CurtainCallGame.prototype, {
         // Update progress indicator and combat state display
         this.updateProgressIndicator();
         this.renderCombatState();
+        this.renderStageProps();
 
         // Go to scene selection
         this.showSceneSelection();

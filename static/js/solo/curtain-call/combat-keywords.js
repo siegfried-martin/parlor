@@ -168,8 +168,15 @@ Object.assign(CurtainCallGame.prototype, {
                     this.renderProtagonistHP(card.owner);
                     this.showSpeechBubble(`Retaliate ${retDmg}!`, 'damage', this.elements.enemyPuppet);
                     if (protState.currentHP <= 0) {
-                        protState.knockedOut = true;
-                        this.renderKnockoutState(card.owner);
+                        const koCtx = { protagonist: card.owner, prevented: false };
+                        await this.events.emit('beforeKnockout', koCtx);
+                        if (koCtx.prevented) {
+                            protState.currentHP = 1;
+                            this.renderProtagonistHP(card.owner);
+                        } else {
+                            protState.knockedOut = true;
+                            this.renderKnockoutState(card.owner);
+                        }
                     }
                 }
             }

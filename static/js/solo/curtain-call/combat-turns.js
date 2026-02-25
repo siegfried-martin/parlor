@@ -28,7 +28,7 @@ Object.assign(CurtainCallGame.prototype, {
         this.renderEnergy();
 
         // Process start-of-turn keywords (DoTs, decay)
-        this.processStartOfTurnKeywords();
+        await this.processStartOfTurnKeywords();
 
         // Emit playerTurnStart for event bus listeners
         await this.events.emit('playerTurnStart', { turn: this.turnNumber });
@@ -168,7 +168,7 @@ Object.assign(CurtainCallGame.prototype, {
     // === Start-of-Turn Keyword Processing ====================================
     // =========================================================================
 
-    processStartOfTurnKeywords() {
+    async processStartOfTurnKeywords() {
         const kw = this.keywords;
 
         // --- Ovation decay ---
@@ -214,9 +214,16 @@ Object.assign(CurtainCallGame.prototype, {
                 this.renderProtagonistHP(prot);
                 debuffs.poison--;
                 if (state.currentHP <= 0) {
-                    state.knockedOut = true;
-                    this.renderKnockoutState(prot);
-                    this.showSpeechBubble('KO!', 'damage', this.getTargetElement(prot));
+                    const koCtx = { protagonist: prot, prevented: false };
+                    await this.events.emit('beforeKnockout', koCtx);
+                    if (koCtx.prevented) {
+                        state.currentHP = 1;
+                        this.renderProtagonistHP(prot);
+                    } else {
+                        state.knockedOut = true;
+                        this.renderKnockoutState(prot);
+                        this.showSpeechBubble('KO!', 'damage', this.getTargetElement(prot));
+                    }
                 }
             }
 
@@ -228,9 +235,16 @@ Object.assign(CurtainCallGame.prototype, {
                 this.renderProtagonistHP(prot);
                 debuffs.burn--;
                 if (state.currentHP <= 0) {
-                    state.knockedOut = true;
-                    this.renderKnockoutState(prot);
-                    this.showSpeechBubble('KO!', 'damage', this.getTargetElement(prot));
+                    const koCtx = { protagonist: prot, prevented: false };
+                    await this.events.emit('beforeKnockout', koCtx);
+                    if (koCtx.prevented) {
+                        state.currentHP = 1;
+                        this.renderProtagonistHP(prot);
+                    } else {
+                        state.knockedOut = true;
+                        this.renderKnockoutState(prot);
+                        this.showSpeechBubble('KO!', 'damage', this.getTargetElement(prot));
+                    }
                 }
             }
 
@@ -408,9 +422,10 @@ Object.assign(CurtainCallGame.prototype, {
         const enemy = this.combatState.enemy;
         console.log(`${enemy.name} defeated!`);
 
-        // Clean up enemy passive listeners and enchantments
+        // Clean up enemy passive listeners, enchantments, and stage prop listeners
         this.events.offByOwner('enemy-passive');
         this.clearEnchantments();
+        this.clearStageProps();
         this.events.emit('enemyDefeated', { enemyId: enemy.id, isBoss: enemy.isBoss });
         this.events.emit('combatEnd', { result: 'victory', enemyId: enemy.id });
 
@@ -446,9 +461,10 @@ Object.assign(CurtainCallGame.prototype, {
         this.phase = 'gameover';
         console.log('MacGuffin destroyed - Defeat!');
 
-        // Clean up enemy passive listeners and enchantments
+        // Clean up enemy passive listeners, enchantments, and stage prop listeners
         this.events.offByOwner('enemy-passive');
         this.clearEnchantments();
+        this.clearStageProps();
         this.events.emit('combatEnd', { result: 'defeat' });
 
         this.showCharacterBubble('NOOO!', this.elements.macguffin);

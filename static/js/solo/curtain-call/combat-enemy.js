@@ -487,6 +487,13 @@ Object.assign(CurtainCallGame.prototype, {
                 // Ovation loss on unblocked MacGuffin damage
                 this.loseOvation(1);
 
+                // Emit macguffinDamaged for stage prop listeners (e.g. Trapdoor Lever)
+                await this.events.emit('macguffinDamaged', {
+                    amount: currentDamage,
+                    currentHP: this.combatState.macguffin.currentHP,
+                    maxHP: this.combatState.macguffin.maxHP
+                });
+
                 // MacGuffin big damage crowd reaction
                 if (currentDamage >= (ANIMATION_CONFIG?.hit?.bigHitThreshold || 8)) {
                     this.tryCrowdReaction('macguffinBigDamage');
@@ -511,12 +518,21 @@ Object.assign(CurtainCallGame.prototype, {
                 this.renderProtagonistHP(currentTarget);
 
                 if (protState.currentHP <= 0) {
-                    protState.knockedOut = true;
-                    this.renderKnockoutState(currentTarget);
-                    // Guaranteed cross-reaction: partner reacts to knockout
-                    this.tryProtagonistSpeech(currentTarget, 'partnerKnockout');
-                    this.tryCrowdReaction('protagonistKO');
-                    console.log(`${currentTarget} knocked out!`);
+                    // Emit beforeKnockout for stage prop listeners (e.g. Stunt Double)
+                    const koCtx = { protagonist: currentTarget, prevented: false };
+                    await this.events.emit('beforeKnockout', koCtx);
+
+                    if (koCtx.prevented) {
+                        protState.currentHP = 1;
+                        this.renderProtagonistHP(currentTarget);
+                    } else {
+                        protState.knockedOut = true;
+                        this.renderKnockoutState(currentTarget);
+                        // Guaranteed cross-reaction: partner reacts to knockout
+                        this.tryProtagonistSpeech(currentTarget, 'partnerKnockout');
+                        this.tryCrowdReaction('protagonistKO');
+                        console.log(`${currentTarget} knocked out!`);
+                    }
                 } else {
                     // Check if dropped below 50% HP this hit
                     const halfHP = protState.maxHP * 0.5;

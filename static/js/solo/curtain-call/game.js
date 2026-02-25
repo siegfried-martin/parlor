@@ -99,6 +99,9 @@ class CurtainCallGame {
         // Active enchantments (cleared each combat)
         this.activeEnchantments = [];
 
+        // Collected stage props (persist across combats within a run)
+        this.stageProps = [];
+
         // Card zoom / keyword explanation state
         this.zoomedCard = null;
         this.zoomedCardElement = null;
@@ -231,6 +234,7 @@ class CurtainCallGame {
             // removeCardBtn reserved for future post-boss card removal
             continuePerformanceBtn: document.getElementById('continue-performance-btn'),
             refreshRewardBtn: document.getElementById('refresh-reward-btn'),
+            stagePropStrip: document.getElementById('stage-prop-strip'),
             enchantmentStrip: document.getElementById('enchantment-strip'),
         };
 

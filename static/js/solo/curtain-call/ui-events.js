@@ -177,7 +177,11 @@ Object.assign(CurtainCallGame.prototype, {
         // Rewards screen buttons
         if (this.elements.confirmRewardBtn) {
             this.elements.confirmRewardBtn.addEventListener('click', () => {
-                this.confirmReward();
+                if (this._propChoices) {
+                    this.confirmPropSelection();
+                } else {
+                    this.confirmReward();
+                }
             });
         }
         if (this.elements.skipRewardBtn) {
@@ -220,6 +224,14 @@ Object.assign(CurtainCallGame.prototype, {
                     if (this.elements.rewardsOverlay) {
                         this.elements.rewardsOverlay.style.display = 'flex';
                     }
+                } else if (this._removalFromBoss) {
+                    // Skipped removal — proceed to stage prop selection
+                    this._removalFromBoss = false;
+                    this.hideDeckList();
+                    this.showStagePropSelection(() => {
+                        this.advanceScene();
+                    });
+                    return;
                 }
                 this.hideDeckList();
             });
@@ -235,6 +247,13 @@ Object.assign(CurtainCallGame.prototype, {
                         if (this.elements.rewardsOverlay) {
                             this.elements.rewardsOverlay.style.display = 'flex';
                         }
+                    } else if (this._removalFromBoss) {
+                        this._removalFromBoss = false;
+                        this.hideDeckList();
+                        this.showStagePropSelection(() => {
+                            this.advanceScene();
+                        });
+                        return;
                     }
                     this.hideDeckList();
                 }

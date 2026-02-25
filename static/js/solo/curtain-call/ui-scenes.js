@@ -122,7 +122,11 @@ Object.assign(CurtainCallGame.prototype, {
         // Register enemy passive listeners on event bus
         this.registerEnemyPassives(enemy);
 
+        // Register stage prop listeners for this combat
+        this.registerStageProps();
+
         this.renderCombatState();
+        this.renderStageProps();
         this.renderEnemyPassive();
 
         // Update enemy SVG

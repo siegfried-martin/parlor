@@ -30,7 +30,7 @@ Object.assign(CurtainCallGame.prototype, {
             deck: serializeCards(this.deck),
             discardPile: serializeCards(this.discardPile),
             activeEnchantments: serializeCards(this.activeEnchantments),
-            stageProps: [],
+            stageProps: [...(this.stageProps || [])],
             gold: 0
         };
     },
@@ -108,6 +108,9 @@ Object.assign(CurtainCallGame.prototype, {
         this.deck = allCards;
         this.discardPile = [];
         this.hand = [];
+
+        // Stage props
+        this.stageProps = payload.stageProps || [];
     },
 
     /**

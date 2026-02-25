@@ -12,7 +12,7 @@ _Created: February 25, 2026_
 | M2    | Event Bus                             | —            | Done   | Hook system for reactive triggers                       |
 | M3    | Enchantment Cards                     | M2           | Done   | Persistent combat-duration effects                      |
 | M4    | Expanded Card Pools + Reward Refresh  | M2           | Done   | More cards, synergy depth, reward UX                    |
-| M5    | Stage Props                           | M2           |        | Permanent run-duration passives                         |
+| M5    | Stage Props                           | M2           | Done   | Permanent run-duration passives                         |
 | M6    | Currency, Merchant & Narrative Events | M1, M5       |        | Between-combat economy and story beats                  |
 | M7    | Meta-Progression                      | M1, M6       |        | Cross-run unlocks via Ticket currency and unlock tracks |
 | Spike | Card Balance & Additions              | Any          |        | Inserted as needed from playtesting                     |
@@ -331,18 +331,18 @@ Rewards cheap card play. The 0-cost basics (Block, Inspire) now generate Ovation
 
 ### Definition of Done
 
-- [ ] Stage Prop data model defined — ID, name, description, trigger configuration (event bus events), effect, optional condition, rarity
-- [ ] At least 6 Stage Props implemented and obtainable
-- [ ] Stage Props register event bus listeners at combat start, deregister at combat end
-- [ ] Stage Props that are "once per combat" track their usage and reset on next combat
-- [ ] UI: Stage Prop display area visible during combat, showing collected props
-- [ ] Tapping a Stage Prop opens overlay with name, description, and crowd explanation
-- [ ] Stage Props initially awarded as boss rewards (choice of 1 from 2-3 options) — UI similar to card reward screen but with prop-specific layout
-- [ ] Stage Props persist in run save data (M1 integration)
-- [ ] Stage Props listed in a viewable collection from the pause/menu screen
-- [ ] Stage Props visually distinct from enchantment cards in the combat UI
-- [ ] Stage Prop effects trigger correctly across multiple combats in a run (re-registration works)
-- [ ] No Stage Prop creates an infinite loop or game-breaking interaction with existing mechanics
+- [x] Stage Prop data model defined — ID, name, description, trigger configuration (event bus events), effect, optional condition, rarity
+- [x] At least 6 Stage Props implemented and obtainable (9 props: Director's Megaphone, Tattered Script, Applause-O-Meter, Stunt Double, Trapdoor Lever, Villain's Monologue, Opening Night Jitters, Spotlight Rig, Understudy's Mask)
+- [x] Stage Props register event bus listeners at combat start, deregister at combat end
+- [x] Stage Props that are "once per combat" track their usage and reset on next combat (Stunt Double, Trapdoor Lever)
+- [x] UI: Stage Prop display area visible during combat, showing collected props
+- [x] Tapping a Stage Prop shows name and description via speech bubble
+- [x] Stage Props initially awarded as boss rewards (choice of 1 from 3 options) — 3-screen boss reward flow: card reward → card removal → stage prop selection
+- [x] Stage Props persist in run save data (M1 integration)
+- [ ] Stage Props listed in a viewable collection from the pause/menu screen (deferred to M6)
+- [x] Stage Props visually distinct from enchantment cards in the combat UI (circular tokens vs. pill-shaped enchantments)
+- [x] Stage Prop effects trigger correctly across multiple combats in a run (re-registration works)
+- [x] No Stage Prop creates an infinite loop or game-breaking interaction with existing mechanics (Applause-O-Meter uses lock to prevent recursion)
 
 ---
 
