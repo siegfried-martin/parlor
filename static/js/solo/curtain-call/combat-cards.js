@@ -56,11 +56,29 @@ Object.assign(CurtainCallGame.prototype, {
             this.events.emit('energySpent', { amount: effectiveCost });
         }
 
-        // Remove from hand, add to discard
+        // Remove from hand
         const instanceId = card.instanceId;
         this.hand.splice(index, 1);
         delete card.costReduction;
         delete card.damageBonus;
+
+        // Enchantments go to the active enchantments area, not discard
+        if (card.type === 'enchantment') {
+            // Hide played card in DOM and re-index siblings
+            const liveCardEl = this.elements.handCards.querySelector(
+                `.game-card[data-instance-id="${instanceId}"]`
+            );
+            if (liveCardEl) {
+                liveCardEl.style.visibility = 'hidden';
+                liveCardEl.style.pointerEvents = 'none';
+            }
+            this._reindexHandCards();
+            this._debouncedReflow();
+            this.renderDeckCount();
+            this.activateEnchantment(card);
+            return;
+        }
+
         this.discardPile.push(card);
 
         // Hide played card in DOM and re-index siblings

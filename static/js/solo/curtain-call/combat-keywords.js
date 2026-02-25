@@ -491,6 +491,9 @@ Object.assign(CurtainCallGame.prototype, {
             }
         }
 
+        // Emit for enchantment listeners (e.g. Comic Relief)
+        await this.events.emit('debuffInflictedOnEnemy', { keyword, value, card: sourceCard });
+
         this.renderStatusEffects();
         await this.wait(200);
     },

@@ -574,6 +574,102 @@ const CARD_DEFINITIONS = {
         effects: [
             { type: 'damagePerTotalDebuff', perStack: 1 }
         ]
+    },
+
+    // =============================
+    // === Enchantment Cards ===
+    // =============================
+
+    // --- Aldric Enchantments ---
+    'dramatic-lighting': {
+        id: 'dramatic-lighting',
+        name: 'Dramatic Lighting',
+        cost: 1,
+        type: 'enchantment',
+        rarity: 'uncommon',
+        description: 'At end of turn, double your Retaliate stacks.',
+        owner: 'aldric',
+        speechBubble: 'SET THE SCENE!',
+        effects: []
+    },
+    'fortress-scene': {
+        id: 'fortress-scene',
+        name: 'Fortress Scene',
+        cost: 2,
+        type: 'enchantment',
+        rarity: 'uncommon',
+        description: 'At end of turn, gain Shield equal to your Taunt stacks.',
+        owner: 'aldric',
+        speechBubble: 'HOLD FAST!',
+        effects: []
+    },
+    'curtain-of-iron': {
+        id: 'curtain-of-iron',
+        name: 'Curtain of Iron',
+        cost: 1,
+        type: 'enchantment',
+        rarity: 'uncommon',
+        description: 'Whenever you gain Block, gain 1 Ovation.',
+        owner: 'aldric',
+        speechBubble: 'THE CROWD ROARS!',
+        effects: []
+    },
+    'war-drums': {
+        id: 'war-drums',
+        name: 'War Drums',
+        cost: 2,
+        type: 'enchantment',
+        rarity: 'rare',
+        description: 'At the start of your turn, gain 1 Fortify and 1 Retaliate.',
+        owner: 'aldric',
+        speechBubble: 'THE BEAT RISES!',
+        effects: []
+    },
+
+    // --- Pip Enchantments ---
+    'comic-relief': {
+        id: 'comic-relief',
+        name: 'Comic Relief',
+        cost: 1,
+        type: 'enchantment',
+        rarity: 'uncommon',
+        description: 'Whenever you inflict a debuff on the enemy, gain 1 Luck.',
+        owner: 'pip',
+        speechBubble: 'HA HA HA!',
+        effects: []
+    },
+    'plot-twist': {
+        id: 'plot-twist',
+        name: 'Plot Twist',
+        cost: 2,
+        type: 'enchantment',
+        rarity: 'rare',
+        description: 'At the end of the enemy\'s turn, deal damage equal to their Frustrated stacks.',
+        owner: 'pip',
+        speechBubble: 'DIDN\'T SEE THAT COMING!',
+        effects: []
+    },
+    'encore': {
+        id: 'encore',
+        name: 'Encore',
+        cost: 1,
+        type: 'enchantment',
+        rarity: 'uncommon',
+        description: 'Whenever you play your 3rd card in a turn, gain 1 Ovation and draw 1 card.',
+        owner: 'pip',
+        speechBubble: 'ONE MORE TIME!',
+        effects: []
+    },
+    'smoke-and-mirrors': {
+        id: 'smoke-and-mirrors',
+        name: 'Smoke and Mirrors',
+        cost: 1,
+        type: 'enchantment',
+        rarity: 'rare',
+        description: 'At the end of your turn, gain Distract equal to unique debuff types on the enemy.',
+        owner: 'pip',
+        speechBubble: 'NOW YOU SEE ME...',
+        effects: []
     }
 };
 
@@ -583,13 +679,15 @@ const CARD_POOLS = {
         'aegis', 'burning-devotion', 'cooperative-strike', 'protective-stance',
         'protect', 'iron-wall', 'true-strike', 'inspirational-shout',
         'cleanse', 'aggressive-strike', 'captivating-strike', 'heated-resistance',
-        'battle-hymn', 'shield-bash', 'stand-guard', 'stalwart'
+        'battle-hymn', 'shield-bash', 'stand-guard', 'stalwart',
+        'dramatic-lighting', 'fortress-scene', 'curtain-of-iron', 'war-drums'
     ],
     pip: [
         'good-fortune', 'create-opportunity', 'loaded-insult', 'coup-de-grace',
         'pips-cocktail', 'annoying-poke', 'stylish-dance', 'hit-where-it-hurts',
         'vex', 'best-explanation', 'ultimate-jeer', 'flirtatious-jeer',
-        'quick-draw', 'pepper-spray', 'mischief', 'twist-the-knife'
+        'quick-draw', 'pepper-spray', 'mischief', 'twist-the-knife',
+        'comic-relief', 'plot-twist', 'encore', 'smoke-and-mirrors'
     ]
 };
 
@@ -600,18 +698,20 @@ const CARD_POOLS_BY_RARITY = {
             'aegis', 'burning-devotion', 'cooperative-strike', 'protective-stance',
             'protect', 'iron-wall', 'true-strike', 'inspirational-shout',
             'cleanse', 'aggressive-strike',
-            'battle-hymn', 'shield-bash', 'stand-guard', 'stalwart'
+            'battle-hymn', 'shield-bash', 'stand-guard', 'stalwart',
+            'dramatic-lighting', 'fortress-scene', 'curtain-of-iron'
         ],
-        rare: ['captivating-strike', 'heated-resistance']
+        rare: ['captivating-strike', 'heated-resistance', 'war-drums']
     },
     pip: {
         uncommon: [
             'good-fortune', 'create-opportunity', 'loaded-insult', 'coup-de-grace',
             'pips-cocktail', 'annoying-poke', 'stylish-dance', 'hit-where-it-hurts',
             'vex', 'best-explanation',
-            'quick-draw', 'pepper-spray', 'mischief', 'twist-the-knife'
+            'quick-draw', 'pepper-spray', 'mischief', 'twist-the-knife',
+            'comic-relief', 'encore'
         ],
-        rare: ['ultimate-jeer', 'flirtatious-jeer']
+        rare: ['ultimate-jeer', 'flirtatious-jeer', 'plot-twist', 'smoke-and-mirrors']
     }
 };
 
@@ -892,6 +992,18 @@ const KEYWORD_GLOSSARY = {
             "Frustration builds toward Heckled!",
             "At 5 Frustration, get 1 turn of Heckled!",
             "Pip's signature pressure mechanic!"
+        ]
+    },
+
+    // Card type keywords
+    enchantment: {
+        name: 'Enchantment',
+        icon: '✧',
+        explanation: 'Persistent effect that lasts the entire combat. Removed when combat ends.',
+        hints: [
+            "Enchantments stay active all combat!",
+            "Play them early for maximum value!",
+            "They don't go to the discard pile!"
         ]
     }
 };

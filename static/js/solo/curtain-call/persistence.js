@@ -29,6 +29,7 @@ Object.assign(CurtainCallGame.prototype, {
             },
             deck: serializeCards(this.deck),
             discardPile: serializeCards(this.discardPile),
+            activeEnchantments: serializeCards(this.activeEnchantments),
             stageProps: [],
             gold: 0
         };
@@ -94,7 +95,8 @@ Object.assign(CurtainCallGame.prototype, {
 
         const allCards = [
             ...reconstruct(payload.deck || []),
-            ...reconstruct(payload.discardPile || [])
+            ...reconstruct(payload.discardPile || []),
+            ...reconstruct(payload.activeEnchantments || [])
         ];
 
         // Shuffle combined cards into deck for next combat

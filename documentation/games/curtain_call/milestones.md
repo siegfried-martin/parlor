@@ -10,7 +10,7 @@ _Created: February 25, 2026_
 | ----- | ------------------------------------- | ------------ | ------ | ------------------------------------------------------- |
 | M1    | Run Persistence                       | —            | Done   | Save/restore active run state via SQLite                |
 | M2    | Event Bus                             | —            | Done   | Hook system for reactive triggers                       |
-| M3    | Enchantment Cards                     | M2           |        | Persistent combat-duration effects                      |
+| M3    | Enchantment Cards                     | M2           | Done   | Persistent combat-duration effects                      |
 | M4    | Expanded Card Pools + Reward Refresh  | M2           |        | More cards, synergy depth, reward UX                    |
 | M5    | Stage Props                           | M2           |        | Permanent run-duration passives                         |
 | M6    | Currency, Merchant & Narrative Events | M1, M5       |        | Between-combat economy and story beats                  |
@@ -157,19 +157,19 @@ Synergy: Annoying Poke and Vex inflict Frustration. This converts Frustration in
 
 ### Definition of Done
 
-- [ ] New card type "enchantment" added to card data model (alongside attack, defense, action)
-- [ ] Enchantment cards can be defined in `cards.js` with an `onPlay` event registration spec (what events to listen to, what effects to trigger)
-- [ ] Playing an enchantment card: deducts energy, removes from hand, registers event listeners via M2's event bus, moves card to enchantment display area
-- [ ] Enchantment display area: visible slots flanking the enemy, showing miniature versions of active enchantment cards
-- [ ] No cap on simultaneous active enchantments — display area scrolls or wraps if many are active
-- [ ] Tapping an enchantment card in the display area opens card zoom overlay with crowd keyword explanations
-- [ ] All enchantment listeners deregistered on combat end (victory or defeat)
-- [ ] Enchantment cards cleared from display on combat end
-- [ ] Enchantment cards appear in card reward pools with appropriate rarity weighting
-- [ ] At least 4 enchantment cards implemented and playable (a mix of Aldric and Pip)
-- [ ] Enchantment cards rendered with a distinct visual treatment in hand (different border style or color accent) so the player knows they behave differently before playing them
-- [ ] Enchantment interaction with Inspire should be intentional and consistent (design decision for the coding agent — does Inspire boost the enchantment's registered values? Or is Inspire irrelevant to enchantments?)
-- [ ] Save/load (M1) correctly persists enchantments as part of the deck between combats
+- [x] New card type "enchantment" added to card data model (alongside attack, defense, action)
+- [x] Enchantment cards can be defined in `cards.js` with an `onPlay` event registration spec (what events to listen to, what effects to trigger)
+- [x] Playing an enchantment card: deducts energy, removes from hand, registers event listeners via M2's event bus, moves card to enchantment display area
+- [x] Enchantment display area: enchantment strip between stage and hand, showing tokens for active enchantments
+- [x] No cap on simultaneous active enchantments — display area wraps via flex layout
+- [x] Tapping an enchantment card in the display area opens card zoom overlay with crowd keyword explanations
+- [x] All enchantment listeners deregistered on combat end (victory or defeat)
+- [x] Enchantment cards cleared from display on combat end
+- [x] Enchantment cards appear in card reward pools with appropriate rarity weighting
+- [x] 8 enchantment cards implemented and playable (4 Aldric, 4 Pip)
+- [x] Enchantment cards rendered with a distinct visual treatment — unique type badge (teal gradient with border) and ✧ icon
+- [x] Inspire does NOT boost enchantment effects — enchantments register event bus listeners, not card effects. Inspire adds to damage on card play, which is orthogonal to enchantment triggers.
+- [x] Save/load (M1) correctly persists enchantments as part of the deck between combats (activeEnchantments serialized in save payload)
 
 ---
 

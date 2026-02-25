@@ -408,8 +408,9 @@ Object.assign(CurtainCallGame.prototype, {
         const enemy = this.combatState.enemy;
         console.log(`${enemy.name} defeated!`);
 
-        // Clean up enemy passive listeners
+        // Clean up enemy passive listeners and enchantments
         this.events.offByOwner('enemy-passive');
+        this.clearEnchantments();
         this.events.emit('enemyDefeated', { enemyId: enemy.id, isBoss: enemy.isBoss });
         this.events.emit('combatEnd', { result: 'victory', enemyId: enemy.id });
 
@@ -445,8 +446,9 @@ Object.assign(CurtainCallGame.prototype, {
         this.phase = 'gameover';
         console.log('MacGuffin destroyed - Defeat!');
 
-        // Clean up enemy passive listeners
+        // Clean up enemy passive listeners and enchantments
         this.events.offByOwner('enemy-passive');
+        this.clearEnchantments();
         this.events.emit('combatEnd', { result: 'defeat' });
 
         this.showCharacterBubble('NOOO!', this.elements.macguffin);

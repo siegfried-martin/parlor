@@ -96,6 +96,9 @@ class CurtainCallGame {
             cardsPlayedThisTurn: 0
         };
 
+        // Active enchantments (cleared each combat)
+        this.activeEnchantments = [];
+
         // Card zoom / keyword explanation state
         this.zoomedCard = null;
         this.zoomedCardElement = null;
@@ -227,6 +230,7 @@ class CurtainCallGame {
             deckCountDiscard: document.getElementById('deck-count-discard'),
             // removeCardBtn reserved for future post-boss card removal
             continuePerformanceBtn: document.getElementById('continue-performance-btn'),
+            enchantmentStrip: document.getElementById('enchantment-strip'),
         };
 
         // Rewards state

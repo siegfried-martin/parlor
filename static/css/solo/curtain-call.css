@@ -325,6 +325,7 @@
 .curtain-call.game-ui-hidden .enemy-area,
 .curtain-call.game-ui-hidden .stage-area,
 .curtain-call.game-ui-hidden .hand-area,
+.curtain-call.game-ui-hidden .enchantment-strip,
 .curtain-call.game-ui-hidden .stage-edge,
 .curtain-call.game-ui-hidden .controls-area,
 .curtain-call.game-ui-hidden .progress-indicator {
@@ -1059,6 +1060,11 @@
     background: #3A2050;
 }
 
+.card__type-badge.type-enchantment {
+    background: linear-gradient(135deg, #2A4040, #1A5050);
+    border: 1px solid #4A8888;
+}
+
 /* Aldric edge */
 .card-aldric .card__edge {
     width: 12px;
@@ -1094,6 +1100,63 @@
 
 .card-neutral .card__body {
     padding-right: 8px;
+}
+
+/* === Enchantment Strip === */
+.enchantment-strip {
+    flex: 0 0 auto;
+    display: flex;
+    gap: 6px;
+    padding: 4px 8px;
+    justify-content: center;
+    z-index: 1;
+}
+
+.enchantment-token {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-family: 'IM Fell English', serif;
+    font-size: 10px;
+    cursor: pointer;
+    opacity: 0.9;
+    transition: opacity 0.2s;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.enchantment-token:active {
+    opacity: 1;
+}
+
+.enchantment-token.card-aldric {
+    background: linear-gradient(135deg, #3A4050, #4A5060);
+    color: #C0C8D8;
+    border-color: #6B7080;
+}
+
+.enchantment-token.card-pip {
+    background: linear-gradient(135deg, #2A3A20, #3A4A30);
+    color: #B0C8A0;
+    border-color: #5A7050;
+}
+
+.enchantment-token.card-neutral {
+    background: linear-gradient(135deg, #3A3020, #4A4030);
+    color: #D4C8A0;
+    border-color: #7A6840;
+}
+
+.enchantment-token__icon {
+    font-size: 12px;
+}
+
+.enchantment-token__name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 90px;
 }
 
 /* === Stage Edge (divider between cards and audience) === */
