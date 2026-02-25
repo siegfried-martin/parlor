@@ -52,6 +52,9 @@ Object.assign(CurtainCallGame.prototype, {
         const effectiveCost = this.getEffectiveCardCost(card);
         this.energy.current -= effectiveCost;
         this.renderEnergy();
+        if (effectiveCost > 0) {
+            this.events.emit('energySpent', { amount: effectiveCost });
+        }
 
         // Remove from hand, add to discard
         const instanceId = card.instanceId;
@@ -129,6 +132,11 @@ Object.assign(CurtainCallGame.prototype, {
 
     async executeCardEffects(card, target) {
         this.keywords.cardsPlayedThisTurn++;
+        await this.events.emit('cardPlayed', {
+            card,
+            target,
+            cardsPlayedThisTurn: this.keywords.cardsPlayedThisTurn
+        });
 
         for (const effect of card.effects) {
             switch (effect.type) {

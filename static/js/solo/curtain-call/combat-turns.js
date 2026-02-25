@@ -16,7 +16,7 @@ Object.assign(CurtainCallGame.prototype, {
     // === Turn Management =====================================================
     // =========================================================================
 
-    startTurn() {
+    async startTurn() {
         if (this.phase === 'gameover') return;
 
         this.turnNumber++;
@@ -27,8 +27,11 @@ Object.assign(CurtainCallGame.prototype, {
         this.energy.current = this.energy.max;
         this.renderEnergy();
 
-        // Process start-of-turn keywords (DoTs, decay, enemy passives)
+        // Process start-of-turn keywords (DoTs, decay)
         this.processStartOfTurnKeywords();
+
+        // Emit playerTurnStart for event bus listeners
+        await this.events.emit('playerTurnStart', { turn: this.turnNumber });
 
         // Draw cards up to hand size
         this.drawToHandSize();
@@ -85,16 +88,22 @@ Object.assign(CurtainCallGame.prototype, {
         // Resolve Curse damage on MacGuffin before enemy acts
         await this.processEndOfTurnCurse();
 
+        // Emit playerTurnEnd for event bus listeners
+        await this.events.emit('playerTurnEnd', { turn: this.turnNumber });
+
         await this.wait(300);
 
-        // Reset enemy per-turn defenses before their new turn
-        if (this.enemyHasPassive('stage-fortress')) {
+        // Reset enemy per-turn defenses (passives can modify via beforeEnemyDefenseReset)
+        const defenseCtx = { halfBlock: false, keepRetaliate: false };
+        await this.events.emit('beforeEnemyDefenseReset', defenseCtx);
+
+        if (defenseCtx.halfBlock) {
             this.keywords.enemy.block = Math.floor(this.keywords.enemy.block / 2);
         } else {
             this.keywords.enemy.block = 0;
         }
         this.keywords.enemy.shield = 0;
-        if (!this.enemyHasPassive('dramatic-ego')) {
+        if (!defenseCtx.keepRetaliate) {
             this.keywords.enemy.retaliate = 0;
         }
 
@@ -116,13 +125,16 @@ Object.assign(CurtainCallGame.prototype, {
             ek.regenerate--;
         }
 
-        // Enemy passive start-of-turn triggers
-        this.processEnemyTurnStartPassives();
+        // Emit enemyTurnStart for event bus listeners (replaces processEnemyTurnStartPassives)
+        await this.events.emit('enemyTurnStart', { turn: this.turnNumber });
 
         this.renderCombatState();
 
         // Enemy executes their intent
         await this.executeEnemyTurn();
+
+        // Emit enemyTurnEnd for event bus listeners (e.g. narrative-control)
+        await this.events.emit('enemyTurnEnd', { turn: this.turnNumber });
 
         // Reset player per-turn defenses
         this.combatState.block = 0;
@@ -149,7 +161,7 @@ Object.assign(CurtainCallGame.prototype, {
         }
 
         // Start next turn
-        this.startTurn();
+        await this.startTurn();
     },
 
     // =========================================================================
@@ -330,24 +342,6 @@ Object.assign(CurtainCallGame.prototype, {
     },
 
     // =========================================================================
-    // === Enemy Passive Processing ============================================
-    // =========================================================================
-
-    processEnemyTurnStartPassives() {
-        // Curtain Rigging (Stagehand): +1 Inspire each turn
-        if (this.enemyHasPassive('curtain-rigging')) {
-            this.keywords.enemy.inspire += 1;
-            this.showSpeechBubble('Inspire +1', 'buff', this.elements.enemyPuppet);
-        }
-
-        // Dramatic Ego (Prima Donna): +1 Inspire each turn (Retaliate 2 is permanent, set on combat start)
-        if (this.enemyHasPassive('dramatic-ego')) {
-            this.keywords.enemy.inspire += 1;
-            this.showSpeechBubble('Inspire +1', 'buff', this.elements.enemyPuppet);
-        }
-    },
-
-    // =========================================================================
     // === Ovation =============================================================
     // =========================================================================
 
@@ -357,6 +351,11 @@ Object.assign(CurtainCallGame.prototype, {
         this.keywords.ovation = Math.min(5, this.keywords.ovation + amount);
         this.renderStatusEffects();
         this.renderOvationMeter();
+
+        const delta = this.keywords.ovation - prevOvation;
+        if (delta !== 0) {
+            this.events.emit('ovationChanged', { ovation: this.keywords.ovation, delta });
+        }
 
         // Protagonist speech when ovation reaches max (5)
         if (prevOvation < 5 && this.keywords.ovation >= 5) {
@@ -368,9 +367,15 @@ Object.assign(CurtainCallGame.prototype, {
 
     loseOvation(amount) {
         if (this.keywords.flourish > 0) amount *= 2;
+        const prev = this.keywords.ovation;
         this.keywords.ovation = Math.max(0, this.keywords.ovation - amount);
         this.renderStatusEffects();
         this.renderOvationMeter();
+
+        const delta = this.keywords.ovation - prev;
+        if (delta !== 0) {
+            this.events.emit('ovationChanged', { ovation: this.keywords.ovation, delta });
+        }
     },
 
     getOvationDamageBonus() {
@@ -403,6 +408,11 @@ Object.assign(CurtainCallGame.prototype, {
         const enemy = this.combatState.enemy;
         console.log(`${enemy.name} defeated!`);
 
+        // Clean up enemy passive listeners
+        this.events.offByOwner('enemy-passive');
+        this.events.emit('enemyDefeated', { enemyId: enemy.id, isBoss: enemy.isBoss });
+        this.events.emit('combatEnd', { result: 'victory', enemyId: enemy.id });
+
         this.elements.enemyPuppet.classList.remove('enemy-idle');
         this.elements.enemyPuppet.classList.add('enemy-defeat');
 
@@ -434,6 +444,10 @@ Object.assign(CurtainCallGame.prototype, {
     onDefeat() {
         this.phase = 'gameover';
         console.log('MacGuffin destroyed - Defeat!');
+
+        // Clean up enemy passive listeners
+        this.events.offByOwner('enemy-passive');
+        this.events.emit('combatEnd', { result: 'defeat' });
 
         this.showCharacterBubble('NOOO!', this.elements.macguffin);
 

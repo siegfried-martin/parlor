@@ -116,8 +116,8 @@ Object.assign(CurtainCallGame.prototype, {
         const pipBadge = this.elements.heroPip.querySelector('.ko-badge');
         if (pipBadge) pipBadge.remove();
 
-        // Apply combat-start passives
-        this.applyCombatStartPassives(enemy);
+        // Register enemy passive listeners on event bus
+        this.registerEnemyPassives(enemy);
 
         this.renderCombatState();
         this.renderEnemyPassive();
@@ -141,6 +141,7 @@ Object.assign(CurtainCallGame.prototype, {
 
         // Start the turn
         this.runState.phase = 'combat';
+        this.events.emit('combatStart', { enemyId: enemy.id, isBoss: enemy.isBoss || false });
         this.startTurn();
     },
 

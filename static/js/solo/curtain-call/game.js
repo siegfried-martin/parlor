@@ -19,6 +19,7 @@
 class CurtainCallGame {
     constructor() {
         this.initialized = false;
+        this.events = new EventBus();
         this.deck = [];
         this.hand = [];
         this.discardPile = [];
@@ -556,6 +557,9 @@ class CurtainCallGame {
     }
 
     restartCombat() {
+        // Clean up any existing event bus listeners
+        this.events.offByOwner('enemy-passive');
+
         this.combatState = {
             macguffin: { currentHP: 60, maxHP: 60 },
             aldric: { currentHP: 20, maxHP: 20, knockedOut: false, shield: 0, taunt: 0 },
@@ -582,6 +586,10 @@ class CurtainCallGame {
         this.elements.enemyPuppet.classList.add('enemy-idle');
         this.elements.heroAldric.classList.remove('knocked-out');
         this.elements.heroPip.classList.remove('knocked-out');
+
+        // Register passives for the debug enemy
+        const enemy = this.enemies[this.combatState.enemy.id];
+        if (enemy) this.registerEnemyPassives(enemy);
 
         this.initializeDeck();
         this.resetSpeechForCombat();

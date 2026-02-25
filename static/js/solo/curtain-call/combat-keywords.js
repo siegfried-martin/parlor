@@ -52,13 +52,10 @@ Object.assign(CurtainCallGame.prototype, {
             finalDamage = Math.floor(finalDamage * 1.5);
         }
 
-        // Two Faces (Comedy): 50% reduced damage in comedy state
-        if (this.enemyHasPassive('two-faces')) {
-            const state = this.combatState.enemy.passiveState.currentState;
-            if (state === 'comedy') {
-                finalDamage = Math.floor(finalDamage * 0.5);
-            }
-        }
+        // Allow passives to modify damage (e.g. two-faces comedy state)
+        const damageCtx = { damage: finalDamage, card };
+        await this.events.emit('beforeDamageDealt', damageCtx);
+        finalDamage = damageCtx.damage;
 
         // Ensure non-negative
         finalDamage = Math.max(0, finalDamage);
@@ -147,15 +144,14 @@ Object.assign(CurtainCallGame.prototype, {
             this.gainOvation(finalDamage - 1);
         }
 
-        // Mirror Spite passive: inflicts 1 Burn on attacking protagonist
-        if (this.enemyHasPassive('mirror-spite') && card.owner !== 'macguffin') {
-            this.applyDebuffToProtagonist(card.owner, 'burn', 1);
-            this.showSpeechBubble('Mirror Spite!', 'debuff', this.getTargetElement(card.owner));
-            this.renderStatusEffects();
+        // Emit damageDealtToEnemy for passive listeners (mirror-spite, understudys-resilience, etc.)
+        if (finalDamage > 0) {
+            await this.events.emit('damageDealtToEnemy', {
+                amount: finalDamage,
+                card,
+                enemyHPRatio: this.combatState.enemy.currentHP / this.combatState.enemy.maxHP
+            });
         }
-
-        // Scathing Pen passive: heal 3 when enemy attacks deal damage? No — "heals 3 when inflicting a debuff"
-        // (Handled in applyDebuffFromEnemy)
 
         // Enemy Retaliate: deal damage back to attacker
         if (this.keywords.enemy.retaliate > 0 && this.keywords.focus <= 0) {
@@ -176,18 +172,6 @@ Object.assign(CurtainCallGame.prototype, {
                         this.renderKnockoutState(card.owner);
                     }
                 }
-            }
-        }
-
-        // Understudy's Resilience: gains Regenerate 2 on first drop below 50%
-        if (this.enemyHasPassive('understudys-resilience') &&
-            !this.combatState.enemy.passiveState.resilienceTriggered) {
-            const enemy = this.combatState.enemy;
-            if (enemy.currentHP / enemy.maxHP <= 0.5) {
-                this.keywords.enemy.regenerate += 2;
-                this.combatState.enemy.passiveState.resilienceTriggered = true;
-                this.showSpeechBubble('Regenerate!', 'buff', this.elements.enemyPuppet);
-                this.renderStatusEffects();
             }
         }
 
@@ -226,6 +210,7 @@ Object.assign(CurtainCallGame.prototype, {
         this.showBlockBubble(finalBlock, this.elements.macguffin);
         this.combatState.block += finalBlock;
         this.renderMacGuffinBlock();
+        this.events.emit('blockGained', { amount: finalBlock });
 
         await this.wait(200);
     },
@@ -251,6 +236,7 @@ Object.assign(CurtainCallGame.prototype, {
         this.combatState[protagonist].shield += finalShield;
         this.showSpeechBubble(`Shield +${finalShield}`, 'block', this.getTargetElement(protagonist));
         this.renderProtagonistDefenses(protagonist);
+        this.events.emit('keywordGained', { keyword: 'shield', amount: finalShield, target: protagonist });
 
         await this.wait(200);
     },
@@ -268,6 +254,7 @@ Object.assign(CurtainCallGame.prototype, {
         this.combatState[protagonist].taunt += amount;
         this.showSpeechBubble(`Taunt +${amount}`, 'buff', this.getTargetElement(protagonist));
         this.renderProtagonistDefenses(protagonist);
+        this.events.emit('keywordGained', { keyword: 'taunt', amount, target: protagonist });
 
         await this.wait(200);
     },
@@ -282,6 +269,7 @@ Object.assign(CurtainCallGame.prototype, {
         this.combatState.distract += amount;
         this.showSpeechBubble(`Distract +${amount}`, 'buff', this.elements.macguffin);
         this.renderStatusEffects();
+        this.events.emit('keywordGained', { keyword: 'distract', amount, target: 'global' });
 
         await this.wait(200);
     },
@@ -296,6 +284,7 @@ Object.assign(CurtainCallGame.prototype, {
         this.combatState.retaliate += amount;
         this.showSpeechBubble(`Retaliate +${amount}`, 'buff', this.elements.macguffin);
         this.renderStatusEffects();
+        this.events.emit('keywordGained', { keyword: 'retaliate', amount, target: 'global' });
 
         await this.wait(200);
     },
@@ -310,6 +299,7 @@ Object.assign(CurtainCallGame.prototype, {
         this.keywords.inspire += amount;
         this.showSpeechBubble(`Inspire +${amount}`, 'buff', this.elements.macguffin);
         this.renderStatusEffects();
+        this.events.emit('keywordGained', { keyword: 'inspire', amount, target: 'global' });
 
         await this.wait(200);
     },
@@ -317,6 +307,7 @@ Object.assign(CurtainCallGame.prototype, {
     async gainEnergy(amount) {
         this.energy.current = Math.min(this.energy.max + amount, this.energy.current + amount);
         this.renderEnergy();
+        this.events.emit('energyGained', { amount });
         await this.wait(100);
     },
 
@@ -326,6 +317,7 @@ Object.assign(CurtainCallGame.prototype, {
             const card = this.drawCard();
             if (card) {
                 this.hand.push(card);
+                this.events.emit('cardDrawn', { card });
             }
         }
         this.renderHand();
@@ -416,10 +408,7 @@ Object.assign(CurtainCallGame.prototype, {
             this.showSpeechBubble(`${keyword} +${value}`, 'debuff', this.elements.macguffin);
             this.renderStatusEffects();
 
-            // Scathing Pen: heal 3 HP when inflicting a debuff
-            if (this.enemyHasPassive('scathing-pen')) {
-                await this.enemyHeal(3);
-            }
+            await this.events.emit('debuffInflictedOnPlayer', { keyword, value, target: 'global' });
             await this.wait(300);
             return;
         }
@@ -435,9 +424,7 @@ Object.assign(CurtainCallGame.prototype, {
             this.showSpeechBubble(`Curse ${value}!`, 'debuff', this.elements.macguffin);
             this.renderStatusEffects();
 
-            if (this.enemyHasPassive('scathing-pen')) {
-                await this.enemyHeal(3);
-            }
+            await this.events.emit('debuffInflictedOnPlayer', { keyword, value, target: 'macguffin' });
             await this.wait(300);
             return;
         }
@@ -461,9 +448,8 @@ Object.assign(CurtainCallGame.prototype, {
             this.tryEnemySpeech(this.combatState.enemy.id, 'appliesDebuff');
         }
 
-        // Scathing Pen: heal 3 HP when inflicting a debuff
-        if (debuffApplied && this.enemyHasPassive('scathing-pen')) {
-            await this.enemyHeal(3);
+        if (debuffApplied) {
+            await this.events.emit('debuffInflictedOnPlayer', { keyword, value, targets });
         }
 
         await this.wait(300);
@@ -475,32 +461,13 @@ Object.assign(CurtainCallGame.prototype, {
     async inflictDebuffOnEnemy(keyword, value, sourceCard) {
         const ek = this.keywords.enemy;
 
-        // Two Faces (Tragedy): immune to debuffs
-        if (this.enemyHasPassive('two-faces')) {
-            const state = this.combatState.enemy.passiveState.currentState;
-            if (state === 'tragedy') {
-                this.showSpeechBubble('Immune!', 'buff', this.elements.enemyPuppet);
-                await this.wait(300);
-                return;
-            }
-        }
-
-        // Iron Curtain: immune to Forgetful and Vulnerable
-        if (this.enemyHasPassive('iron-curtain')) {
-            if (keyword === 'forgetful' || keyword === 'vulnerable') {
-                this.showSpeechBubble('Immune!', 'buff', this.elements.enemyPuppet);
-                await this.wait(300);
-                return;
-            }
-        }
-
-        // Erratic: immune to Fear and Frustration
-        if (this.enemyHasPassive('erratic')) {
-            if (keyword === 'fear' || keyword === 'frustration') {
-                this.showSpeechBubble('Immune!', 'buff', this.elements.enemyPuppet);
-                await this.wait(300);
-                return;
-            }
+        // Allow passives to block debuff application (two-faces, iron-curtain, erratic)
+        const debuffCtx = { keyword, value, card: sourceCard, blocked: false };
+        await this.events.emit('beforeDebuffOnEnemy', debuffCtx);
+        if (debuffCtx.blocked) {
+            this.showSpeechBubble('Immune!', 'buff', this.elements.enemyPuppet);
+            await this.wait(300);
+            return;
         }
 
         if (keyword in ek) {
