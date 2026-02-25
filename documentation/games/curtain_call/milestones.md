@@ -11,7 +11,7 @@ _Created: February 25, 2026_
 | M1    | Run Persistence                       | —            | Done   | Save/restore active run state via SQLite                |
 | M2    | Event Bus                             | —            | Done   | Hook system for reactive triggers                       |
 | M3    | Enchantment Cards                     | M2           | Done   | Persistent combat-duration effects                      |
-| M4    | Expanded Card Pools + Reward Refresh  | M2           |        | More cards, synergy depth, reward UX                    |
+| M4    | Expanded Card Pools + Reward Refresh  | M2           | Done   | More cards, synergy depth, reward UX                    |
 | M5    | Stage Props                           | M2           |        | Permanent run-duration passives                         |
 | M6    | Currency, Merchant & Narrative Events | M1, M5       |        | Between-combat economy and story beats                  |
 | M7    | Meta-Progression                      | M1, M6       |        | Cross-run unlocks via Ticket currency and unlock tracks |
@@ -257,18 +257,18 @@ Late-game payoff at 0 cost because the synergy is hard to assemble. If you've be
 
 ### Definition of Done
 
-- [ ] At least 8 new cards added across Aldric and Pip pools, spanning uncommon/rare
-- [ ] New cards defined in `cards.js` following existing data format
-- [ ] New cards appear in appropriate card reward pools based on protagonist affinity and rarity
-- [ ] Reward refresh button added to post-combat reward screen
-- [ ] 1 free refresh per reward screen — rerolls all 3 options, respecting rarity weights and not re-offering already-seen cards from this screen
-- [ ] Refresh button visually communicates remaining refreshes (e.g., greyed out after use)
-- [ ] Visual: refresh animation that feels theatrical (cards flip, slide off, new ones slide in)
-- [ ] New cards have keyword emojis in descriptions following existing convention
-- [ ] All new cards are playable, resolve their effects correctly, and interact with existing keywords/mechanics as described
-- [ ] Card zoom on new cards shows correct keyword explanations via audience speech bubbles
-- [ ] New entries in `KEYWORD_GLOSSARY` if any new keywords are introduced
-- [ ] No card names reference keyword names directly
+- [x] 12 new cards added across Aldric (6) and Pip (6) pools, spanning uncommon/rare
+- [x] New cards defined in `cards.js` following existing data format
+- [x] New cards appear in appropriate card reward pools based on protagonist affinity and rarity
+- [x] Reward refresh button added to post-combat reward screen
+- [x] 1 free refresh per reward screen — rerolls all 3 options, respecting rarity weights and not re-offering already-seen cards
+- [x] Refresh button visually communicates remaining refreshes (greyed out after use, shows count)
+- [x] Visual: refresh animation — cards fade up, new ones slide in from below
+- [x] New cards have keyword emojis in descriptions via existing `_injectKeywordEmojis` pipeline
+- [x] All new cards playable with custom effect types in `executeCardEffects` switch
+- [x] Card zoom on new cards shows correct keyword explanations via `_extractCardKeywords` updates
+- [x] No new keywords needed — all effects use existing keyword system
+- [x] No card names reference keyword names directly
 - [ ] Balance pass: playtest each new card in at least one full run to verify it feels impactful but not broken
 
 ---

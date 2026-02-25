@@ -185,6 +185,12 @@ Object.assign(CurtainCallGame.prototype, {
                 this.skipReward();
             });
         }
+        // Reward refresh button
+        if (this.elements.refreshRewardBtn) {
+            this.elements.refreshRewardBtn.addEventListener('click', () => {
+                this.refreshRewards();
+            });
+        }
         // Reward card selection (event delegation)
         if (this.elements.rewardsCards) {
             this.elements.rewardsCards.addEventListener('click', (e) => {

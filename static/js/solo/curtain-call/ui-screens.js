@@ -47,6 +47,16 @@ Object.assign(CurtainCallGame.prototype, {
                 found.add('burn');
                 found.add('poison');
             }
+            // M4 debuff-scaling effects
+            if (effect.type === 'distractPerDebuffType') found.add('distract');
+            if (effect.type === 'luckPerDebuffType') found.add('luck');
+            if (effect.type === 'shieldFromLuck') { found.add('shield'); found.add('luck'); }
+            if (effect.type === 'luckyBreak') found.add('luck');
+            if (effect.type === 'allInLuck') found.add('luck');
+            if (effect.type === 'ovationFromTaunt') { found.add('ovation'); found.add('taunt'); }
+            if (effect.type === 'shieldFromTaunt') { found.add('shield'); found.add('taunt'); }
+            if (effect.type === 'convertBlockToOvation') { found.add('block'); found.add('ovation'); }
+            if (effect.type === 'retaliateFromFortify') { found.add('retaliate'); found.add('fortify'); }
         }
 
         // Only return keywords that exist in the glossary
@@ -228,24 +238,11 @@ Object.assign(CurtainCallGame.prototype, {
      */
     showRewardsScreen(type) {
         if (!type) type = 'normal';
+        this._rewardType = type;
+        this._rewardRefreshesLeft = 1;
+        this._rewardSeenIds = new Set();
 
-        if (type === 'boss') {
-            // 2 uncommon (1 per protagonist) + 1 rare (random protagonist)
-            const rarePool = Math.random() < 0.5 ? 'aldric' : 'pip';
-            this.rewardOptions = [
-                this.getRandomCardByRarity('aldric', 'uncommon'),
-                this.getRandomCardByRarity('pip', 'uncommon'),
-                this.getRandomCardByRarity(rarePool, 'rare')
-            ];
-        } else {
-            // 3 uncommon (1 Aldric, 1 Pip, 1 from random pool)
-            const bonusPool = Math.random() < 0.5 ? 'aldric' : 'pip';
-            this.rewardOptions = [
-                this.getRandomCardByRarity('aldric', 'uncommon'),
-                this.getRandomCardByRarity('pip', 'uncommon'),
-                this.getRandomCardByRarity(bonusPool, 'uncommon')
-            ];
-        }
+        this._generateRewardOptions(type);
 
         this.selectedRewardIndex = null;
 
@@ -260,6 +257,85 @@ Object.assign(CurtainCallGame.prototype, {
         // Reset button state
         if (this.elements.confirmRewardBtn) {
             this.elements.confirmRewardBtn.disabled = true;
+        }
+
+        // Reset refresh button
+        if (this.elements.refreshRewardBtn) {
+            this.elements.refreshRewardBtn.disabled = false;
+            this.elements.refreshRewardBtn.textContent = 'Refresh (1)';
+        }
+    },
+
+    _generateRewardOptions(type) {
+        if (type === 'boss') {
+            const rarePool = Math.random() < 0.5 ? 'aldric' : 'pip';
+            this.rewardOptions = [
+                this._getUniqueRewardCard('aldric', 'uncommon'),
+                this._getUniqueRewardCard('pip', 'uncommon'),
+                this._getUniqueRewardCard(rarePool, 'rare')
+            ];
+        } else {
+            const bonusPool = Math.random() < 0.5 ? 'aldric' : 'pip';
+            this.rewardOptions = [
+                this._getUniqueRewardCard('aldric', 'uncommon'),
+                this._getUniqueRewardCard('pip', 'uncommon'),
+                this._getUniqueRewardCard(bonusPool, 'uncommon')
+            ];
+        }
+
+        // Track seen IDs
+        for (const card of this.rewardOptions) {
+            if (card) this._rewardSeenIds.add(card.id);
+        }
+    },
+
+    _getUniqueRewardCard(pool, rarity) {
+        const ids = CARD_POOLS_BY_RARITY[pool]?.[rarity];
+        if (!ids || ids.length === 0) return null;
+
+        // Filter out already-seen cards
+        const available = ids.filter(id => !this._rewardSeenIds?.has(id));
+        const source = available.length > 0 ? available : ids;
+
+        const randomId = source[Math.floor(Math.random() * source.length)];
+        return { ...CARD_DEFINITIONS[randomId] };
+    },
+
+    refreshRewards() {
+        if (this._rewardRefreshesLeft <= 0) return;
+
+        this._rewardRefreshesLeft--;
+
+        // Clear selection
+        this.selectedRewardIndex = null;
+        this.clearExplanationBubbles();
+        if (this.elements.confirmRewardBtn) {
+            this.elements.confirmRewardBtn.disabled = true;
+        }
+
+        // Animate cards out, generate new, animate in
+        const container = this.elements.rewardsCards;
+        if (container) {
+            container.classList.add('refreshing');
+            setTimeout(() => {
+                this._generateRewardOptions(this._rewardType);
+                this.renderRewardCards();
+                container.classList.remove('refreshing');
+                container.classList.add('refresh-enter');
+                setTimeout(() => {
+                    container.classList.remove('refresh-enter');
+                }, 400);
+            }, 300);
+        }
+
+        // Update refresh button
+        if (this.elements.refreshRewardBtn) {
+            if (this._rewardRefreshesLeft <= 0) {
+                this.elements.refreshRewardBtn.disabled = true;
+                this.elements.refreshRewardBtn.textContent = 'Refresh (0)';
+            } else {
+                this.elements.refreshRewardBtn.textContent = `Refresh (${this._rewardRefreshesLeft})`;
+            }
         }
     },
 

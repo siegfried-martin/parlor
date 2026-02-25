@@ -230,6 +230,7 @@ class CurtainCallGame {
             deckCountDiscard: document.getElementById('deck-count-discard'),
             // removeCardBtn reserved for future post-boss card removal
             continuePerformanceBtn: document.getElementById('continue-performance-btn'),
+            refreshRewardBtn: document.getElementById('refresh-reward-btn'),
             enchantmentStrip: document.getElementById('enchantment-strip'),
         };
 

@@ -577,6 +577,184 @@ const CARD_DEFINITIONS = {
     },
 
     // =============================
+    // === M4 Expanded Cards ===
+    // =============================
+
+    // --- Quick Jab Synergies (Pip — debuff diversity) ---
+    'read-the-room': {
+        id: 'read-the-room',
+        name: 'Read the Room',
+        cost: 1,
+        type: 'action',
+        rarity: 'uncommon',
+        description: 'Gain 1 Distract per unique debuff type on enemy. Draw 1 card.',
+        owner: 'pip',
+        speechBubble: 'I SEE YOU!',
+        effects: [
+            { type: 'distractPerDebuffType' },
+            { type: 'draw', value: 1 }
+        ]
+    },
+    'catalogue-of-woes': {
+        id: 'catalogue-of-woes',
+        name: 'Catalogue of Woes',
+        cost: 1,
+        type: 'action',
+        rarity: 'uncommon',
+        description: 'Gain 1 Luck per unique debuff type on enemy.',
+        owner: 'pip',
+        speechBubble: 'LET ME COUNT!',
+        effects: [
+            { type: 'luckPerDebuffType' }
+        ]
+    },
+    'unraveling': {
+        id: 'unraveling',
+        name: 'Unraveling',
+        cost: 2,
+        type: 'attack',
+        rarity: 'rare',
+        description: 'Deal 3 damage per unique debuff type on enemy. Inflict 1 random debuff.',
+        owner: 'pip',
+        speechBubble: 'FALL APART!',
+        effects: [
+            { type: 'damagePerDebuffType', perType: 3 },
+            { type: 'inflictRandomDebuff', value: 1 }
+        ]
+    },
+
+    // --- Lucky Shot Synergies (Pip — Luck accumulation) ---
+    'charmed-life': {
+        id: 'charmed-life',
+        name: 'Charmed Life',
+        cost: 1,
+        type: 'defense',
+        rarity: 'uncommon',
+        description: 'Gain Shield equal to your Luck.',
+        owner: 'pip',
+        targeting: 'protagonist',
+        speechBubble: 'LUCKY ME!',
+        effects: [
+            { type: 'shieldFromLuck' }
+        ]
+    },
+    'lucky-break': {
+        id: 'lucky-break',
+        name: 'Lucky Break',
+        cost: 1,
+        type: 'action',
+        rarity: 'rare',
+        description: 'If you have 5+ Luck, gain 2 Energy and draw 2 cards. Lose 3 Luck.',
+        owner: 'pip',
+        speechBubble: 'JACKPOT!',
+        effects: [
+            { type: 'luckyBreak' }
+        ]
+    },
+    'all-in': {
+        id: 'all-in',
+        name: 'All In',
+        cost: 2,
+        type: 'attack',
+        rarity: 'rare',
+        description: 'Spend all Luck. Deal damage equal to Luck spent x3.',
+        owner: 'pip',
+        speechBubble: 'ALL OR NOTHING!',
+        effects: [
+            { type: 'allInLuck', multiplier: 3 }
+        ]
+    },
+
+    // --- Galvanize Synergies (Aldric — Taunt accumulation) ---
+    'defiant-roar': {
+        id: 'defiant-roar',
+        name: 'Defiant Roar',
+        cost: 1,
+        type: 'action',
+        rarity: 'uncommon',
+        description: 'Gain 1 Ovation per Taunt stack. Gain 1 Retaliate.',
+        owner: 'aldric',
+        speechBubble: 'COME AT ME!',
+        effects: [
+            { type: 'ovationFromTaunt' },
+            { type: 'retaliate', value: 1 }
+        ]
+    },
+    'immovable': {
+        id: 'immovable',
+        name: 'Immovable',
+        cost: 1,
+        type: 'defense',
+        rarity: 'uncommon',
+        description: 'Gain Shield equal to double your Taunt stacks.',
+        owner: 'aldric',
+        targeting: 'protagonist',
+        speechBubble: 'NOTHING MOVES ME!',
+        effects: [
+            { type: 'shieldFromTaunt', multiplier: 2 }
+        ]
+    },
+    'unyielding': {
+        id: 'unyielding',
+        name: 'Unyielding',
+        cost: 1,
+        type: 'defense',
+        rarity: 'rare',
+        description: 'Gain 2 Taunt and 2 Shield. Gain 1 Ovation per Taunt stack.',
+        owner: 'aldric',
+        speechBubble: 'I WILL NOT FALL!',
+        effects: [
+            { type: 'taunt', value: 2 },
+            { type: 'shield', value: 2 },
+            { type: 'ovationFromTaunt' }
+        ]
+    },
+
+    // --- Bulwark Synergies (Aldric — Block + Retaliate) ---
+    'rousing-recital': {
+        id: 'rousing-recital',
+        name: 'Rousing Recital',
+        cost: 1,
+        type: 'action',
+        rarity: 'uncommon',
+        description: 'Convert all Block into Ovation (up to max). Gain 1 Fortify.',
+        owner: 'aldric',
+        speechBubble: 'THE SHOW MUST GO ON!',
+        effects: [
+            { type: 'convertBlockToOvation' },
+            { type: 'fortify', value: 1 }
+        ]
+    },
+    'spiked-barricade': {
+        id: 'spiked-barricade',
+        name: 'Spiked Barricade',
+        cost: 2,
+        type: 'defense',
+        rarity: 'uncommon',
+        description: 'Gain 6 Block and 4 Retaliate.',
+        owner: 'aldric',
+        speechBubble: 'TOUCH IT AND HURT!',
+        effects: [
+            { type: 'block', value: 6 },
+            { type: 'retaliate', value: 4 }
+        ]
+    },
+    'sworn-protector': {
+        id: 'sworn-protector',
+        name: 'Sworn Protector',
+        cost: 0,
+        type: 'action',
+        rarity: 'rare',
+        description: 'Gain Retaliate equal to your Fortify. Gain 2 Block.',
+        owner: 'aldric',
+        speechBubble: 'MY OATH STANDS!',
+        effects: [
+            { type: 'retaliateFromFortify' },
+            { type: 'block', value: 2 }
+        ]
+    },
+
+    // =============================
     // === Enchantment Cards ===
     // =============================
 
@@ -680,14 +858,18 @@ const CARD_POOLS = {
         'protect', 'iron-wall', 'true-strike', 'inspirational-shout',
         'cleanse', 'aggressive-strike', 'captivating-strike', 'heated-resistance',
         'battle-hymn', 'shield-bash', 'stand-guard', 'stalwart',
-        'dramatic-lighting', 'fortress-scene', 'curtain-of-iron', 'war-drums'
+        'dramatic-lighting', 'fortress-scene', 'curtain-of-iron', 'war-drums',
+        'defiant-roar', 'immovable', 'unyielding',
+        'rousing-recital', 'spiked-barricade', 'sworn-protector'
     ],
     pip: [
         'good-fortune', 'create-opportunity', 'loaded-insult', 'coup-de-grace',
         'pips-cocktail', 'annoying-poke', 'stylish-dance', 'hit-where-it-hurts',
         'vex', 'best-explanation', 'ultimate-jeer', 'flirtatious-jeer',
         'quick-draw', 'pepper-spray', 'mischief', 'twist-the-knife',
-        'comic-relief', 'plot-twist', 'encore', 'smoke-and-mirrors'
+        'comic-relief', 'plot-twist', 'encore', 'smoke-and-mirrors',
+        'read-the-room', 'catalogue-of-woes', 'unraveling',
+        'charmed-life', 'lucky-break', 'all-in'
     ]
 };
 
@@ -699,9 +881,11 @@ const CARD_POOLS_BY_RARITY = {
             'protect', 'iron-wall', 'true-strike', 'inspirational-shout',
             'cleanse', 'aggressive-strike',
             'battle-hymn', 'shield-bash', 'stand-guard', 'stalwart',
-            'dramatic-lighting', 'fortress-scene', 'curtain-of-iron'
+            'dramatic-lighting', 'fortress-scene', 'curtain-of-iron',
+            'defiant-roar', 'immovable', 'rousing-recital', 'spiked-barricade'
         ],
-        rare: ['captivating-strike', 'heated-resistance', 'war-drums']
+        rare: ['captivating-strike', 'heated-resistance', 'war-drums',
+               'unyielding', 'sworn-protector']
     },
     pip: {
         uncommon: [
@@ -709,9 +893,11 @@ const CARD_POOLS_BY_RARITY = {
             'pips-cocktail', 'annoying-poke', 'stylish-dance', 'hit-where-it-hurts',
             'vex', 'best-explanation',
             'quick-draw', 'pepper-spray', 'mischief', 'twist-the-knife',
-            'comic-relief', 'encore'
+            'comic-relief', 'encore',
+            'read-the-room', 'catalogue-of-woes', 'charmed-life'
         ],
-        rare: ['ultimate-jeer', 'flirtatious-jeer', 'plot-twist', 'smoke-and-mirrors']
+        rare: ['ultimate-jeer', 'flirtatious-jeer', 'plot-twist', 'smoke-and-mirrors',
+               'unraveling', 'lucky-break', 'all-in']
     }
 };
 
