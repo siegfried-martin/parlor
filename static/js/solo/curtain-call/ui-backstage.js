@@ -97,7 +97,7 @@ Object.assign(CurtainCallGame.prototype, {
                 if (isUnlocked) {
                     html += `<div class="unlock-tier-status">Unlocked</div>`;
                 } else {
-                    html += `<div class="unlock-tier-cost">\uD83C\uDFAB ${tierDef.cost}</div>`;
+                    html += `<div class="unlock-tier-cost">🎫 ${tierDef.cost}</div>`;
                 }
                 html += `</div>`;
             }
@@ -141,7 +141,7 @@ Object.assign(CurtainCallGame.prototype, {
             html += `<div class="achievement-name">${def.name}</div>`;
             html += `<div class="achievement-desc">${def.description}</div>`;
             html += `</div>`;
-            html += `<div class="achievement-reward">${isEarned ? 'Earned' : `\uD83C\uDFAB ${def.tickets}`}</div>`;
+            html += `<div class="achievement-reward">${isEarned ? 'Earned' : `🎫 ${def.tickets}`}</div>`;
             html += `</div>`;
         }
 
@@ -171,7 +171,7 @@ Object.assign(CurtainCallGame.prototype, {
             html += `<span>Bosses: ${run.bossesDefeated}</span>`;
             html += `<span>${diffDef.icon} ${diffDef.name}</span>`;
             html += `</div>`;
-            html += `<div class="history-tickets">\uD83C\uDFAB +${run.ticketsEarned}</div>`;
+            html += `<div class="history-tickets">🎫 +${run.ticketsEarned}</div>`;
             html += `</div>`;
         }
         html += '</div>';

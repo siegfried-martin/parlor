@@ -186,10 +186,20 @@
                 <h1 class="title-name">Curtain Call</h1>
                 <div class="title-subtitle">A Shadow Puppet Deck-Builder</div>
             </div>
-            <div class="title-tickets" id="title-tickets"><span class="ticket-icon">\uD83C\uDFAB</span> <span id="title-ticket-count">0</span></div>
-            <button class="title-btn" id="continue-performance-btn" style="display: none;">Continue Performance</button>
-            <button class="title-btn" id="new-performance-btn">New Performance</button>
-            <button class="title-btn title-btn-secondary" id="backstage-btn">Backstage</button>
+            <!-- Username input (shown first, hides after login) -->
+            <div class="title-login" id="title-login">
+                <input type="text" class="title-username-input" id="title-username" placeholder="Enter your name..." maxlength="20" autocomplete="off">
+                <button class="title-btn" id="title-login-btn">Enter</button>
+            </div>
+            <!-- Game buttons (shown after username entered) -->
+            <div class="title-actions" id="title-actions" style="display: none;">
+                <div class="title-welcome" id="title-welcome"></div>
+                <div class="title-tickets" id="title-tickets"><span class="ticket-icon">🎫</span> <span id="title-ticket-count">0</span></div>
+                <button class="title-btn" id="continue-performance-btn" style="display: none;">Continue Performance</button>
+                <button class="title-btn" id="new-performance-btn">New Performance</button>
+                <button class="title-btn title-btn-secondary" id="backstage-btn">Backstage</button>
+                <button class="title-btn title-btn-tertiary" id="title-logout-btn">Switch User</button>
+            </div>
         </div>
     </div>
 
@@ -308,7 +318,7 @@
         <div class="backstage-content">
             <div class="backstage-header">
                 <h2 class="backstage-title">Backstage</h2>
-                <div class="backstage-tickets"><span class="ticket-icon">\uD83C\uDFAB</span> <span id="backstage-ticket-count">0</span></div>
+                <div class="backstage-tickets"><span class="ticket-icon">🎫</span> <span id="backstage-ticket-count">0</span></div>
                 <button class="backstage-close" id="backstage-close">&times;</button>
             </div>
             <div class="backstage-tabs">

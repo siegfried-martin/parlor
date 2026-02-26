@@ -118,6 +118,7 @@ class CurtainCallGame {
         this.metaState = { tickets: 0, unlocks: {}, achievements: [], history: [] };
         this.difficulty = 0;
         this.selectedMacGuffin = 'treasure-chest';
+        this.username = '';
         this.runStats = {
             actsCompleted: 0,
             bossesDefeated: [],
@@ -297,13 +298,9 @@ class CurtainCallGame {
         // Expose debug API
         this.exposeDebugAPI();
 
-        // Start with curtains closed; load meta state + check for existing run
+        // Start with curtains closed; fetch recent user then show title with login
         this.elements.container.classList.add('curtain-closed', 'game-ui-hidden');
-        Promise.all([
-            this.loadMetaState(),
-            this.checkForExistingRun()
-        ]).then(([_, savedData]) => {
-            this._savedRunData = savedData;
+        this.fetchRecentUser().then(() => {
             this.showTitleScreen();
             console.log('Curtain Call: Ready');
         });

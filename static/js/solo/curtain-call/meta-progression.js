@@ -3,6 +3,7 @@
  *
  * Load/cache meta state, pool injection, ticket calculation,
  * achievement checking, end-of-run submission, purchase flow.
+ * Per-user support: all API calls include username.
  *
  * Extends CurtainCallGame.prototype (loaded after meta-data.js).
  */
@@ -12,12 +13,80 @@
 Object.assign(CurtainCallGame.prototype, {
 
     /**
-     * Load meta state from the server and cache it.
+     * Fetch the most recent username from the server.
+     * Also checks localStorage for a cached username.
      * Called during setup() before showing the title screen.
      */
-    async loadMetaState() {
+    async fetchRecentUser() {
+        // Check localStorage first
+        const cached = localStorage.getItem('curtainCallUsername');
+        if (cached) {
+            this._suggestedUsername = cached;
+            return;
+        }
         try {
-            const res = await fetch('/api/curtain-call/meta');
+            const res = await fetch('/api/curtain-call/recent-user');
+            if (res.ok) {
+                const data = await res.json();
+                if (data.username) {
+                    this._suggestedUsername = data.username;
+                }
+            }
+        } catch (err) {
+            console.warn('Curtain Call: recent-user fetch error', err);
+        }
+    },
+
+    /**
+     * Log in as a user: set username, load meta state, check for existing run.
+     * Called when the user submits the username input on the title screen.
+     */
+    async loginUser(username) {
+        this.username = username;
+        localStorage.setItem('curtainCallUsername', username);
+
+        // Load meta state and check for active run in parallel
+        const [_, userRun] = await Promise.all([
+            this.loadMetaState(),
+            this._fetchUserRun(username)
+        ]);
+
+        // If user has an active run, store it
+        if (userRun && userRun.runId && userRun.state) {
+            this._savedRunData = userRun.state;
+            localStorage.setItem('curtainCallRunId', userRun.runId);
+        } else {
+            this._savedRunData = null;
+            localStorage.removeItem('curtainCallRunId');
+        }
+    },
+
+    /**
+     * Fetch active run for a specific user from the server.
+     */
+    async _fetchUserRun(username) {
+        try {
+            const res = await fetch(`/api/curtain-call/user-run/${encodeURIComponent(username)}`);
+            if (res.ok) {
+                return await res.json();
+            }
+        } catch (err) {
+            console.warn('Curtain Call: user-run fetch error', err);
+        }
+        return null;
+    },
+
+    /**
+     * Load meta state from the server and cache it.
+     * Uses this.username for the API call.
+     */
+    async loadMetaState() {
+        if (!this.username) {
+            this.metaState = { tickets: 0, unlocks: {}, achievements: [], history: [] };
+            return;
+        }
+        try {
+            const res = await fetch(`/api/curtain-call/meta/${encodeURIComponent(this.username)}`);
             if (!res.ok) {
                 console.warn('Curtain Call: meta load failed', res.status);
                 this.metaState = { tickets: 0, unlocks: {}, achievements: [], history: [] };
@@ -202,6 +271,7 @@ Object.assign(CurtainCallGame.prototype, {
         const totalTickets = ticketsEarned + achievementTickets;
 
         const body = {
+            username: this.username,
             ticketsEarned: totalTickets,
             newAchievements,
             runData: {
@@ -277,11 +347,11 @@ Object.assign(CurtainCallGame.prototype, {
         const ticketsEl = overlay.querySelector('.run-summary-tickets');
         if (ticketsEl) {
             let html = `<div class="ticket-heading">Tickets Earned</div>`;
-            html += `<div class="ticket-line"><span>Run performance</span><span>+${ticketsEarned - (ticketsEarned > 0 ? 0 : 0)}</span></div>`;
+            html += `<div class="ticket-line"><span>Run performance</span><span>+${ticketsEarned}</span></div>`;
             if (achievementTickets > 0) {
                 html += `<div class="ticket-line achievement"><span>Achievement bonuses</span><span>+${achievementTickets}</span></div>`;
             }
-            html += `<div class="ticket-total"><span>Total</span><span>\uD83C\uDFAB ${totalTickets}</span></div>`;
+            html += `<div class="ticket-total"><span>Total</span><span>🎫 ${totalTickets}</span></div>`;
             ticketsEl.innerHTML = html;
         }
 
@@ -293,7 +363,7 @@ Object.assign(CurtainCallGame.prototype, {
                 for (const achId of newAchievements) {
                     const def = ACHIEVEMENT_DEFINITIONS[achId];
                     if (def) {
-                        html += `<div class="achievement-entry">${def.icon} ${def.name} <span class="achievement-tickets">+${def.tickets} \uD83C\uDFAB</span></div>`;
+                        html += `<div class="achievement-entry">${def.icon} ${def.name} <span class="achievement-tickets">+${def.tickets} 🎫</span></div>`;
                     }
                 }
                 achEl.innerHTML = html;
@@ -343,7 +413,7 @@ Object.assign(CurtainCallGame.prototype, {
             const res = await fetch('/api/curtain-call/meta/purchase', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ trackId, tier, cost })
+                body: JSON.stringify({ username: this.username, trackId, tier, cost })
             });
             if (!res.ok) {
                 console.warn('Curtain Call: purchase failed', res.status);

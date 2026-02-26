@@ -597,7 +597,7 @@ Object.assign(CurtainCallGame.prototype, {
                 const cancelBtn = document.createElement('button');
                 cancelBtn.className = 'rewards-btn skip-btn';
                 cancelBtn.textContent = 'Cancel';
-                cancelBtn.addEventListener('click', () => this.hideDeckList());
+                cancelBtn.addEventListener('click', () => this._handleDeckListClose());
                 footer.appendChild(cancelBtn);
 
                 const countSpan = document.createElement('div');
@@ -761,6 +761,68 @@ Object.assign(CurtainCallGame.prototype, {
             this.elements.characterSelect.style.display = 'none';
         }
 
+        const loginSection = document.getElementById('title-login');
+        const actionsSection = document.getElementById('title-actions');
+        const usernameInput = document.getElementById('title-username');
+        const loginBtn = document.getElementById('title-login-btn');
+
+        // If already logged in, show actions directly
+        if (this.username) {
+            if (loginSection) loginSection.style.display = 'none';
+            this._showTitleActions();
+            return;
+        }
+
+        // Show login, hide actions
+        if (loginSection) loginSection.style.display = '';
+        if (actionsSection) actionsSection.style.display = 'none';
+
+        // Auto-fill suggested username
+        if (usernameInput && this._suggestedUsername) {
+            usernameInput.value = this._suggestedUsername;
+        }
+
+        // Focus the input
+        if (usernameInput) {
+            setTimeout(() => usernameInput.focus(), 100);
+        }
+
+        // Bind login button
+        const doLogin = async () => {
+            const name = usernameInput?.value?.trim();
+            if (!name) return;
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'Loading...';
+            await this.loginUser(name);
+            loginBtn.disabled = false;
+            loginBtn.textContent = 'Enter';
+            if (loginSection) loginSection.style.display = 'none';
+            this._showTitleActions();
+        };
+
+        if (loginBtn) {
+            loginBtn.onclick = doLogin;
+        }
+        if (usernameInput) {
+            usernameInput.onkeydown = (e) => {
+                if (e.key === 'Enter') doLogin();
+            };
+        }
+    },
+
+    /**
+     * Show the title screen action buttons (after login).
+     */
+    _showTitleActions() {
+        const actionsSection = document.getElementById('title-actions');
+        if (actionsSection) actionsSection.style.display = '';
+
+        // Welcome message
+        const welcome = document.getElementById('title-welcome');
+        if (welcome) {
+            welcome.textContent = `Welcome, ${this.username}`;
+        }
+
         // Show/hide continue button based on saved run data
         if (this.elements.continuePerformanceBtn) {
             if (this._savedRunData) {
@@ -787,6 +849,19 @@ Object.assign(CurtainCallGame.prototype, {
         const backstageBtn = document.getElementById('backstage-btn');
         if (backstageBtn) {
             backstageBtn.onclick = () => this.showBackstage();
+        }
+
+        // Switch user button
+        const logoutBtn = document.getElementById('title-logout-btn');
+        if (logoutBtn) {
+            logoutBtn.onclick = () => {
+                this.username = '';
+                this._savedRunData = null;
+                localStorage.removeItem('curtainCallUsername');
+                localStorage.removeItem('curtainCallRunId');
+                this.metaState = { tickets: 0, unlocks: {}, achievements: [], history: [] };
+                this.showTitleScreen();
+            };
         }
     },
 

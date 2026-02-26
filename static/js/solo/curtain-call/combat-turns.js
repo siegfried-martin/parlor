@@ -481,7 +481,10 @@ Object.assign(CurtainCallGame.prototype, {
 
         this.updateProgressIndicator();
 
-        if (enemy.isBoss) {
+        if (enemy.isBoss && !this.actStructure[this.runState.currentAct + 1]) {
+            // Final boss — skip rewards, go straight to victory
+            setTimeout(() => this.advanceScene(), 2000);
+        } else if (enemy.isBoss) {
             setTimeout(() => this.showRewardsScreen('boss'), 2000);
         } else {
             setTimeout(() => this.showRewardsScreen('normal'), 1500);

@@ -57,7 +57,7 @@ Object.assign(CurtainCallGame.prototype, {
         fetch('/api/curtain-call/save', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ run_id: runId, state: payload })
+            body: JSON.stringify({ run_id: runId, state: payload, username: this.username || '' })
         }).then(res => {
             if (!res.ok) console.warn('Curtain Call: save failed', res.status);
             else console.log('Curtain Call: run saved');

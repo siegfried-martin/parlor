@@ -3078,6 +3078,58 @@
 
 /* === M7 Title Screen Tickets & Backstage Button === */
 
+/* Title screen login */
+.title-login {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.title-username-input {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    padding: 10px 16px;
+    border: 2px solid #8B7030;
+    border-radius: 8px;
+    background: rgba(30, 20, 10, 0.8);
+    color: #F5E6D0;
+    text-align: center;
+    width: 200px;
+    outline: none;
+}
+
+.title-username-input::placeholder {
+    color: #8B7355;
+}
+
+.title-username-input:focus {
+    border-color: #D4A030;
+    box-shadow: 0 0 8px rgba(212, 160, 48, 0.3);
+}
+
+.title-welcome {
+    font-family: 'Playfair Display', serif;
+    font-size: 15px;
+    color: #C4A882;
+    margin-bottom: 4px;
+}
+
+.title-btn-tertiary {
+    background: transparent;
+    border: 1px solid #5A4A3A;
+    color: #8B7355;
+    font-size: 12px;
+    padding: 6px 16px;
+    margin-top: 4px;
+}
+
+.title-btn-tertiary:hover {
+    color: #C4A882;
+    border-color: #8B7030;
+}
+
 .title-tickets {
     font-family: 'Playfair Display', serif;
     font-size: 18px;
