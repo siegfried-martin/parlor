@@ -186,8 +186,10 @@
                 <h1 class="title-name">Curtain Call</h1>
                 <div class="title-subtitle">A Shadow Puppet Deck-Builder</div>
             </div>
+            <div class="title-tickets" id="title-tickets"><span class="ticket-icon">\uD83C\uDFAB</span> <span id="title-ticket-count">0</span></div>
             <button class="title-btn" id="continue-performance-btn" style="display: none;">Continue Performance</button>
             <button class="title-btn" id="new-performance-btn">New Performance</button>
+            <button class="title-btn title-btn-secondary" id="backstage-btn">Backstage</button>
         </div>
     </div>
 
@@ -225,6 +227,17 @@
                     </div>
                 </div>
             </div>
+
+            <!-- MacGuffin Variant Picker -->
+            <div class="cs-macguffin-section" id="cs-macguffin-section">
+                <div class="cs-macguffin-label">MacGuffin</div>
+                <div class="cs-macguffin-options" id="cs-macguffin-options">
+                    <!-- Rendered dynamically -->
+                </div>
+            </div>
+
+            <!-- Difficulty Badge -->
+            <div class="cs-difficulty-badge" id="cs-difficulty-badge"></div>
 
             <button class="title-btn" id="raise-curtain-btn">Raise the Curtain</button>
         </div>
@@ -278,6 +291,35 @@
 
     <!-- Event Stage Title (positioned over enemy area during events) -->
     <div class="event-stage-title" id="event-stage-title" style="display: none;"></div>
+
+    <!-- Run Summary Overlay (end-of-run) -->
+    <div class="run-summary-overlay" id="run-summary-overlay" style="display: none;">
+        <div class="run-summary-content">
+            <h2 class="run-summary-title">Performance Complete!</h2>
+            <div class="run-summary-stats"></div>
+            <div class="run-summary-tickets"></div>
+            <div class="run-summary-achievements"></div>
+            <button class="title-btn run-summary-btn" onclick="game.hideEndOfRunSummary()">Return to Title</button>
+        </div>
+    </div>
+
+    <!-- Backstage Overlay -->
+    <div class="backstage-overlay" id="backstage-overlay" style="display: none;">
+        <div class="backstage-content">
+            <div class="backstage-header">
+                <h2 class="backstage-title">Backstage</h2>
+                <div class="backstage-tickets"><span class="ticket-icon">\uD83C\uDFAB</span> <span id="backstage-ticket-count">0</span></div>
+                <button class="backstage-close" id="backstage-close">&times;</button>
+            </div>
+            <div class="backstage-tabs">
+                <button class="backstage-tab active" data-tab="unlocks">Unlocks</button>
+                <button class="backstage-tab" data-tab="achievements">Achievements</button>
+                <button class="backstage-tab" data-tab="history">History</button>
+                <button class="backstage-tab" data-tab="difficulty">Difficulty</button>
+            </div>
+            <div class="backstage-body" id="backstage-body"></div>
+        </div>
+    </div>
 
     <!-- Merchant Overlay -->
     <div class="merchant-overlay" id="merchant-overlay" style="display: none;">
@@ -441,6 +483,10 @@
 <script src="/static/js/solo/curtain-call/merchant.js"></script>
 <!-- Persistence -->
 <script src="/static/js/solo/curtain-call/persistence.js"></script>
+<!-- M7 Meta-Progression -->
+<script src="/static/js/solo/curtain-call/meta-data.js"></script>
+<script src="/static/js/solo/curtain-call/meta-progression.js"></script>
+<script src="/static/js/solo/curtain-call/ui-backstage.js"></script>
 <!-- Instantiate after all extensions are loaded -->
 <script>const game = new CurtainCallGame();</script>
 {% endblock %}

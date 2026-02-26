@@ -114,6 +114,24 @@ class CurtainCallGame {
         // Merchant purchases (tracks which slots have been bought per act)
         this.merchantPurchases = [];
 
+        // M7 Meta-progression state (loaded from server in setup)
+        this.metaState = { tickets: 0, unlocks: {}, achievements: [], history: [] };
+        this.difficulty = 0;
+        this.selectedMacGuffin = 'treasure-chest';
+        this.runStats = {
+            actsCompleted: 0,
+            bossesDefeated: [],
+            maxOvationReached: 0,
+            maxEnemyDebuffTypes: 0,
+            flawlessBoss: false,
+            finalGold: 0,
+            result: 'defeat',
+            macguffinId: 'treasure-chest',
+            difficulty: 0,
+            aldricBasic: 'galvanize',
+            pipBasic: 'quick-jab'
+        };
+
         // Card zoom / keyword explanation state
         this.zoomedCard = null;
         this.zoomedCardElement = null;
@@ -279,9 +297,12 @@ class CurtainCallGame {
         // Expose debug API
         this.exposeDebugAPI();
 
-        // Start with curtains closed; check for existing run before showing title
+        // Start with curtains closed; load meta state + check for existing run
         this.elements.container.classList.add('curtain-closed', 'game-ui-hidden');
-        this.checkForExistingRun().then(savedData => {
+        Promise.all([
+            this.loadMetaState(),
+            this.checkForExistingRun()
+        ]).then(([_, savedData]) => {
             this._savedRunData = savedData;
             this.showTitleScreen();
             console.log('Curtain Call: Ready');

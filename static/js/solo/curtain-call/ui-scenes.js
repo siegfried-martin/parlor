@@ -147,11 +147,17 @@ Object.assign(CurtainCallGame.prototype, {
         const pipBadge = this.elements.heroPip.querySelector('.ko-badge');
         if (pipBadge) pipBadge.remove();
 
+        // M7: Apply difficulty modifiers to enemy
+        this._applyDifficultyModifiers();
+
         // Register enemy passive listeners on event bus
         this.registerEnemyPassives(enemy);
 
         // Register stage prop listeners for this combat
         this.registerStageProps();
+
+        // M7: Register MacGuffin passive if applicable
+        this._registerMacGuffinPassive();
 
         // Apply next-combat modifiers (from narrative events)
         this._applyNextCombatModifiers();
@@ -181,6 +187,67 @@ Object.assign(CurtainCallGame.prototype, {
         this.runState.phase = 'combat';
         this.events.emit('combatStart', { enemyId: enemy.id, isBoss: enemy.isBoss || false });
         this.startTurn();
+    },
+
+    /**
+     * M7: Apply difficulty modifiers to the current enemy.
+     */
+    _applyDifficultyModifiers() {
+        const diffDef = DIFFICULTY_DEFINITIONS[this.difficulty] || DIFFICULTY_DEFINITIONS[0];
+        if (diffDef.level === 0) return;
+
+        // Scale enemy HP
+        if (diffDef.hpMultiplier > 1) {
+            const enemy = this.combatState.enemy;
+            enemy.maxHP = Math.round(enemy.maxHP * diffDef.hpMultiplier);
+            enemy.currentHP = enemy.maxHP;
+        }
+
+        // Enemy starting Inspire
+        if (diffDef.enemyInspire > 0) {
+            this.keywords.enemy.inspire += diffDef.enemyInspire;
+        }
+    },
+
+    /**
+     * M7: Register MacGuffin passive effect on the event bus.
+     */
+    _registerMacGuffinPassive() {
+        const variant = MACGUFFIN_VARIANTS[this.selectedMacGuffin];
+        if (!variant || !variant.passive) return;
+
+        const game = this;
+        const owner = 'macguffin-passive';
+
+        switch (variant.passive) {
+            case 'tome-velocity':
+                // After playing 5 cards in a turn, draw 1
+                this.events.on('cardPlayed', async () => {
+                    if (game.keywords.cardsPlayedThisTurn === 5) {
+                        await game.drawCards(1);
+                        game.showSpeechBubble('Tome: Draw!', 'buff', game.elements.macguffin);
+                    }
+                }, { owner });
+                break;
+
+            case 'royal-presence':
+                // Ovation cannot decay below 2
+                this.events.on('playerTurnStart', async () => {
+                    if (game.keywords.ovation < 2 && game.keywords.ovation > 0) {
+                        game.keywords.ovation = 2;
+                        game.renderOvationMeter();
+                        game.renderStatusEffects();
+                    }
+                }, { owner, priority: 5 });
+                break;
+        }
+    },
+
+    /**
+     * M7: Clean up MacGuffin passive listeners at combat end.
+     */
+    _clearMacGuffinPassive() {
+        this.events.offByOwner('macguffin-passive');
     },
 
     /**
@@ -260,6 +327,9 @@ Object.assign(CurtainCallGame.prototype, {
     onActComplete() {
         console.log(`Act ${this.runState.currentAct} complete!`);
 
+        // Track act completion for meta-progression
+        this.runStats.actsCompleted = this.runState.currentAct;
+
         const nextAct = this.runState.currentAct + 1;
         if (this.actStructure[nextAct]) {
             // Advance to next act
@@ -287,6 +357,9 @@ Object.assign(CurtainCallGame.prototype, {
 
             // Clean up saved run
             this.deleteCompletedRun();
+
+            // Show end-of-run summary
+            setTimeout(() => this.showEndOfRunSummary('victory'), 2000);
         }
     },
 

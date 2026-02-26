@@ -371,6 +371,11 @@ Object.assign(CurtainCallGame.prototype, {
             this.events.emit('ovationChanged', { ovation: this.keywords.ovation, delta });
         }
 
+        // Track max ovation for achievements
+        if (this.keywords.ovation > this.runStats.maxOvationReached) {
+            this.runStats.maxOvationReached = this.keywords.ovation;
+        }
+
         // Protagonist speech when ovation reaches max (5)
         if (prevOvation < 5 && this.keywords.ovation >= 5) {
             const speaker = Math.random() < 0.5 ? 'aldric' : 'pip';
@@ -432,10 +437,20 @@ Object.assign(CurtainCallGame.prototype, {
         const enemy = this.combatState.enemy;
         console.log(`${enemy.name} defeated!`);
 
-        // Clean up enemy passive listeners, enchantments, and stage prop listeners
+        // Track boss kills and flawless boss for meta-progression
+        if (enemy.isBoss) {
+            this.runStats.bossesDefeated.push(enemy.id);
+            // Check flawless: MacGuffin at full HP
+            if (this.combatState.macguffin.currentHP >= this.combatState.macguffin.maxHP) {
+                this.runStats.flawlessBoss = true;
+            }
+        }
+
+        // Clean up enemy passive listeners, enchantments, stage props, and MacGuffin passive
         this.events.offByOwner('enemy-passive');
         this.clearEnchantments();
         this.clearStageProps();
+        this._clearMacGuffinPassive();
         this.events.emit('enemyDefeated', { enemyId: enemy.id, isBoss: enemy.isBoss });
         this.events.emit('combatEnd', { result: 'victory', enemyId: enemy.id });
 
@@ -477,10 +492,11 @@ Object.assign(CurtainCallGame.prototype, {
         this.phase = 'gameover';
         console.log('MacGuffin destroyed - Defeat!');
 
-        // Clean up enemy passive listeners, enchantments, and stage prop listeners
+        // Clean up enemy passive listeners, enchantments, stage props, and MacGuffin passive
         this.events.offByOwner('enemy-passive');
         this.clearEnchantments();
         this.clearStageProps();
+        this._clearMacGuffinPassive();
         this.events.emit('combatEnd', { result: 'defeat' });
 
         this.showCharacterBubble('NOOO!', this.elements.macguffin);
@@ -492,5 +508,18 @@ Object.assign(CurtainCallGame.prototype, {
 
         // Clean up saved run
         this.deleteCompletedRun();
+
+        // Show end-of-run summary after a delay
+        setTimeout(() => this.showEndOfRunSummary('defeat'), 2000);
+    },
+
+    /**
+     * Track enemy debuff types for achievements (called from combat-cards applyDebuff).
+     */
+    trackEnemyDebuffTypes() {
+        const count = this.getEnemyDebuffCount();
+        if (count > this.runStats.maxEnemyDebuffTypes) {
+            this.runStats.maxEnemyDebuffTypes = count;
+        }
     }
 });

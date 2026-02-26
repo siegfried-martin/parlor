@@ -498,6 +498,9 @@ Object.assign(CurtainCallGame.prototype, {
             }
         }
 
+        // Track enemy debuff types for meta-progression achievements
+        this.trackEnemyDebuffTypes();
+
         // Emit for enchantment listeners (e.g. Comic Relief)
         await this.events.emit('debuffInflictedOnEnemy', { keyword, value, card: sourceCard });
 

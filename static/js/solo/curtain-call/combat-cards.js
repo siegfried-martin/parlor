@@ -529,6 +529,48 @@ Object.assign(CurtainCallGame.prototype, {
                     }
                     break;
                 }
+
+                // M7: Gain Ovation directly
+                case 'ovation':
+                    this.gainOvation(effect.value);
+                    await this.wait(200);
+                    break;
+
+                // M7: Set Ovation to exact value
+                case 'setOvation':
+                    this.keywords.ovation = Math.min(5, effect.value);
+                    this.renderOvationMeter();
+                    this.renderStatusEffects();
+                    this.showSpeechBubble(`Ovation = ${this.keywords.ovation}!`, 'buff', this.elements.macguffin);
+                    await this.wait(200);
+                    break;
+
+                // M7: Self-inflict Curse on MacGuffin
+                case 'selfCurse':
+                    this.keywords.curse += effect.value;
+                    this.showSpeechBubble(`Curse +${effect.value}`, 'debuff', this.elements.macguffin);
+                    this.renderStatusEffects();
+                    await this.wait(200);
+                    break;
+
+                // M7: Heal target protagonist
+                case 'heal': {
+                    const healTarget = target || card.owner;
+                    if (healTarget !== 'macguffin') {
+                        const state = this.combatState[healTarget];
+                        if (state && !state.knockedOut) {
+                            const oldHP = state.currentHP;
+                            state.currentHP = Math.min(state.maxHP, state.currentHP + effect.value);
+                            const healed = state.currentHP - oldHP;
+                            if (healed > 0) {
+                                this.showHealBubble(healed, this.getTargetElement(healTarget));
+                                this.renderProtagonistHP(healTarget);
+                            }
+                        }
+                    }
+                    await this.wait(200);
+                    break;
+                }
             }
         }
     }

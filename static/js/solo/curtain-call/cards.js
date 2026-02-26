@@ -848,6 +848,351 @@ const CARD_DEFINITIONS = {
         owner: 'pip',
         speechBubble: 'NOW YOU SEE ME...',
         effects: []
+    },
+
+    // =========================================
+    // === M7 MacGuffin Variant Starting Cards ===
+    // =========================================
+
+    'crown-decree': {
+        id: 'crown-decree',
+        name: 'Crown Decree',
+        cost: 0,
+        type: 'defense',
+        rarity: 'basic',
+        description: 'Gain 2 Block. Gain 1 Ovation.',
+        owner: 'macguffin',
+        speechBubble: 'BY DECREE!',
+        effects: [
+            { type: 'block', value: 2 },
+            { type: 'ovation', value: 1 }
+        ]
+    },
+    'crown-rally': {
+        id: 'crown-rally',
+        name: 'Crown Rally',
+        cost: 0,
+        type: 'action',
+        rarity: 'basic',
+        description: 'Gain 1 Inspire. Gain 1 Ovation.',
+        owner: 'macguffin',
+        speechBubble: 'RALLY!',
+        effects: [
+            { type: 'inspire', value: 1 },
+            { type: 'ovation', value: 1 }
+        ]
+    },
+    'tome-study': {
+        id: 'tome-study',
+        name: 'Tome Study',
+        cost: 0,
+        type: 'defense',
+        rarity: 'basic',
+        description: 'Gain 3 Block. Draw 1 card.',
+        owner: 'macguffin',
+        speechBubble: 'KNOWLEDGE!',
+        effects: [
+            { type: 'block', value: 3 },
+            { type: 'draw', value: 1 }
+        ]
+    },
+    'tome-insight': {
+        id: 'tome-insight',
+        name: 'Tome Insight',
+        cost: 0,
+        type: 'action',
+        rarity: 'basic',
+        description: 'Gain 1 Inspire. Draw 1 card.',
+        owner: 'macguffin',
+        speechBubble: 'I SEE!',
+        effects: [
+            { type: 'inspire', value: 1 },
+            { type: 'draw', value: 1 }
+        ]
+    },
+    'heirloom-radiance': {
+        id: 'heirloom-radiance',
+        name: 'Heirloom Radiance',
+        cost: 0,
+        type: 'action',
+        rarity: 'basic',
+        description: 'Gain 2 Inspire. Gain 1 Flourish.',
+        owner: 'macguffin',
+        speechBubble: 'SHINE!',
+        effects: [
+            { type: 'inspire', value: 2 },
+            { type: 'flourish', value: 1 }
+        ]
+    },
+    'idol-curse': {
+        id: 'idol-curse',
+        name: 'Idol Curse',
+        cost: 0,
+        type: 'action',
+        rarity: 'basic',
+        description: 'Gain 1 Curse. Unremovable.',
+        owner: 'macguffin',
+        speechBubble: 'CURSED!',
+        unremovable: true,
+        effects: [
+            { type: 'selfCurse', value: 1 }
+        ]
+    },
+
+    // ====================================
+    // === M7 Aldric Repertoire Cards ===
+    // ====================================
+
+    'heroic-charge': {
+        id: 'heroic-charge',
+        name: 'Heroic Charge',
+        cost: 2,
+        type: 'attack',
+        rarity: 'uncommon',
+        description: 'Deal 10 damage. Gain 2 Taunt.',
+        owner: 'aldric',
+        speechBubble: 'CHARGE!',
+        effects: [
+            { type: 'damage', value: 10 },
+            { type: 'taunt', value: 2 }
+        ]
+    },
+    'rallying-banner': {
+        id: 'rallying-banner',
+        name: 'Rallying Banner',
+        cost: 1,
+        type: 'action',
+        rarity: 'uncommon',
+        description: 'Gain 1 Inspire and 1 Ward. Draw 1 card.',
+        owner: 'aldric',
+        speechBubble: 'TO ME!',
+        effects: [
+            { type: 'inspire', value: 1 },
+            { type: 'ward', value: 1 },
+            { type: 'draw', value: 1 }
+        ]
+    },
+    'divine-intervention': {
+        id: 'divine-intervention',
+        name: 'Divine Intervention',
+        cost: 2,
+        type: 'defense',
+        rarity: 'rare',
+        description: 'Gain 8 Block. Heal target protagonist 5 HP.',
+        owner: 'aldric',
+        speechBubble: 'BY THE LIGHT!',
+        targeting: 'protagonist',
+        effects: [
+            { type: 'block', value: 8 },
+            { type: 'heal', value: 5 }
+        ]
+    },
+    'phalanx-formation': {
+        id: 'phalanx-formation',
+        name: 'Phalanx Formation',
+        cost: 2,
+        type: 'defense',
+        rarity: 'uncommon',
+        description: 'Gain 6 Block. Gain 2 Fortify and 1 Retaliate.',
+        owner: 'aldric',
+        speechBubble: 'HOLD FORMATION!',
+        effects: [
+            { type: 'block', value: 6 },
+            { type: 'fortify', value: 2 },
+            { type: 'retaliate', value: 1 }
+        ]
+    },
+    'commanders-presence': {
+        id: 'commanders-presence',
+        name: "Commander's Presence",
+        cost: 3,
+        type: 'enchantment',
+        rarity: 'rare',
+        description: 'At the start of your turn, gain 1 Inspire and 1 Taunt.',
+        owner: 'aldric',
+        speechBubble: 'I LEAD!',
+        effects: []
+    },
+
+    // ================================
+    // === M7 Pip Repertoire Cards ===
+    // ================================
+
+    'sleight-of-hand': {
+        id: 'sleight-of-hand',
+        name: 'Sleight of Hand',
+        cost: 1,
+        type: 'action',
+        rarity: 'uncommon',
+        description: 'Draw 2 cards. Reduce the cost of 1 random card in hand by 1.',
+        owner: 'pip',
+        speechBubble: 'WATCH CLOSELY!',
+        effects: [
+            { type: 'draw', value: 2 },
+            { type: 'reduceCostRandom', amount: 1 }
+        ]
+    },
+    'dirty-tricks': {
+        id: 'dirty-tricks',
+        name: 'Dirty Tricks',
+        cost: 1,
+        type: 'attack',
+        rarity: 'uncommon',
+        description: 'Deal 4 damage. Inflict 1 Vulnerable and 1 Weak.',
+        owner: 'pip',
+        speechBubble: 'NO RULES!',
+        effects: [
+            { type: 'damage', value: 4 },
+            { type: 'inflict', keyword: 'vulnerable', value: 1 },
+            { type: 'inflict', keyword: 'weak', value: 1 }
+        ]
+    },
+    'calculated-gamble': {
+        id: 'calculated-gamble',
+        name: 'Calculated Gamble',
+        cost: 1,
+        type: 'attack',
+        rarity: 'uncommon',
+        description: 'Deal 3 damage. Gain 3 Luck.',
+        owner: 'pip',
+        speechBubble: 'RISKY!',
+        effects: [
+            { type: 'damage', value: 3 },
+            { type: 'luck', value: 3 }
+        ]
+    },
+    'double-cross': {
+        id: 'double-cross',
+        name: 'Double Cross',
+        cost: 2,
+        type: 'attack',
+        rarity: 'rare',
+        description: 'Deal 5 damage twice. Inflict 1 Confused.',
+        owner: 'pip',
+        speechBubble: 'SURPRISE!',
+        effects: [
+            { type: 'damage', value: 5 },
+            { type: 'damage', value: 5 },
+            { type: 'inflict', keyword: 'confused', value: 1 }
+        ]
+    },
+    'grand-finale': {
+        id: 'grand-finale',
+        name: 'Grand Finale',
+        cost: 3,
+        type: 'enchantment',
+        rarity: 'rare',
+        description: 'Whenever you play your 5th card in a turn, deal 10 damage.',
+        owner: 'pip',
+        speechBubble: 'THE GRAND FINALE!',
+        effects: []
+    },
+
+    // =============================
+    // === M7 Neutral Cards ===
+    // =============================
+
+    'stage-whisper': {
+        id: 'stage-whisper',
+        name: 'Stage Whisper',
+        cost: 0,
+        type: 'action',
+        rarity: 'uncommon',
+        description: 'Draw 2 cards.',
+        owner: 'macguffin',
+        speechBubble: '*whisper*',
+        effects: [
+            { type: 'draw', value: 2 }
+        ]
+    },
+    'standing-ovation': {
+        id: 'standing-ovation',
+        name: 'Standing Ovation',
+        cost: 1,
+        type: 'action',
+        rarity: 'rare',
+        description: 'Set Ovation to 5.',
+        owner: 'macguffin',
+        speechBubble: 'BRAVO!',
+        effects: [
+            { type: 'setOvation', value: 5 }
+        ]
+    },
+    'dramatic-pause': {
+        id: 'dramatic-pause',
+        name: 'Dramatic Pause',
+        cost: 0,
+        type: 'defense',
+        rarity: 'uncommon',
+        description: 'Gain 4 Block. Gain 1 Flourish.',
+        owner: 'macguffin',
+        speechBubble: '...',
+        effects: [
+            { type: 'block', value: 4 },
+            { type: 'flourish', value: 1 }
+        ]
+    },
+
+    // =====================================
+    // === M7 Alternative Basic Cards ===
+    // =====================================
+
+    'shield-slam': {
+        id: 'shield-slam',
+        name: 'Shield Slam',
+        cost: 1,
+        type: 'attack',
+        rarity: 'basic',
+        description: 'Deal 2 damage. Gain 3 Block.',
+        owner: 'aldric',
+        speechBubble: 'SLAM!',
+        effects: [
+            { type: 'damage', value: 2 },
+            { type: 'block', value: 3 }
+        ]
+    },
+    'rallying-cry': {
+        id: 'rallying-cry',
+        name: 'Rallying Cry',
+        cost: 1,
+        type: 'action',
+        rarity: 'basic',
+        description: 'Gain 1 Inspire. Gain 2 Taunt.',
+        owner: 'aldric',
+        speechBubble: 'TO ARMS!',
+        effects: [
+            { type: 'inspire', value: 1 },
+            { type: 'taunt', value: 2 }
+        ]
+    },
+    'smoke-bomb': {
+        id: 'smoke-bomb',
+        name: 'Smoke Bomb',
+        cost: 1,
+        type: 'defense',
+        rarity: 'basic',
+        description: 'Gain 1 Distract. Inflict 1 Confused.',
+        owner: 'pip',
+        speechBubble: 'POOF!',
+        effects: [
+            { type: 'distract', value: 1 },
+            { type: 'inflict', keyword: 'confused', value: 1 }
+        ]
+    },
+    'trick-shot': {
+        id: 'trick-shot',
+        name: 'Trick Shot',
+        cost: 1,
+        type: 'attack',
+        rarity: 'basic',
+        description: 'Deal 2 damage. Gain 1 Luck. Draw 1 card.',
+        owner: 'pip',
+        speechBubble: 'WATCH THIS!',
+        effects: [
+            { type: 'damage', value: 2 },
+            { type: 'luck', value: 1 },
+            { type: 'draw', value: 1 }
+        ]
     }
 };
 

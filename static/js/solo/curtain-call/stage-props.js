@@ -89,15 +89,58 @@ const STAGE_PROP_DEFINITIONS = {
         id: 'understudys-mask',
         name: "Understudy's Mask",
         description: 'At the start of each combat, gain 1 Ward.',
-        icon: '🎭',
+        icon: '\uD83C\uDFAD',
         rarity: 'common',
         event: 'combatStart',
         effect: 'startingWard'
+    },
+
+    // === M7 Unlockable Stage Props (not in pool by default) ===
+
+    'smoke-machine': {
+        id: 'smoke-machine',
+        name: 'Smoke Machine',
+        description: 'At the start of each combat, gain 1 Distract.',
+        icon: '\uD83C\uDF2B\uFE0F',
+        rarity: 'uncommon',
+        event: 'combatStart',
+        effect: 'startingDistract'
+    },
+    'pyrotechnics': {
+        id: 'pyrotechnics',
+        name: 'Pyrotechnics',
+        description: 'At the start of each combat, inflict 3 Burn on the enemy.',
+        icon: '\uD83C\uDF86',
+        rarity: 'rare',
+        event: 'combatStart',
+        effect: 'startingEnemyBurn'
+    },
+    'prompters-whisper': {
+        id: 'prompters-whisper',
+        name: "Prompter's Whisper",
+        description: 'At the start of each combat, draw 1 extra card.',
+        icon: '\uD83D\uDCAC',
+        rarity: 'uncommon',
+        event: 'combatStart',
+        effect: 'startingExtraDraw'
+    },
+    'grand-chandelier': {
+        id: 'grand-chandelier',
+        name: 'Grand Chandelier',
+        description: 'Whenever you reach Ovation 5, gain 1 Energy.',
+        icon: '\uD83D\uDCA1',
+        rarity: 'rare',
+        event: 'ovationChanged',
+        effect: 'ovationMaxEnergy'
     }
 };
 
-// Pool for boss reward selection
-const STAGE_PROP_POOL = Object.keys(STAGE_PROP_DEFINITIONS);
+// Pool for boss reward selection (base props only; M7 unlockables added by meta-progression)
+const STAGE_PROP_POOL = [
+    'directors-megaphone', 'tattered-script', 'applause-o-meter',
+    'stunt-double', 'trapdoor-lever', 'villains-monologue',
+    'opening-night-jitters', 'spotlight-rig', 'understudys-mask'
+];
 
 Object.assign(CurtainCallGame.prototype, {
 
@@ -202,6 +245,46 @@ Object.assign(CurtainCallGame.prototype, {
                     game.keywords.ward += 1;
                     game.showSpeechBubble('Ward +1', 'buff', game.elements.macguffin);
                     game.renderStatusEffects();
+                }, { owner });
+                break;
+
+            // M7 Unlockable props
+            case 'startingDistract':
+                this.events.on('combatStart', async () => {
+                    game.combatState.distract += 1;
+                    game.showSpeechBubble('Distract +1', 'buff', game.elements.macguffin);
+                    game.renderStatusEffects();
+                }, { owner });
+                break;
+
+            case 'startingEnemyBurn':
+                this.events.on('combatStart', async () => {
+                    game.keywords.enemy.burn += 3;
+                    game.showSpeechBubble('Burn +3', 'debuff', game.elements.enemyPuppet);
+                    game.renderStatusEffects();
+                }, { owner });
+                break;
+
+            case 'startingExtraDraw':
+                this.events.on('combatStart', async () => {
+                    await game.drawCards(1);
+                }, { owner });
+                break;
+
+            case 'ovationMaxEnergy':
+                this.events.on('ovationChanged', async (data) => {
+                    if (game.keywords.ovation >= 5 && data.delta > 0) {
+                        if (!game._stagePropState._chandelierFiredThisTurn) {
+                            game._stagePropState._chandelierFiredThisTurn = true;
+                            game.energy.current = Math.min(game.energy.current + 1, game.energy.max + 1);
+                            game.renderEnergy();
+                            game.showSpeechBubble('Energy +1', 'buff', game.elements.macguffin);
+                        }
+                    }
+                }, { owner });
+                // Reset the per-turn flag at turn start
+                this.events.on('playerTurnStart', async () => {
+                    game._stagePropState._chandelierFiredThisTurn = false;
                 }, { owner });
                 break;
         }

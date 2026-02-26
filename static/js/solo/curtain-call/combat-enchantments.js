@@ -140,6 +140,27 @@ Object.assign(CurtainCallGame.prototype, {
                     }
                 }, { owner });
                 break;
+
+            // M7 Enchantments
+            case 'commanders-presence':
+                // At the start of your turn, gain 1 Inspire and 1 Taunt
+                this.events.on('playerTurnStart', async () => {
+                    game.keywords.inspire += 1;
+                    await game.gainTaunt(1);
+                    game.showSpeechBubble('Inspire +1, Taunt +1', 'buff', game.elements.macguffin);
+                    game.renderStatusEffects();
+                }, { owner });
+                break;
+
+            case 'grand-finale':
+                // Whenever you play your 5th card in a turn, deal 10 damage
+                this.events.on('cardPlayed', async (data) => {
+                    if (data.cardsPlayedThisTurn === 5) {
+                        await game.dealDamageToEnemy(10);
+                        game.showSpeechBubble('Grand Finale! 10 dmg!', 'damage', game.elements.enemyPuppet);
+                    }
+                }, { owner });
+                break;
         }
     },
 

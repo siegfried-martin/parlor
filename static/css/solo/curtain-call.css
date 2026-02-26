@@ -3075,3 +3075,562 @@
     font-size: 14px;
     padding: 10px 24px;
 }
+
+/* === M7 Title Screen Tickets & Backstage Button === */
+
+.title-tickets {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    color: #D4A030;
+    margin-bottom: 8px;
+}
+
+.ticket-icon {
+    margin-right: 4px;
+}
+
+.title-btn-secondary {
+    background: rgba(60, 40, 20, 0.6);
+    border: 1px solid #8B7030;
+    color: #D4A030;
+    font-size: 14px;
+    padding: 8px 20px;
+}
+
+.title-btn-secondary:hover {
+    background: rgba(80, 60, 30, 0.8);
+}
+
+/* === M7 Character Select: MacGuffin Picker === */
+
+.cs-macguffin-section {
+    margin: 10px 0;
+    text-align: center;
+}
+
+.cs-macguffin-label {
+    font-family: 'Playfair Display', serif;
+    font-size: 13px;
+    color: #8B7A5A;
+    margin-bottom: 6px;
+}
+
+.cs-macguffin-options {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.cs-macguffin-option {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 10px;
+    border: 1px solid #8B7030;
+    border-radius: 6px;
+    background: rgba(60, 40, 20, 0.4);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 12px;
+}
+
+.cs-macguffin-option:hover {
+    background: rgba(80, 60, 30, 0.6);
+}
+
+.cs-macguffin-option.selected {
+    background: rgba(212, 160, 48, 0.2);
+    border-color: #D4A030;
+    box-shadow: 0 0 6px rgba(212, 160, 48, 0.3);
+}
+
+.cs-macguffin-icon {
+    font-size: 18px;
+}
+
+.cs-macguffin-name {
+    font-family: 'Playfair Display', serif;
+    color: #E8D4A8;
+    font-size: 11px;
+}
+
+/* === M7 Difficulty Badge === */
+
+.cs-difficulty-badge {
+    font-family: 'Playfair Display', serif;
+    font-size: 12px;
+    color: #D4A030;
+    text-align: center;
+    margin: 6px 0;
+    padding: 4px 12px;
+    background: rgba(212, 160, 48, 0.1);
+    border-radius: 12px;
+    display: inline-block;
+}
+
+/* === M7 Run Summary Overlay === */
+
+.run-summary-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(26, 26, 46, 0.97);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    animation: fade-in 0.3s ease-out;
+}
+
+.run-summary-content {
+    width: 90%;
+    max-width: 340px;
+    max-height: 90vh;
+    overflow-y: auto;
+    text-align: center;
+    padding: 20px;
+}
+
+.run-summary-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    margin-bottom: 16px;
+}
+
+.run-summary-title.victory {
+    color: #D4A030;
+}
+
+.run-summary-title.defeat {
+    color: #C44;
+}
+
+.run-summary-stats {
+    margin-bottom: 16px;
+}
+
+.run-stat {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+    font-family: 'IM Fell English', serif;
+    font-size: 13px;
+    color: #E8D4A8;
+    border-bottom: 1px solid rgba(139, 112, 48, 0.2);
+}
+
+.run-summary-tickets {
+    margin: 16px 0;
+    padding: 12px;
+    background: rgba(212, 160, 48, 0.1);
+    border: 1px solid rgba(212, 160, 48, 0.3);
+    border-radius: 8px;
+}
+
+.ticket-heading {
+    font-family: 'Playfair Display', serif;
+    font-size: 14px;
+    color: #D4A030;
+    margin-bottom: 8px;
+}
+
+.ticket-line {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'IM Fell English', serif;
+    font-size: 12px;
+    color: #E8D4A8;
+    padding: 2px 0;
+}
+
+.ticket-line.achievement {
+    color: #9BE89B;
+}
+
+.ticket-total {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: #D4A030;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(212, 160, 48, 0.3);
+}
+
+.run-summary-achievements {
+    margin: 12px 0;
+}
+
+.achievement-heading {
+    font-family: 'Playfair Display', serif;
+    font-size: 14px;
+    color: #9BE89B;
+    margin-bottom: 6px;
+}
+
+.achievement-entry {
+    font-family: 'IM Fell English', serif;
+    font-size: 13px;
+    color: #E8D4A8;
+    padding: 4px 0;
+}
+
+.achievement-tickets {
+    color: #D4A030;
+    font-size: 11px;
+}
+
+.run-summary-btn {
+    margin-top: 16px;
+}
+
+/* === M7 Backstage Overlay === */
+
+.backstage-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(26, 26, 46, 0.97);
+    display: flex;
+    flex-direction: column;
+    z-index: 200;
+    animation: fade-in 0.3s ease-out;
+}
+
+.backstage-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 12px;
+}
+
+.backstage-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.backstage-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    color: #D4A030;
+    margin: 0;
+    flex: 1;
+}
+
+.backstage-tickets {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    color: #D4A030;
+}
+
+.backstage-close {
+    background: none;
+    border: none;
+    color: #E8D4A8;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0 4px;
+}
+
+.backstage-tabs {
+    display: flex;
+    gap: 2px;
+    margin-bottom: 8px;
+}
+
+.backstage-tab {
+    flex: 1;
+    padding: 8px 4px;
+    font-family: 'Playfair Display', serif;
+    font-size: 11px;
+    background: rgba(60, 40, 20, 0.4);
+    border: 1px solid #5A4A30;
+    color: #8B7A5A;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-radius: 4px 4px 0 0;
+}
+
+.backstage-tab.active {
+    background: rgba(212, 160, 48, 0.15);
+    border-color: #D4A030;
+    color: #D4A030;
+}
+
+.backstage-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 4px 0;
+}
+
+/* Unlock tracks */
+.unlock-track {
+    margin-bottom: 16px;
+}
+
+.unlock-track-header {
+    font-family: 'Playfair Display', serif;
+    font-size: 14px;
+    color: #D4A030;
+    margin-bottom: 2px;
+}
+
+.unlock-track-desc {
+    font-family: 'IM Fell English', serif;
+    font-size: 11px;
+    color: #8B7A5A;
+    margin-bottom: 6px;
+}
+
+.unlock-track-tiers {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.unlock-tier {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-family: 'IM Fell English', serif;
+    font-size: 12px;
+    transition: all 0.2s;
+}
+
+.unlock-tier.unlocked {
+    background: rgba(155, 232, 155, 0.1);
+    border: 1px solid rgba(155, 232, 155, 0.3);
+}
+
+.unlock-tier-name {
+    color: #E8D4A8;
+}
+
+.unlock-tier.unlocked .unlock-tier-name {
+    color: #9BE89B;
+}
+
+.unlock-tier-status {
+    color: #9BE89B;
+    font-size: 11px;
+}
+
+.unlock-tier.available {
+    background: rgba(212, 160, 48, 0.1);
+    border: 1px solid rgba(212, 160, 48, 0.4);
+    cursor: pointer;
+}
+
+.unlock-tier.available:hover {
+    background: rgba(212, 160, 48, 0.2);
+}
+
+.unlock-tier.locked {
+    background: rgba(60, 40, 20, 0.3);
+    border: 1px solid rgba(90, 74, 48, 0.3);
+    opacity: 0.6;
+}
+
+.unlock-tier-cost {
+    color: #D4A030;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+/* Achievements */
+.achievement-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    border-bottom: 1px solid rgba(139, 112, 48, 0.15);
+}
+
+.achievement-row.earned {
+    background: rgba(155, 232, 155, 0.05);
+}
+
+.achievement-icon {
+    font-size: 20px;
+    width: 28px;
+    text-align: center;
+}
+
+.achievement-info {
+    flex: 1;
+}
+
+.achievement-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 13px;
+    color: #E8D4A8;
+}
+
+.achievement-row.earned .achievement-name {
+    color: #9BE89B;
+}
+
+.achievement-desc {
+    font-family: 'IM Fell English', serif;
+    font-size: 11px;
+    color: #8B7A5A;
+}
+
+.achievement-reward {
+    font-family: 'Playfair Display', serif;
+    font-size: 12px;
+    color: #D4A030;
+    white-space: nowrap;
+}
+
+.achievement-row.earned .achievement-reward {
+    color: #9BE89B;
+}
+
+/* History */
+.history-empty {
+    text-align: center;
+    padding: 40px 20px;
+    font-family: 'IM Fell English', serif;
+    font-size: 14px;
+    color: #8B7A5A;
+}
+
+.history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.history-entry {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    background: rgba(60, 40, 20, 0.3);
+}
+
+.history-entry.victory {
+    border-left: 3px solid #D4A030;
+}
+
+.history-entry.defeat {
+    border-left: 3px solid #C44;
+}
+
+.history-result {
+    font-family: 'Playfair Display', serif;
+    font-size: 12px;
+    font-weight: 600;
+    width: 50px;
+}
+
+.history-entry.victory .history-result {
+    color: #D4A030;
+}
+
+.history-entry.defeat .history-result {
+    color: #C44;
+}
+
+.history-details {
+    flex: 1;
+    display: flex;
+    gap: 8px;
+    font-family: 'IM Fell English', serif;
+    font-size: 11px;
+    color: #8B7A5A;
+}
+
+.history-tickets {
+    font-family: 'Playfair Display', serif;
+    font-size: 12px;
+    color: #D4A030;
+}
+
+/* Difficulty select */
+.difficulty-description {
+    font-family: 'IM Fell English', serif;
+    font-size: 12px;
+    color: #8B7A5A;
+    text-align: center;
+    margin-bottom: 12px;
+}
+
+.difficulty-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    margin-bottom: 6px;
+    border-radius: 8px;
+    background: rgba(60, 40, 20, 0.3);
+    border: 1px solid rgba(90, 74, 48, 0.3);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.difficulty-option:hover:not(.locked) {
+    background: rgba(80, 60, 30, 0.5);
+}
+
+.difficulty-option.selected {
+    background: rgba(212, 160, 48, 0.15);
+    border-color: #D4A030;
+}
+
+.difficulty-option.locked {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.difficulty-icon {
+    font-size: 24px;
+    width: 32px;
+    text-align: center;
+}
+
+.difficulty-info {
+    flex: 1;
+}
+
+.difficulty-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 14px;
+    color: #E8D4A8;
+}
+
+.difficulty-option.selected .difficulty-name {
+    color: #D4A030;
+}
+
+.difficulty-desc {
+    font-family: 'IM Fell English', serif;
+    font-size: 11px;
+    color: #8B7A5A;
+}
+
+.difficulty-lock {
+    font-family: 'IM Fell English', serif;
+    font-size: 11px;
+    color: #8B7A5A;
+    white-space: nowrap;
+}
+
+/* Unremovable card in deck list */
+.deck-list-entry.unremovable {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

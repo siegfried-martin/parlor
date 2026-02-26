@@ -520,7 +520,11 @@ Object.assign(CurtainCallGame.prototype, {
             row.dataset.deckIndex = idx;
 
             if (mode === 'remove') {
-                row.classList.add('removable');
+                if (card.unremovable) {
+                    row.classList.add('unremovable');
+                } else {
+                    row.classList.add('removable');
+                }
             }
 
             // Energy cost blips
@@ -566,7 +570,7 @@ Object.assign(CurtainCallGame.prototype, {
             }
 
             // Click handler for removal mode
-            if (mode === 'remove') {
+            if (mode === 'remove' && !card.unremovable) {
                 row.addEventListener('click', () => {
                     this.selectCardForRemoval(idx);
                 });
@@ -777,6 +781,13 @@ Object.assign(CurtainCallGame.prototype, {
                 this.showCharacterSelect();
             };
         }
+
+        // M7: Update ticket display and bind Backstage button
+        this._updateTitleTickets();
+        const backstageBtn = document.getElementById('backstage-btn');
+        if (backstageBtn) {
+            backstageBtn.onclick = () => this.showBackstage();
+        }
     },
 
     continuePerformance() {
@@ -790,6 +801,10 @@ Object.assign(CurtainCallGame.prototype, {
         // Restore state from payload
         this.restoreFromPayload(this._savedRunData);
         this._savedRunData = null;
+
+        // M7: Apply difficulty energy cap for continued runs
+        const diffDef = DIFFICULTY_DEFINITIONS[this.difficulty] || DIFFICULTY_DEFINITIONS[0];
+        this.energy.max = diffDef.maxEnergy;
 
         // Show game UI behind closed curtains
         this.elements.container.classList.remove('game-ui-hidden');
@@ -818,6 +833,9 @@ Object.assign(CurtainCallGame.prototype, {
             this.elements.characterSelect.style.display = 'flex';
         }
 
+        // M7: Render dynamic basic options from BASIC_OPTIONS
+        this._renderDynamicBasics();
+
         // Bind basic card selection (radio-style per protagonist)
         const attackOptions = document.querySelectorAll('.cs-attack-option');
         attackOptions.forEach(option => {
@@ -832,9 +850,86 @@ Object.assign(CurtainCallGame.prototype, {
             };
         });
 
+        // M7: Render MacGuffin variant picker
+        this._renderMacGuffinPicker();
+
+        // M7: Show difficulty badge
+        this._renderDifficultyBadge();
+
         // Bind button
         if (this.elements.raiseCurtainBtn) {
             this.elements.raiseCurtainBtn.onclick = () => this.startPerformance();
+        }
+    },
+
+    _renderDynamicBasics() {
+        for (const protagonist of ['aldric', 'pip']) {
+            const card = document.querySelector(`.cs-card[data-protagonist="${protagonist}"]`);
+            if (!card) continue;
+            const attacksContainer = card.querySelector('.cs-attacks');
+            if (!attacksContainer) continue;
+
+            const options = BASIC_OPTIONS[protagonist] || [];
+            // Keep the label, rebuild options
+            const label = attacksContainer.querySelector('.cs-attack-label');
+            attacksContainer.innerHTML = '';
+            if (label) attacksContainer.appendChild(label);
+
+            options.forEach((cardId, index) => {
+                const cardDef = CARD_DEFINITIONS[cardId];
+                if (!cardDef) return;
+
+                const el = document.createElement('div');
+                el.className = 'cs-attack-option' + (index === 0 ? ' selected' : '');
+                el.dataset.card = cardId;
+                el.textContent = `${cardDef.name} (${cardDef.description})`;
+                attacksContainer.appendChild(el);
+            });
+        }
+    },
+
+    _renderMacGuffinPicker() {
+        const container = document.getElementById('cs-macguffin-options');
+        if (!container) return;
+
+        const unlocked = this.getUnlockedMacGuffins();
+        container.innerHTML = '';
+
+        for (const variantId of unlocked) {
+            const variant = MACGUFFIN_VARIANTS[variantId];
+            if (!variant) continue;
+
+            const el = document.createElement('div');
+            el.className = 'cs-macguffin-option' + (variantId === 'treasure-chest' ? ' selected' : '');
+            el.dataset.macguffin = variantId;
+            el.title = `${variant.name}: ${variant.description} (${variant.hp} HP)`;
+            el.innerHTML = `<span class="cs-macguffin-icon">${variant.icon}</span><span class="cs-macguffin-name">${variant.name}</span>`;
+
+            el.addEventListener('click', () => {
+                container.querySelectorAll('.cs-macguffin-option').forEach(o => o.classList.remove('selected'));
+                el.classList.add('selected');
+            });
+
+            container.appendChild(el);
+        }
+
+        // Hide section if only default available
+        const section = document.getElementById('cs-macguffin-section');
+        if (section) {
+            section.style.display = unlocked.length > 1 ? '' : 'none';
+        }
+    },
+
+    _renderDifficultyBadge() {
+        const badge = document.getElementById('cs-difficulty-badge');
+        if (!badge) return;
+
+        const diffDef = DIFFICULTY_DEFINITIONS[this.difficulty] || DIFFICULTY_DEFINITIONS[0];
+        if (this.difficulty > 0) {
+            badge.textContent = `${diffDef.icon} ${diffDef.name}`;
+            badge.style.display = '';
+        } else {
+            badge.style.display = 'none';
         }
     },
 
@@ -846,13 +941,33 @@ Object.assign(CurtainCallGame.prototype, {
         this.selectedAldricBasic = aldricOption?.dataset.card || 'galvanize';
         this.selectedPipBasic = pipOption?.dataset.card || 'quick-jab';
 
-        console.log(`Starting deck: ${this.selectedAldricBasic} + ${this.selectedPipBasic}`);
+        // M7: Read selected MacGuffin variant
+        const macguffinOption = document.querySelector('.cs-macguffin-option.selected');
+        this.selectedMacGuffin = macguffinOption?.dataset.macguffin || 'treasure-chest';
+        const variant = MACGUFFIN_VARIANTS[this.selectedMacGuffin] || MACGUFFIN_VARIANTS['treasure-chest'];
+
+        console.log(`Starting deck: ${this.selectedAldricBasic} + ${this.selectedPipBasic}, MacGuffin: ${variant.name}`);
 
         // Start new persistence run
         this.startNewRun();
 
-        // Rebuild deck with selections
-        this.initializeDeck();
+        // M7: Apply MacGuffin variant HP
+        this.combatState.macguffin.maxHP = variant.hp;
+        this.combatState.macguffin.currentHP = variant.hp;
+
+        // M7: Build starting deck with variant starting cards
+        const deckIds = [
+            this.selectedAldricBasic, this.selectedAldricBasic, this.selectedAldricBasic,
+            this.selectedPipBasic, this.selectedPipBasic, this.selectedPipBasic,
+            ...variant.startingCards
+        ];
+        this.deck = deckIds.map((cardId, index) => ({
+            ...CARD_DEFINITIONS[cardId],
+            instanceId: `${cardId}-${index}`
+        }));
+        this.shuffleDeck();
+        this.hand = [];
+        this.discardPile = [];
 
         // Reset run state to Act 1 scene 0
         this.runState = {
@@ -866,6 +981,26 @@ Object.assign(CurtainCallGame.prototype, {
         this.eventHistory = [];
         this.nextCombatModifiers = {};
         this.merchantPurchases = [];
+
+        // M7: Reset run stats
+        this.runStats = {
+            actsCompleted: 0,
+            bossesDefeated: [],
+            maxOvationReached: 0,
+            maxEnemyDebuffTypes: 0,
+            flawlessBoss: false,
+            finalGold: 0,
+            result: 'defeat',
+            macguffinId: this.selectedMacGuffin,
+            difficulty: this.difficulty || 0,
+            aldricBasic: this.selectedAldricBasic,
+            pipBasic: this.selectedPipBasic
+        };
+
+        // M7: Apply difficulty energy cap
+        const diffDef = DIFFICULTY_DEFINITIONS[this.difficulty] || DIFFICULTY_DEFINITIONS[0];
+        this.energy.max = diffDef.maxEnergy;
+        this.energy.current = diffDef.maxEnergy;
 
         // Hide character select
         if (this.elements.characterSelect) {

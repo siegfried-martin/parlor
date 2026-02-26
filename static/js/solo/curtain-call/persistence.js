@@ -22,7 +22,7 @@ Object.assign(CurtainCallGame.prototype, {
             cards.map(c => ({ id: c.id, instanceId: c.instanceId }));
 
         return {
-            version: 2,
+            version: 3,
             selectedAldricBasic: this.selectedAldricBasic,
             selectedPipBasic: this.selectedPipBasic,
             runState: { ...this.runState },
@@ -37,7 +37,11 @@ Object.assign(CurtainCallGame.prototype, {
             gold: this.gold || 0,
             eventHistory: [...(this.eventHistory || [])],
             nextCombatModifiers: { ...(this.nextCombatModifiers || {}) },
-            merchantPurchases: [...(this.merchantPurchases || [])]
+            merchantPurchases: [...(this.merchantPurchases || [])],
+            // M7 fields
+            selectedMacGuffin: this.selectedMacGuffin || 'treasure-chest',
+            difficulty: this.difficulty || 0,
+            runStats: { ...this.runStats, bossesDefeated: [...(this.runStats.bossesDefeated || [])] }
         };
     },
 
@@ -86,8 +90,6 @@ Object.assign(CurtainCallGame.prototype, {
         if (scene === 'boss') {
             payload.runState.currentScene = 4;
         } else if (typeof scene === 'number') {
-            // v1: 0 = first combat, 1 = second combat
-            // v2: 0 = combat-0, 2 = combat-1
             payload.runState.currentScene = scene * 2;
         }
         payload.version = 2;
@@ -99,12 +101,32 @@ Object.assign(CurtainCallGame.prototype, {
     },
 
     /**
+     * Migrate a v2 payload to v3 format (M7 meta-progression fields).
+     */
+    _migrateV2toV3(payload) {
+        payload.version = 3;
+        payload.selectedMacGuffin = payload.selectedMacGuffin || 'treasure-chest';
+        payload.difficulty = payload.difficulty || 0;
+        payload.runStats = payload.runStats || {
+            actsCompleted: 0, bossesDefeated: [], maxOvationReached: 0,
+            maxEnemyDebuffTypes: 0, flawlessBoss: false, finalGold: 0,
+            result: 'defeat', macguffinId: 'treasure-chest', difficulty: 0,
+            aldricBasic: payload.selectedAldricBasic || 'galvanize',
+            pipBasic: payload.selectedPipBasic || 'quick-jab'
+        };
+        return payload;
+    },
+
+    /**
      * Restore game state from a saved payload.
      */
     restoreFromPayload(payload) {
         // Migrate old saves
         if (payload.version === 1 || !payload.version) {
             payload = this._migrateV1toV2(payload);
+        }
+        if (payload.version === 2) {
+            payload = this._migrateV2toV3(payload);
         }
 
         // Character choices
@@ -148,6 +170,17 @@ Object.assign(CurtainCallGame.prototype, {
         this.eventHistory = payload.eventHistory || [];
         this.nextCombatModifiers = payload.nextCombatModifiers || {};
         this.merchantPurchases = payload.merchantPurchases || [];
+
+        // M7 fields
+        this.selectedMacGuffin = payload.selectedMacGuffin || 'treasure-chest';
+        this.difficulty = payload.difficulty || 0;
+        if (payload.runStats) {
+            this.runStats = {
+                ...this.runStats,
+                ...payload.runStats,
+                bossesDefeated: payload.runStats.bossesDefeated || []
+            };
+        }
     },
 
     /**
