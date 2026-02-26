@@ -372,11 +372,8 @@ Object.assign(CurtainCallGame.prototype, {
         strip.innerHTML = '';
 
         if (!this.stageProps || this.stageProps.length === 0) {
-            strip.style.display = 'none';
             return;
         }
-
-        strip.style.display = 'flex';
 
         for (const propId of this.stageProps) {
             const prop = STAGE_PROP_DEFINITIONS[propId];
@@ -391,12 +388,81 @@ Object.assign(CurtainCallGame.prototype, {
             icon.textContent = prop.icon;
             el.appendChild(icon);
 
-            // Tap to explain
+            // Tap to show zoom detail
             el.addEventListener('click', () => {
-                this.showSpeechBubble(`${prop.icon} ${prop.name}: ${prop.description}`, 'info', this.elements.macguffin);
+                this.showStagePropZoom(prop);
             });
 
             strip.appendChild(el);
         }
+    },
+
+    /**
+     * Show a zoomed detail overlay for a stage prop.
+     * Same overlay pattern as showEnchantmentZoom / showCardZoom.
+     */
+    showStagePropZoom(prop) {
+        if (this.zoomedCardElement) this.hideCardZoom();
+
+        this._zoomJustOpened = true;
+        requestAnimationFrame(() => { this._zoomJustOpened = false; });
+
+        this.zoomedCard = -2; // sentinel for "prop zoom"
+
+        const overlay = document.createElement('div');
+        overlay.className = 'card-zoom-overlay';
+
+        const detail = document.createElement('div');
+        detail.className = 'prop-zoom-detail';
+
+        const iconEl = document.createElement('div');
+        iconEl.className = 'prop-zoom-detail__icon';
+        iconEl.textContent = prop.icon;
+        detail.appendChild(iconEl);
+
+        const nameEl = document.createElement('div');
+        nameEl.className = 'prop-zoom-detail__name';
+        nameEl.textContent = prop.name;
+        detail.appendChild(nameEl);
+
+        const rule = document.createElement('div');
+        rule.className = 'prop-zoom-detail__rule';
+        detail.appendChild(rule);
+
+        const descEl = document.createElement('div');
+        descEl.className = 'prop-zoom-detail__desc';
+        descEl.textContent = prop.description;
+        detail.appendChild(descEl);
+
+        const badge = document.createElement('div');
+        badge.className = 'prop-zoom-detail__badge';
+        badge.textContent = 'Stage Prop';
+        detail.appendChild(badge);
+
+        overlay.appendChild(detail);
+        document.body.appendChild(overlay);
+
+        this.zoomedCardElement = overlay;
+
+        // Extract keywords and show audience explanations
+        const keywords = this._extractPropKeywords(prop);
+        if (keywords.length > 0) {
+            this.showKeywordExplanations(keywords);
+        }
+    },
+
+    /**
+     * Extract keyword glossary keys mentioned in a prop's description.
+     */
+    _extractPropKeywords(prop) {
+        const desc = prop.description || '';
+        const found = [];
+        for (const key in KEYWORD_GLOSSARY) {
+            const entry = KEYWORD_GLOSSARY[key];
+            if (entry.name && desc.includes(entry.name)) {
+                found.push(key);
+            }
+        }
+        return found;
     }
 });

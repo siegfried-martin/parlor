@@ -267,10 +267,7 @@ Object.assign(CurtainCallGame.prototype, {
         }
 
         // Reset refresh button
-        if (this.elements.refreshRewardBtn) {
-            this.elements.refreshRewardBtn.disabled = false;
-            this.elements.refreshRewardBtn.textContent = 'Refresh (1)';
-        }
+        this._updateRefreshButton();
     },
 
     _generateRewardOptions(type) {
@@ -309,9 +306,20 @@ Object.assign(CurtainCallGame.prototype, {
     },
 
     refreshRewards() {
-        if (this._rewardRefreshesLeft <= 0) return;
+        const PAID_REFRESH_COST = 10;
 
-        this._rewardRefreshesLeft--;
+        // Free refreshes available
+        if (this._rewardRefreshesLeft > 0) {
+            this._rewardRefreshesLeft--;
+        } else if (this.gold >= PAID_REFRESH_COST) {
+            // Paid refresh
+            this.gold -= PAID_REFRESH_COST;
+            this.renderGoldDisplay();
+            this.showSpeechBubble(`-${PAID_REFRESH_COST} Gold`, 'damage', this.elements.macguffin);
+        } else {
+            // Can't afford
+            return;
+        }
 
         // Clear selection
         this.selectedRewardIndex = null;
@@ -325,7 +333,7 @@ Object.assign(CurtainCallGame.prototype, {
         if (container) {
             container.classList.add('refreshing');
             setTimeout(() => {
-                this._generateRewardOptions(this._rewardType);
+                this._generateRewardOptions(this._rewardType === 'merchant-rare' ? 'boss' : this._rewardType);
                 this.renderRewardCards();
                 container.classList.remove('refreshing');
                 container.classList.add('refresh-enter');
@@ -336,12 +344,21 @@ Object.assign(CurtainCallGame.prototype, {
         }
 
         // Update refresh button
+        this._updateRefreshButton();
+    },
+
+    _updateRefreshButton() {
+        const PAID_REFRESH_COST = 10;
         if (this.elements.refreshRewardBtn) {
-            if (this._rewardRefreshesLeft <= 0) {
-                this.elements.refreshRewardBtn.disabled = true;
-                this.elements.refreshRewardBtn.textContent = 'Refresh (0)';
-            } else {
+            if (this._rewardRefreshesLeft > 0) {
+                this.elements.refreshRewardBtn.disabled = false;
                 this.elements.refreshRewardBtn.textContent = `Refresh (${this._rewardRefreshesLeft})`;
+            } else if (this.gold >= PAID_REFRESH_COST) {
+                this.elements.refreshRewardBtn.disabled = false;
+                this.elements.refreshRewardBtn.textContent = `Refresh (\uD83E\uDE99${PAID_REFRESH_COST})`;
+            } else {
+                this.elements.refreshRewardBtn.disabled = true;
+                this.elements.refreshRewardBtn.textContent = `Refresh (\uD83E\uDE99${PAID_REFRESH_COST})`;
             }
         }
     },
@@ -423,7 +440,7 @@ Object.assign(CurtainCallGame.prototype, {
         this.rewardOptions = [];
         this.selectedRewardIndex = null;
 
-        // Opening reward goes to scene select; combat rewards advance the scene
+        // Route based on where the reward was triggered from
         if (this._openingReward) {
             this._openingReward = false;
             this.showSceneSelection();
@@ -432,6 +449,14 @@ Object.assign(CurtainCallGame.prototype, {
             this._bossRewardPhase = 'removal';
             this._removalFromBoss = true;
             this.showDeckList('remove');
+        } else if (this._merchantReward) {
+            // Return to merchant after merchant card purchase
+            this._merchantReward = false;
+            this.returnToMerchant();
+        } else if (this._eventReward) {
+            // Event card reward — advance scene
+            this._eventReward = false;
+            this.advanceScene();
         } else {
             this.advanceScene();
         }
@@ -598,6 +623,37 @@ Object.assign(CurtainCallGame.prototype, {
         this._deckListAllCards = null;
     },
 
+    /**
+     * Handle deck list close/cancel from various contexts.
+     */
+    _handleDeckListClose() {
+        if (this._removalFromRewards) {
+            this._removalFromRewards = false;
+            this.hideDeckList();
+            if (this.elements.rewardsOverlay) {
+                this.elements.rewardsOverlay.style.display = 'flex';
+            }
+        } else if (this._removalFromBoss) {
+            this._removalFromBoss = false;
+            this.hideDeckList();
+            this.showStagePropSelection(() => {
+                this.advanceScene();
+            });
+        } else if (this._removalFromMerchant) {
+            // Cancelled removal from merchant — return to merchant
+            this._removalFromMerchant = false;
+            this.hideDeckList();
+            this.returnToMerchant();
+        } else if (this._removalFromEvent) {
+            // Cancelled removal from event — advance scene
+            this._removalFromEvent = false;
+            this.hideDeckList();
+            this.advanceScene();
+        } else {
+            this.hideDeckList();
+        }
+    },
+
     selectCardForRemoval(idx) {
         if (this._deckListMode !== 'remove') return;
 
@@ -669,6 +725,14 @@ Object.assign(CurtainCallGame.prototype, {
             this.showStagePropSelection(() => {
                 this.advanceScene();
             });
+        } else if (this._removalFromMerchant) {
+            // Return to merchant after merchant card shredder
+            this._removalFromMerchant = false;
+            this.returnToMerchant();
+        } else if (this._removalFromEvent) {
+            // Event card removal — advance scene
+            this._removalFromEvent = false;
+            this.advanceScene();
         }
     },
 
@@ -738,9 +802,10 @@ Object.assign(CurtainCallGame.prototype, {
         this.updateProgressIndicator();
         this.renderCombatState();
         this.renderStageProps();
+        this.renderGoldDisplay();
 
-        // Go to scene selection
-        this.showSceneSelection();
+        // Route to the current node
+        this.routeToNode(NODE_SEQUENCE[this.runState.currentScene]);
     },
 
     showCharacterSelect() {
@@ -795,6 +860,12 @@ Object.assign(CurtainCallGame.prototype, {
             currentScene: 0,
             phase: 'scene-select'
         };
+
+        // Reset M6 state
+        this.gold = 0;
+        this.eventHistory = [];
+        this.nextCombatModifiers = {};
+        this.merchantPurchases = [];
 
         // Hide character select
         if (this.elements.characterSelect) {

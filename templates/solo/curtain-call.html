@@ -276,27 +276,50 @@
         </div>
     </div>
 
-    <!-- Stage Props Strip -->
-    <div class="stage-prop-strip" id="stage-prop-strip" style="display: none;"></div>
+    <!-- Event Stage Title (positioned over enemy area during events) -->
+    <div class="event-stage-title" id="event-stage-title" style="display: none;"></div>
+
+    <!-- Merchant Overlay -->
+    <div class="merchant-overlay" id="merchant-overlay" style="display: none;">
+        <div class="merchant-content">
+            <h2 class="merchant-title">Gertie's Grip Shop</h2>
+            <p class="merchant-greeting" id="merchant-greeting">Need somethin' before the next scene, dearies?</p>
+            <div class="merchant-gold">
+                <span class="gold-icon">&#x1FA99;</span>
+                <span class="merchant-gold-value" id="merchant-gold-value">0</span>
+            </div>
+            <div class="merchant-items" id="merchant-items"></div>
+            <button class="title-btn merchant-leave-btn" id="merchant-leave-btn">Leave Shop</button>
+        </div>
+    </div>
 
     <!-- Enemy Area (~25% of screen) -->
     <div class="enemy-area">
-        <div class="enemy-sidebar enemy-sidebar-left">
-            <div class="enemy-intent intent-attack">
-                <img src="/static/svg/intent-attack.svg" alt="Attack" class="intent-icon" id="intent-icon">
-                <span class="intent-value intent-attack">7</span>
+        <!-- Left edge: Stage Props -->
+        <div class="enemy-sidebar enemy-sidebar-left" id="stage-prop-strip"></div>
+
+        <!-- Center group: Enemy + status modifiers -->
+        <div class="enemy-main">
+            <div class="enemy-center">
+                <div class="enemy-intent intent-attack">
+                    <img src="/static/svg/intent-attack.svg" alt="Attack" class="intent-icon" id="intent-icon">
+                    <span class="intent-value intent-attack">7</span>
+                </div>
+                <div class="enemy-puppet enemy-idle" id="enemy-puppet">
+                    <img src="/static/svg/enemy-placeholder.svg" alt="Enemy" class="puppet-svg enemy-svg">
+                </div>
+                <div class="enemy-hp-bar">
+                    <div class="hp-fill" style="width: 100%;"></div>
+                    <span class="hp-text">28/28</span>
+                </div>
             </div>
+            <div id="enemy-modifiers"></div>
         </div>
-        <div class="enemy-center">
-            <div class="enemy-puppet enemy-idle" id="enemy-puppet">
-                <img src="/static/svg/enemy-placeholder.svg" alt="Enemy" class="puppet-svg enemy-svg">
-            </div>
-            <div class="enemy-hp-bar">
-                <div class="hp-fill" style="width: 100%;"></div>
-                <span class="hp-text">28/28</span>
-            </div>
+
+        <!-- Right edge: Enchantments -->
+        <div class="enemy-sidebar enemy-sidebar-right">
+            <div class="enchantment-strip" id="enchantment-strip" style="display: none;"></div>
         </div>
-        <div class="enemy-sidebar enemy-sidebar-right" id="enemy-modifiers"></div>
     </div>
 
     <!-- Stage Area (~30% of screen) -->
@@ -342,14 +365,12 @@
         </div>
     </div>
 
-    <!-- Active Enchantments Strip -->
-    <div class="enchantment-strip" id="enchantment-strip" style="display: none;"></div>
-
     <!-- Hand Area (~30% of screen) -->
     <div class="hand-area">
         <div class="hand-cards" id="hand-cards">
             <!-- Cards are rendered dynamically by game.js -->
         </div>
+        <div class="event-stage-choices" id="event-stage-choices" style="display: none;"></div>
     </div>
 
     <!-- Stage Edge (divider) -->
@@ -363,6 +384,10 @@
         <!-- Energy, Deck Count, and End Turn -->
         <div class="controls-right">
             <div class="controls-top-row">
+                <div class="gold-indicator" id="gold-indicator" style="display: none;">
+                    <span class="gold-icon">&#x1FA99;</span>
+                    <span class="gold-value" id="gold-value">0</span>
+                </div>
                 <div class="energy-indicator">
                     <span class="energy-icon">&#x26A1;</span>
                     <span class="energy-value">3</span>
@@ -411,6 +436,9 @@
 <script src="/static/js/solo/curtain-call/audience-speech.js"></script>
 <!-- Stage Props -->
 <script src="/static/js/solo/curtain-call/stage-props.js"></script>
+<!-- Narrative Events & Merchant -->
+<script src="/static/js/solo/curtain-call/narrative-events.js"></script>
+<script src="/static/js/solo/curtain-call/merchant.js"></script>
 <!-- Persistence -->
 <script src="/static/js/solo/curtain-call/persistence.js"></script>
 <!-- Instantiate after all extensions are loaded -->

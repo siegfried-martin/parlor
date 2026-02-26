@@ -164,6 +164,9 @@ Object.assign(CurtainCallGame.prototype, {
         // Reuse the same card zoom overlay pattern
         if (this.zoomedCardElement) this.hideCardZoom();
 
+        this._zoomJustOpened = true;
+        requestAnimationFrame(() => { this._zoomJustOpened = false; });
+
         this.zoomedCard = -1; // sentinel for "enchantment zoom"
 
         const overlay = document.createElement('div');

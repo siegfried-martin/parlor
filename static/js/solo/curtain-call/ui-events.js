@@ -218,22 +218,7 @@ Object.assign(CurtainCallGame.prototype, {
         // Deck list close button
         if (this.elements.deckListClose) {
             this.elements.deckListClose.addEventListener('click', () => {
-                // If removal was in progress from rewards, re-show rewards
-                if (this._removalFromRewards) {
-                    this._removalFromRewards = false;
-                    if (this.elements.rewardsOverlay) {
-                        this.elements.rewardsOverlay.style.display = 'flex';
-                    }
-                } else if (this._removalFromBoss) {
-                    // Skipped removal — proceed to stage prop selection
-                    this._removalFromBoss = false;
-                    this.hideDeckList();
-                    this.showStagePropSelection(() => {
-                        this.advanceScene();
-                    });
-                    return;
-                }
-                this.hideDeckList();
+                this._handleDeckListClose();
             });
         }
 
@@ -241,22 +226,15 @@ Object.assign(CurtainCallGame.prototype, {
         if (this.elements.deckListOverlay) {
             this.elements.deckListOverlay.addEventListener('click', (e) => {
                 if (e.target === this.elements.deckListOverlay) {
-                    // Same logic as close button
-                    if (this._removalFromRewards) {
-                        this._removalFromRewards = false;
-                        if (this.elements.rewardsOverlay) {
-                            this.elements.rewardsOverlay.style.display = 'flex';
-                        }
-                    } else if (this._removalFromBoss) {
-                        this._removalFromBoss = false;
-                        this.hideDeckList();
-                        this.showStagePropSelection(() => {
-                            this.advanceScene();
-                        });
-                        return;
-                    }
-                    this.hideDeckList();
+                    this._handleDeckListClose();
                 }
+            });
+        }
+
+        // Merchant leave button
+        if (this.elements.merchantLeaveBtn) {
+            this.elements.merchantLeaveBtn.addEventListener('click', () => {
+                this.leaveMerchant();
             });
         }
     },

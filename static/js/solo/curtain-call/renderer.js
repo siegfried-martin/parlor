@@ -503,6 +503,21 @@ Object.assign(CurtainCallGame.prototype, {
         this.showSpeechBubble(text, 'character', targetElement, { offsetY: -30 });
     },
 
+    renderGoldDisplay() {
+        if (this.elements.goldValue) {
+            this.elements.goldValue.textContent = this.gold;
+        }
+        if (this.elements.merchantGoldValue) {
+            this.elements.merchantGoldValue.textContent = this.gold;
+        }
+    },
+
+    showGoldDisplay(visible) {
+        if (this.elements.goldIndicator) {
+            this.elements.goldIndicator.style.display = visible ? 'flex' : 'none';
+        }
+    },
+
     onPuppetTap(puppet) {
         const id = puppet.id;
         console.log('Puppet tapped:', id);

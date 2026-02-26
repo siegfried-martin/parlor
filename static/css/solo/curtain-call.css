@@ -325,8 +325,6 @@
 .curtain-call.game-ui-hidden .enemy-area,
 .curtain-call.game-ui-hidden .stage-area,
 .curtain-call.game-ui-hidden .hand-area,
-.curtain-call.game-ui-hidden .enchantment-strip,
-.curtain-call.game-ui-hidden .stage-prop-strip,
 .curtain-call.game-ui-hidden .stage-edge,
 .curtain-call.game-ui-hidden .controls-area,
 .curtain-call.game-ui-hidden .progress-indicator {
@@ -359,10 +357,16 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     padding: 10px 4px;
     position: relative;
     z-index: 42;
+}
+
+.enemy-main {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
     gap: 6px;
 }
 
@@ -385,7 +389,7 @@
 }
 
 .enemy-sidebar-right {
-    align-items: flex-start;
+    align-items: flex-end;
 }
 
 .enemy-intent {
@@ -1103,32 +1107,31 @@
     padding-right: 8px;
 }
 
-/* === Enchantment Strip === */
+/* === Enchantment Strip (in right enemy sidebar) === */
 .enchantment-strip {
-    flex: 0 0 auto;
     display: flex;
-    gap: 6px;
-    padding: 4px 8px;
-    justify-content: center;
-    z-index: 1;
+    flex-direction: column;
+    gap: 4px;
 }
 
 .enchantment-token {
     display: flex;
     align-items: center;
-    gap: 4px;
-    padding: 3px 8px;
-    border-radius: 12px;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
     font-family: 'IM Fell English', serif;
     font-size: 10px;
     cursor: pointer;
     opacity: 0.9;
-    transition: opacity 0.2s;
+    transition: opacity 0.2s, transform 0.15s;
     border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .enchantment-token:active {
     opacity: 1;
+    transform: scale(1.15);
 }
 
 .enchantment-token.card-aldric {
@@ -1154,10 +1157,7 @@
 }
 
 .enchantment-token__name {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 90px;
+    display: none;
 }
 
 /* === Stage Edge (divider between cards and audience) === */
@@ -2051,6 +2051,72 @@
     );
 }
 
+/* === Prop Zoom Detail Card === */
+.prop-zoom-detail {
+    width: 280px;
+    max-width: 85vw;
+    background: linear-gradient(135deg, #F5E6C8, #E8D4A8);
+    border: 3px solid #8B6914;
+    border-radius: 12px;
+    padding: 24px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    animation: card-zoom-in 0.2s ease-out;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.prop-zoom-detail__icon {
+    font-size: 48px;
+    line-height: 1;
+}
+
+.prop-zoom-detail__name {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: #3A2A18;
+    text-align: center;
+}
+
+.prop-zoom-detail__rule {
+    width: 60%;
+    height: 1px;
+    background: #8B6914;
+    position: relative;
+}
+
+.prop-zoom-detail__rule::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #F5E6C8;
+    border: 1px solid #8B6914;
+}
+
+.prop-zoom-detail__desc {
+    font-family: 'IM Fell English', serif;
+    font-size: 15px;
+    color: #4A3520;
+    text-align: center;
+    line-height: 1.4;
+}
+
+.prop-zoom-detail__badge {
+    font-family: 'Special Elite', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #8B6914;
+    margin-top: 4px;
+}
+
 /* === Audience Bubbles (Keyword Explanations) === */
 
 .audience-bubble {
@@ -2610,15 +2676,8 @@
     line-height: 14px;
 }
 
-/* === Stage Prop Strip === */
-.stage-prop-strip {
-    flex: 0 0 auto;
-    display: flex;
-    gap: 6px;
-    padding: 2px 8px;
-    justify-content: center;
-    z-index: 1;
-}
+/* === Stage Prop Strip (in left enemy sidebar) === */
+/* Layout handled by .enemy-sidebar parent */
 
 .stage-prop-token {
     display: flex;
@@ -2686,4 +2745,333 @@
     font-size: 10px;
     color: #A09070;
     line-height: 1.3;
+}
+
+/* === Gold Indicator === */
+.gold-indicator {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(30, 25, 15, 0.9);
+    padding: 6px 10px;
+    border-radius: 14px;
+    border: 2px solid #D4A030;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.gold-icon {
+    font-size: 14px;
+}
+
+.gold-value {
+    color: #F5D060;
+    min-width: 16px;
+    text-align: center;
+}
+
+/* === Progress Dot Variants === */
+.progress-dot.event {
+    border-radius: 2px;
+    width: 8px;
+    height: 8px;
+}
+
+.progress-dot.merchant {
+    border-radius: 2px;
+    width: 8px;
+    height: 8px;
+    border-color: #D4A030;
+}
+
+.progress-dot.merchant.complete {
+    border-color: var(--hp-green);
+}
+
+.progress-dot.merchant.active {
+    border-color: #F5D060;
+}
+
+/* === Narrative Event — Stage-Based Display === */
+
+/* Hide combat-only UI when an event is active */
+.curtain-call.event-active .enemy-area > * {
+    visibility: hidden;
+}
+.curtain-call.event-active .hand-cards {
+    display: none;
+}
+.curtain-call.event-active .ovation-meter {
+    visibility: hidden;
+}
+/* enchantment-strip and stage-prop-strip are now inside .enemy-area,
+   so .event-active .enemy-area > * { visibility: hidden } covers them */
+.curtain-call.event-active .controls-right {
+    visibility: hidden;
+}
+
+/* Event title — positioned over the enemy area */
+.event-stage-title {
+    position: absolute;
+    top: 80px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: #F5D060;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+    z-index: 35;
+    animation: event-title-in 0.5s ease-out;
+    pointer-events: none;
+}
+
+@keyframes event-title-in {
+    0% { opacity: 0; transform: translateY(-10px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Persistent speech bubbles — override auto-dismiss animation */
+.speech-bubble.event-persistent {
+    animation: event-bubble-in 0.4s ease-out forwards;
+    white-space: normal;
+    max-width: 160px;
+    text-align: center;
+    font-size: 11px;
+    line-height: 1.3;
+    z-index: 52;
+}
+
+@keyframes event-bubble-in {
+    0% { opacity: 0; transform: translateX(-50%) scale(0.8); }
+    100% { opacity: 1; transform: translateX(-50%) scale(1); }
+}
+
+/* Event choice buttons — in the hand area */
+.event-stage-choices {
+    display: flex;
+    gap: 10px;
+    padding: 8px 12px;
+    justify-content: center;
+    align-items: stretch;
+    width: 100%;
+    animation: event-choices-in 0.4s ease-out;
+}
+
+@keyframes event-choices-in {
+    0% { opacity: 0; transform: translateY(15px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+.event-stage-choice {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 10px;
+    border: 2px solid;
+    border-radius: 10px;
+    font-family: 'IM Fell English', serif;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+    text-align: center;
+    min-height: 70px;
+}
+
+.event-stage-choice:active {
+    transform: scale(0.97);
+}
+
+.event-stage-choice:disabled {
+    opacity: 0.5;
+    cursor: default;
+    transform: none;
+}
+
+.event-stage-choice.choice-aldric {
+    background: rgba(245, 176, 65, 0.15);
+    border-color: #C07820;
+    color: #F5D060;
+}
+
+.event-stage-choice.choice-aldric:hover:not(:disabled) {
+    background: rgba(245, 176, 65, 0.3);
+    box-shadow: 0 0 12px rgba(245, 176, 65, 0.2);
+}
+
+.event-stage-choice.choice-pip {
+    background: rgba(231, 76, 60, 0.15);
+    border-color: #A03020;
+    color: #E8A090;
+}
+
+.event-stage-choice.choice-pip:hover:not(:disabled) {
+    background: rgba(231, 76, 60, 0.3);
+    box-shadow: 0 0 12px rgba(231, 76, 60, 0.2);
+}
+
+.event-choice-label {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    font-size: 15px;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.event-choice-desc {
+    font-size: 11px;
+    opacity: 0.8;
+    line-height: 1.3;
+}
+
+/* === Merchant Overlay === */
+.merchant-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 100px;
+    background: rgba(26, 26, 46, 0.97);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    animation: fade-in 0.3s ease-out;
+}
+
+.merchant-content {
+    background: var(--parchment-light);
+    border-radius: 12px;
+    padding: 16px;
+    width: 95%;
+    max-width: 360px;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    overflow-y: auto;
+}
+
+.merchant-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--silhouette-color);
+    margin: 0 0 4px 0;
+}
+
+.merchant-greeting {
+    font-family: 'IM Fell English', serif;
+    font-size: 13px;
+    font-style: italic;
+    color: #6B5A40;
+    margin: 0 0 10px 0;
+    text-align: center;
+}
+
+.merchant-gold {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #D4A030;
+    margin-bottom: 12px;
+}
+
+.merchant-gold .gold-icon {
+    font-size: 16px;
+}
+
+.merchant-items {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.merchant-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: rgba(244, 228, 193, 0.6);
+    border: 1.5px solid #D4C0A0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+}
+
+.merchant-item:hover:not(.sold):not(.unaffordable) {
+    background: rgba(212, 160, 48, 0.15);
+    border-color: #D4A030;
+}
+
+.merchant-item:active:not(.sold):not(.unaffordable) {
+    transform: scale(0.98);
+}
+
+.merchant-item.sold {
+    opacity: 0.4;
+    cursor: default;
+    text-decoration: line-through;
+}
+
+.merchant-item.unaffordable {
+    opacity: 0.5;
+    cursor: default;
+}
+
+.merchant-item-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+    width: 28px;
+    text-align: center;
+}
+
+.merchant-item-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.merchant-item-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: #3D2B1F;
+}
+
+.merchant-item-desc {
+    font-family: 'IM Fell English', serif;
+    font-size: 10px;
+    color: #6B5A40;
+}
+
+.merchant-item-price {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #D4A030;
+    flex-shrink: 0;
+}
+
+.merchant-item-price .gold-icon {
+    font-size: 12px;
+}
+
+.merchant-item.sold .merchant-item-price {
+    text-decoration: line-through;
+}
+
+.merchant-leave-btn {
+    margin-top: 4px;
+    font-size: 14px;
+    padding: 10px 24px;
 }

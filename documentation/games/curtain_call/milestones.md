@@ -13,7 +13,7 @@ _Created: February 25, 2026_
 | M3    | Enchantment Cards                     | M2           | Done   | Persistent combat-duration effects                      |
 | M4    | Expanded Card Pools + Reward Refresh  | M2           | Done   | More cards, synergy depth, reward UX                    |
 | M5    | Stage Props                           | M2           | Done   | Permanent run-duration passives                         |
-| M6    | Currency, Merchant & Narrative Events | M1, M5       |        | Between-combat economy and story beats                  |
+| M6    | Currency, Merchant & Narrative Events | M1, M5       | Done   | Between-combat economy and story beats                  |
 | M7    | Meta-Progression                      | M1, M6       |        | Cross-run unlocks via Ticket currency and unlock tracks |
 | Spike | Card Balance & Additions              | Any          |        | Inserted as needed from playtesting                     |
 

@@ -102,6 +102,18 @@ class CurtainCallGame {
         // Collected stage props (persist across combats within a run)
         this.stageProps = [];
 
+        // Gold currency (earned in combat, spent at merchant)
+        this.gold = 0;
+
+        // Event history (tracks which narrative events have been seen this run)
+        this.eventHistory = [];
+
+        // Modifiers to apply at the start of the next combat
+        this.nextCombatModifiers = {};
+
+        // Merchant purchases (tracks which slots have been bought per act)
+        this.merchantPurchases = [];
+
         // Card zoom / keyword explanation state
         this.zoomedCard = null;
         this.zoomedCardElement = null;
@@ -236,6 +248,18 @@ class CurtainCallGame {
             refreshRewardBtn: document.getElementById('refresh-reward-btn'),
             stagePropStrip: document.getElementById('stage-prop-strip'),
             enchantmentStrip: document.getElementById('enchantment-strip'),
+            // Gold display
+            goldIndicator: document.getElementById('gold-indicator'),
+            goldValue: document.getElementById('gold-value'),
+            // Event (stage-based)
+            eventStageTitle: document.getElementById('event-stage-title'),
+            eventStageChoices: document.getElementById('event-stage-choices'),
+            // Merchant overlay
+            merchantOverlay: document.getElementById('merchant-overlay'),
+            merchantGreeting: document.getElementById('merchant-greeting'),
+            merchantGoldValue: document.getElementById('merchant-gold-value'),
+            merchantItems: document.getElementById('merchant-items'),
+            merchantLeaveBtn: document.getElementById('merchant-leave-btn'),
         };
 
         // Rewards state

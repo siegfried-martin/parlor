@@ -4,6 +4,9 @@
  * Save/load/restore prototype extensions for run persistence.
  * Cards stored as {id, instanceId} — reconstructed from CARD_DEFINITIONS on load.
  *
+ * Version 2: Adds gold, eventHistory, nextCombatModifiers, merchantPurchases.
+ *            Scene index is now 0-4 into NODE_SEQUENCE.
+ *
  * Extends CurtainCallGame.prototype (loaded after game.js).
  */
 
@@ -19,7 +22,7 @@ Object.assign(CurtainCallGame.prototype, {
             cards.map(c => ({ id: c.id, instanceId: c.instanceId }));
 
         return {
-            version: 1,
+            version: 2,
             selectedAldricBasic: this.selectedAldricBasic,
             selectedPipBasic: this.selectedPipBasic,
             runState: { ...this.runState },
@@ -31,7 +34,10 @@ Object.assign(CurtainCallGame.prototype, {
             discardPile: serializeCards(this.discardPile),
             activeEnchantments: serializeCards(this.activeEnchantments),
             stageProps: [...(this.stageProps || [])],
-            gold: 0
+            gold: this.gold || 0,
+            eventHistory: [...(this.eventHistory || [])],
+            nextCombatModifiers: { ...(this.nextCombatModifiers || {}) },
+            merchantPurchases: [...(this.merchantPurchases || [])]
         };
     },
 
@@ -73,9 +79,34 @@ Object.assign(CurtainCallGame.prototype, {
     },
 
     /**
+     * Migrate a v1 payload to v2 format.
+     */
+    _migrateV1toV2(payload) {
+        const scene = payload.runState.currentScene;
+        if (scene === 'boss') {
+            payload.runState.currentScene = 4;
+        } else if (typeof scene === 'number') {
+            // v1: 0 = first combat, 1 = second combat
+            // v2: 0 = combat-0, 2 = combat-1
+            payload.runState.currentScene = scene * 2;
+        }
+        payload.version = 2;
+        payload.gold = payload.gold || 0;
+        payload.eventHistory = [];
+        payload.nextCombatModifiers = {};
+        payload.merchantPurchases = [];
+        return payload;
+    },
+
+    /**
      * Restore game state from a saved payload.
      */
     restoreFromPayload(payload) {
+        // Migrate old saves
+        if (payload.version === 1 || !payload.version) {
+            payload = this._migrateV1toV2(payload);
+        }
+
         // Character choices
         this.selectedAldricBasic = payload.selectedAldricBasic || 'galvanize';
         this.selectedPipBasic = payload.selectedPipBasic || 'quick-jab';
@@ -111,6 +142,12 @@ Object.assign(CurtainCallGame.prototype, {
 
         // Stage props
         this.stageProps = payload.stageProps || [];
+
+        // M6 fields
+        this.gold = payload.gold || 0;
+        this.eventHistory = payload.eventHistory || [];
+        this.nextCombatModifiers = payload.nextCombatModifiers || {};
+        this.merchantPurchases = payload.merchantPurchases || [];
     },
 
     /**

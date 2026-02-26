@@ -417,6 +417,16 @@ Object.assign(CurtainCallGame.prototype, {
     // === Victory / Defeat ====================================================
     // =========================================================================
 
+    calculateGoldReward(isBoss) {
+        let base = isBoss ? 35 : 18;
+        let bonus = 0;
+        if (this.keywords.ovation >= 3) bonus += 5;
+        if (this.keywords.ovation >= 5) bonus += 5;
+        const pct = this.combatState.macguffin.currentHP / this.combatState.macguffin.maxHP;
+        if (pct >= 0.9) bonus += 5;
+        return base + bonus;
+    },
+
     onEnemyDefeated() {
         this.phase = 'reward';
         const enemy = this.combatState.enemy;
@@ -431,6 +441,12 @@ Object.assign(CurtainCallGame.prototype, {
 
         this.elements.enemyPuppet.classList.remove('enemy-idle');
         this.elements.enemyPuppet.classList.add('enemy-defeat');
+
+        // Award gold
+        const goldReward = this.calculateGoldReward(enemy.isBoss);
+        this.gold += goldReward;
+        this.renderGoldDisplay();
+        this.showSpeechBubble(`+${goldReward} Gold`, 'buff', this.elements.macguffin);
 
         // Guaranteed enemy defeat speech
         this.tryEnemySpeech(enemy.id, 'defeat', { guaranteed: true });
