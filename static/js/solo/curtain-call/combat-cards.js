@@ -52,12 +52,33 @@ Object.assign(CurtainCallGame.prototype, {
         const effectiveCost = this.getEffectiveCardCost(card);
         this.energy.current -= effectiveCost;
         this.renderEnergy();
+        if (effectiveCost > 0) {
+            this.events.emit('energySpent', { amount: effectiveCost });
+        }
 
-        // Remove from hand, add to discard
+        // Remove from hand
         const instanceId = card.instanceId;
         this.hand.splice(index, 1);
         delete card.costReduction;
         delete card.damageBonus;
+
+        // Enchantments go to the active enchantments area, not discard
+        if (card.type === 'enchantment') {
+            // Hide played card in DOM and re-index siblings
+            const liveCardEl = this.elements.handCards.querySelector(
+                `.game-card[data-instance-id="${instanceId}"]`
+            );
+            if (liveCardEl) {
+                liveCardEl.style.visibility = 'hidden';
+                liveCardEl.style.pointerEvents = 'none';
+            }
+            this._reindexHandCards();
+            this._debouncedReflow();
+            this.renderDeckCount();
+            this.activateEnchantment(card);
+            return;
+        }
+
         this.discardPile.push(card);
 
         // Hide played card in DOM and re-index siblings
@@ -129,6 +150,11 @@ Object.assign(CurtainCallGame.prototype, {
 
     async executeCardEffects(card, target) {
         this.keywords.cardsPlayedThisTurn++;
+        await this.events.emit('cardPlayed', {
+            card,
+            target,
+            cardsPlayedThisTurn: this.keywords.cardsPlayedThisTurn
+        });
 
         for (const effect of card.effects) {
             switch (effect.type) {
@@ -377,6 +403,171 @@ Object.assign(CurtainCallGame.prototype, {
                         }
                     }
                     this.renderStatusEffects();
+                    await this.wait(200);
+                    break;
+                }
+
+                // === M4 New Effects ===
+
+                // Gain Distract per unique debuff type on enemy (Read the Room)
+                case 'distractPerDebuffType': {
+                    const count = this.getEnemyDebuffCount();
+                    if (count > 0) {
+                        await this.gainDistract(count, card);
+                    }
+                    break;
+                }
+
+                // Gain Luck per unique debuff type on enemy (Catalogue of Woes)
+                case 'luckPerDebuffType': {
+                    const count = this.getEnemyDebuffCount();
+                    if (count > 0) {
+                        this.keywords.luck += count;
+                        this.showSpeechBubble(`Luck +${count}`, 'buff', this.elements.macguffin);
+                        this.renderStatusEffects();
+                    }
+                    await this.wait(200);
+                    break;
+                }
+
+                // Damage per unique debuff type on enemy (Unraveling)
+                case 'damagePerDebuffType': {
+                    const count = this.getEnemyDebuffCount();
+                    const totalDmg = count * effect.perType;
+                    if (totalDmg > 0) {
+                        await this.dealDamageToEnemy(totalDmg, card);
+                    }
+                    break;
+                }
+
+                // Gain Shield equal to Luck (Charmed Life)
+                case 'shieldFromLuck': {
+                    const luck = this.keywords.luck;
+                    if (luck > 0) {
+                        await this.gainShield(luck, card, target);
+                    }
+                    break;
+                }
+
+                // If 5+ Luck, gain 2 Energy + draw 2, lose 3 Luck (Lucky Break)
+                case 'luckyBreak': {
+                    if (this.keywords.luck >= 5) {
+                        this.keywords.luck -= 3;
+                        this.showSpeechBubble('Luck -3', 'debuff', this.elements.macguffin);
+                        this.renderStatusEffects();
+                        await this.gainEnergy(2);
+                        await this.drawCards(2);
+                    } else {
+                        this.showSpeechBubble('Need 5+ Luck!', 'info', this.elements.macguffin);
+                        await this.wait(200);
+                    }
+                    break;
+                }
+
+                // Spend all Luck, deal Luck x multiplier damage (All In)
+                case 'allInLuck': {
+                    const luck = this.keywords.luck;
+                    if (luck > 0) {
+                        this.keywords.luck = 0;
+                        this.showSpeechBubble(`Luck spent: ${luck}`, 'buff', this.elements.macguffin);
+                        this.renderStatusEffects();
+                        const totalDmg = luck * effect.multiplier;
+                        await this.dealDamageToEnemy(totalDmg, card);
+                    } else {
+                        this.showSpeechBubble('No Luck to spend!', 'info', this.elements.macguffin);
+                        await this.wait(200);
+                    }
+                    break;
+                }
+
+                // Gain 1 Ovation per Taunt stack on card owner (Defiant Roar, Unyielding)
+                case 'ovationFromTaunt': {
+                    const protagonist = card.owner;
+                    const taunt = (protagonist !== 'macguffin' && this.combatState[protagonist])
+                        ? this.combatState[protagonist].taunt : 0;
+                    if (taunt > 0) {
+                        this.gainOvation(taunt);
+                        this.showSpeechBubble(`Ovation +${taunt}`, 'buff', this.elements.macguffin);
+                    }
+                    await this.wait(200);
+                    break;
+                }
+
+                // Gain Shield equal to Taunt x multiplier (Immovable)
+                case 'shieldFromTaunt': {
+                    const protagonist = card.owner;
+                    const taunt = (protagonist !== 'macguffin' && this.combatState[protagonist])
+                        ? this.combatState[protagonist].taunt : 0;
+                    const shieldAmt = taunt * (effect.multiplier || 1);
+                    if (shieldAmt > 0) {
+                        await this.gainShield(shieldAmt, card, target || protagonist);
+                    }
+                    break;
+                }
+
+                // Convert all Block into Ovation (Rousing Recital)
+                case 'convertBlockToOvation': {
+                    const block = this.combatState.block;
+                    if (block > 0) {
+                        this.combatState.block = 0;
+                        this.renderMacGuffinBlock();
+                        const ovGain = Math.min(block, 5 - this.keywords.ovation);
+                        if (ovGain > 0) {
+                            this.gainOvation(ovGain);
+                        }
+                        this.showSpeechBubble(`Block → Ovation +${ovGain}`, 'buff', this.elements.macguffin);
+                    }
+                    await this.wait(200);
+                    break;
+                }
+
+                // Gain Retaliate equal to Fortify (Sworn Protector)
+                case 'retaliateFromFortify': {
+                    const fort = this.keywords.fortify;
+                    if (fort > 0) {
+                        await this.gainRetaliate(fort, card);
+                    }
+                    break;
+                }
+
+                // M7: Gain Ovation directly
+                case 'ovation':
+                    this.gainOvation(effect.value);
+                    await this.wait(200);
+                    break;
+
+                // M7: Set Ovation to exact value
+                case 'setOvation':
+                    this.keywords.ovation = Math.min(5, effect.value);
+                    this.renderOvationMeter();
+                    this.renderStatusEffects();
+                    this.showSpeechBubble(`Ovation = ${this.keywords.ovation}!`, 'buff', this.elements.macguffin);
+                    await this.wait(200);
+                    break;
+
+                // M7: Self-inflict Curse on MacGuffin
+                case 'selfCurse':
+                    this.keywords.curse += effect.value;
+                    this.showSpeechBubble(`Curse +${effect.value}`, 'debuff', this.elements.macguffin);
+                    this.renderStatusEffects();
+                    await this.wait(200);
+                    break;
+
+                // M7: Heal target protagonist
+                case 'heal': {
+                    const healTarget = target || card.owner;
+                    if (healTarget !== 'macguffin') {
+                        const state = this.combatState[healTarget];
+                        if (state && !state.knockedOut) {
+                            const oldHP = state.currentHP;
+                            state.currentHP = Math.min(state.maxHP, state.currentHP + effect.value);
+                            const healed = state.currentHP - oldHP;
+                            if (healed > 0) {
+                                this.showHealBubble(healed, this.getTargetElement(healTarget));
+                                this.renderProtagonistHP(healTarget);
+                            }
+                        }
+                    }
                     await this.wait(200);
                     break;
                 }

@@ -47,6 +47,16 @@ Object.assign(CurtainCallGame.prototype, {
                 found.add('burn');
                 found.add('poison');
             }
+            // M4 debuff-scaling effects
+            if (effect.type === 'distractPerDebuffType') found.add('distract');
+            if (effect.type === 'luckPerDebuffType') found.add('luck');
+            if (effect.type === 'shieldFromLuck') { found.add('shield'); found.add('luck'); }
+            if (effect.type === 'luckyBreak') found.add('luck');
+            if (effect.type === 'allInLuck') found.add('luck');
+            if (effect.type === 'ovationFromTaunt') { found.add('ovation'); found.add('taunt'); }
+            if (effect.type === 'shieldFromTaunt') { found.add('shield'); found.add('taunt'); }
+            if (effect.type === 'convertBlockToOvation') { found.add('block'); found.add('ovation'); }
+            if (effect.type === 'retaliateFromFortify') { found.add('retaliate'); found.add('fortify'); }
         }
 
         // Only return keywords that exist in the glossary
@@ -228,24 +238,18 @@ Object.assign(CurtainCallGame.prototype, {
      */
     showRewardsScreen(type) {
         if (!type) type = 'normal';
+        this._rewardType = type;
+        this._rewardRefreshesLeft = 1;
+        this._rewardSeenIds = new Set();
 
+        // Boss reward starts the 3-phase boss reward flow
         if (type === 'boss') {
-            // 2 uncommon (1 per protagonist) + 1 rare (random protagonist)
-            const rarePool = Math.random() < 0.5 ? 'aldric' : 'pip';
-            this.rewardOptions = [
-                this.getRandomCardByRarity('aldric', 'uncommon'),
-                this.getRandomCardByRarity('pip', 'uncommon'),
-                this.getRandomCardByRarity(rarePool, 'rare')
-            ];
+            this._bossRewardPhase = 'card';
         } else {
-            // 3 uncommon (1 Aldric, 1 Pip, 1 from random pool)
-            const bonusPool = Math.random() < 0.5 ? 'aldric' : 'pip';
-            this.rewardOptions = [
-                this.getRandomCardByRarity('aldric', 'uncommon'),
-                this.getRandomCardByRarity('pip', 'uncommon'),
-                this.getRandomCardByRarity(bonusPool, 'uncommon')
-            ];
+            this._bossRewardPhase = null;
         }
+
+        this._generateRewardOptions(type);
 
         this.selectedRewardIndex = null;
 
@@ -260,6 +264,102 @@ Object.assign(CurtainCallGame.prototype, {
         // Reset button state
         if (this.elements.confirmRewardBtn) {
             this.elements.confirmRewardBtn.disabled = true;
+        }
+
+        // Reset refresh button
+        this._updateRefreshButton();
+    },
+
+    _generateRewardOptions(type) {
+        if (type === 'boss') {
+            const rarePool = Math.random() < 0.5 ? 'aldric' : 'pip';
+            this.rewardOptions = [
+                this._getUniqueRewardCard('aldric', 'uncommon'),
+                this._getUniqueRewardCard('pip', 'uncommon'),
+                this._getUniqueRewardCard(rarePool, 'rare')
+            ];
+        } else {
+            const bonusPool = Math.random() < 0.5 ? 'aldric' : 'pip';
+            this.rewardOptions = [
+                this._getUniqueRewardCard('aldric', 'uncommon'),
+                this._getUniqueRewardCard('pip', 'uncommon'),
+                this._getUniqueRewardCard(bonusPool, 'uncommon')
+            ];
+        }
+
+        // Track seen IDs
+        for (const card of this.rewardOptions) {
+            if (card) this._rewardSeenIds.add(card.id);
+        }
+    },
+
+    _getUniqueRewardCard(pool, rarity) {
+        const ids = CARD_POOLS_BY_RARITY[pool]?.[rarity];
+        if (!ids || ids.length === 0) return null;
+
+        // Filter out already-seen cards
+        const available = ids.filter(id => !this._rewardSeenIds?.has(id));
+        const source = available.length > 0 ? available : ids;
+
+        const randomId = source[Math.floor(Math.random() * source.length)];
+        return { ...CARD_DEFINITIONS[randomId] };
+    },
+
+    refreshRewards() {
+        const PAID_REFRESH_COST = 10;
+
+        // Free refreshes available
+        if (this._rewardRefreshesLeft > 0) {
+            this._rewardRefreshesLeft--;
+        } else if (this.gold >= PAID_REFRESH_COST) {
+            // Paid refresh
+            this.gold -= PAID_REFRESH_COST;
+            this.renderGoldDisplay();
+            this.showSpeechBubble(`-${PAID_REFRESH_COST} Gold`, 'damage', this.elements.macguffin);
+        } else {
+            // Can't afford
+            return;
+        }
+
+        // Clear selection
+        this.selectedRewardIndex = null;
+        this.clearExplanationBubbles();
+        if (this.elements.confirmRewardBtn) {
+            this.elements.confirmRewardBtn.disabled = true;
+        }
+
+        // Animate cards out, generate new, animate in
+        const container = this.elements.rewardsCards;
+        if (container) {
+            container.classList.add('refreshing');
+            setTimeout(() => {
+                this._generateRewardOptions(this._rewardType === 'merchant-rare' ? 'boss' : this._rewardType);
+                this.renderRewardCards();
+                container.classList.remove('refreshing');
+                container.classList.add('refresh-enter');
+                setTimeout(() => {
+                    container.classList.remove('refresh-enter');
+                }, 400);
+            }, 300);
+        }
+
+        // Update refresh button
+        this._updateRefreshButton();
+    },
+
+    _updateRefreshButton() {
+        const PAID_REFRESH_COST = 10;
+        if (this.elements.refreshRewardBtn) {
+            if (this._rewardRefreshesLeft > 0) {
+                this.elements.refreshRewardBtn.disabled = false;
+                this.elements.refreshRewardBtn.textContent = `Refresh (${this._rewardRefreshesLeft})`;
+            } else if (this.gold >= PAID_REFRESH_COST) {
+                this.elements.refreshRewardBtn.disabled = false;
+                this.elements.refreshRewardBtn.textContent = `Refresh (\uD83E\uDE99${PAID_REFRESH_COST})`;
+            } else {
+                this.elements.refreshRewardBtn.disabled = true;
+                this.elements.refreshRewardBtn.textContent = `Refresh (\uD83E\uDE99${PAID_REFRESH_COST})`;
+            }
         }
     },
 
@@ -340,10 +440,23 @@ Object.assign(CurtainCallGame.prototype, {
         this.rewardOptions = [];
         this.selectedRewardIndex = null;
 
-        // Opening reward goes to scene select; combat rewards advance the scene
+        // Route based on where the reward was triggered from
         if (this._openingReward) {
             this._openingReward = false;
             this.showSceneSelection();
+        } else if (this._bossRewardPhase === 'card') {
+            // Boss reward phase 2: card removal
+            this._bossRewardPhase = 'removal';
+            this._removalFromBoss = true;
+            this.showDeckList('remove');
+        } else if (this._merchantReward) {
+            // Return to merchant after merchant card purchase
+            this._merchantReward = false;
+            this.returnToMerchant();
+        } else if (this._eventReward) {
+            // Event card reward — advance scene
+            this._eventReward = false;
+            this.advanceScene();
         } else {
             this.advanceScene();
         }
@@ -407,7 +520,11 @@ Object.assign(CurtainCallGame.prototype, {
             row.dataset.deckIndex = idx;
 
             if (mode === 'remove') {
-                row.classList.add('removable');
+                if (card.unremovable) {
+                    row.classList.add('unremovable');
+                } else {
+                    row.classList.add('removable');
+                }
             }
 
             // Energy cost blips
@@ -453,7 +570,7 @@ Object.assign(CurtainCallGame.prototype, {
             }
 
             // Click handler for removal mode
-            if (mode === 'remove') {
+            if (mode === 'remove' && !card.unremovable) {
                 row.addEventListener('click', () => {
                     this.selectCardForRemoval(idx);
                 });
@@ -480,7 +597,7 @@ Object.assign(CurtainCallGame.prototype, {
                 const cancelBtn = document.createElement('button');
                 cancelBtn.className = 'rewards-btn skip-btn';
                 cancelBtn.textContent = 'Cancel';
-                cancelBtn.addEventListener('click', () => this.hideDeckList());
+                cancelBtn.addEventListener('click', () => this._handleDeckListClose());
                 footer.appendChild(cancelBtn);
 
                 const countSpan = document.createElement('div');
@@ -508,6 +625,37 @@ Object.assign(CurtainCallGame.prototype, {
         this._deckListMode = null;
         this._removalSelectedIndex = null;
         this._deckListAllCards = null;
+    },
+
+    /**
+     * Handle deck list close/cancel from various contexts.
+     */
+    _handleDeckListClose() {
+        if (this._removalFromRewards) {
+            this._removalFromRewards = false;
+            this.hideDeckList();
+            if (this.elements.rewardsOverlay) {
+                this.elements.rewardsOverlay.style.display = 'flex';
+            }
+        } else if (this._removalFromBoss) {
+            this._removalFromBoss = false;
+            this.hideDeckList();
+            this.showStagePropSelection(() => {
+                this.advanceScene();
+            });
+        } else if (this._removalFromMerchant) {
+            // Cancelled removal from merchant — return to merchant
+            this._removalFromMerchant = false;
+            this.hideDeckList();
+            this.returnToMerchant();
+        } else if (this._removalFromEvent) {
+            // Cancelled removal from event — advance scene
+            this._removalFromEvent = false;
+            this.hideDeckList();
+            this.advanceScene();
+        } else {
+            this.hideDeckList();
+        }
     },
 
     selectCardForRemoval(idx) {
@@ -575,6 +723,20 @@ Object.assign(CurtainCallGame.prototype, {
         if (this._removalFromRewards) {
             this._removalFromRewards = false;
             this.hideRewardsScreen();
+        } else if (this._removalFromBoss) {
+            this._removalFromBoss = false;
+            // Boss reward phase 3: stage prop selection
+            this.showStagePropSelection(() => {
+                this.advanceScene();
+            });
+        } else if (this._removalFromMerchant) {
+            // Return to merchant after merchant card shredder
+            this._removalFromMerchant = false;
+            this.returnToMerchant();
+        } else if (this._removalFromEvent) {
+            // Event card removal — advance scene
+            this._removalFromEvent = false;
+            this.advanceScene();
         }
     },
 
@@ -599,10 +761,141 @@ Object.assign(CurtainCallGame.prototype, {
             this.elements.characterSelect.style.display = 'none';
         }
 
-        // Bind button (use onclick to avoid duplicate listeners)
-        if (this.elements.newPerformanceBtn) {
-            this.elements.newPerformanceBtn.onclick = () => this.showCharacterSelect();
+        const loginSection = document.getElementById('title-login');
+        const actionsSection = document.getElementById('title-actions');
+        const usernameInput = document.getElementById('title-username');
+        const loginBtn = document.getElementById('title-login-btn');
+
+        // If already logged in, show actions directly
+        if (this.username) {
+            if (loginSection) loginSection.style.display = 'none';
+            this._showTitleActions();
+            return;
         }
+
+        // Show login, hide actions
+        if (loginSection) loginSection.style.display = '';
+        if (actionsSection) actionsSection.style.display = 'none';
+
+        // Auto-fill suggested username
+        if (usernameInput && this._suggestedUsername) {
+            usernameInput.value = this._suggestedUsername;
+        }
+
+        // Focus the input
+        if (usernameInput) {
+            setTimeout(() => usernameInput.focus(), 100);
+        }
+
+        // Bind login button
+        const doLogin = async () => {
+            const name = usernameInput?.value?.trim();
+            if (!name) return;
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'Loading...';
+            await this.loginUser(name);
+            loginBtn.disabled = false;
+            loginBtn.textContent = 'Enter';
+            if (loginSection) loginSection.style.display = 'none';
+            this._showTitleActions();
+        };
+
+        if (loginBtn) {
+            loginBtn.onclick = doLogin;
+        }
+        if (usernameInput) {
+            usernameInput.onkeydown = (e) => {
+                if (e.key === 'Enter') doLogin();
+            };
+        }
+    },
+
+    /**
+     * Show the title screen action buttons (after login).
+     */
+    _showTitleActions() {
+        const actionsSection = document.getElementById('title-actions');
+        if (actionsSection) actionsSection.style.display = '';
+
+        // Welcome message
+        const welcome = document.getElementById('title-welcome');
+        if (welcome) {
+            welcome.textContent = `Welcome, ${this.username}`;
+        }
+
+        // Show/hide continue button based on saved run data
+        if (this.elements.continuePerformanceBtn) {
+            if (this._savedRunData) {
+                this.elements.continuePerformanceBtn.style.display = '';
+                this.elements.continuePerformanceBtn.onclick = () => this.continuePerformance();
+            } else {
+                this.elements.continuePerformanceBtn.style.display = 'none';
+            }
+        }
+
+        // Bind "New Performance" — abandon existing run first if present
+        if (this.elements.newPerformanceBtn) {
+            this.elements.newPerformanceBtn.onclick = () => {
+                if (this._savedRunData) {
+                    this.abandonRun();
+                    this._savedRunData = null;
+                }
+                this.showCharacterSelect();
+            };
+        }
+
+        // M7: Update ticket display and bind Backstage button
+        this._updateTitleTickets();
+        const backstageBtn = document.getElementById('backstage-btn');
+        if (backstageBtn) {
+            backstageBtn.onclick = () => this.showBackstage();
+        }
+
+        // Switch user button
+        const logoutBtn = document.getElementById('title-logout-btn');
+        if (logoutBtn) {
+            logoutBtn.onclick = () => {
+                this.username = '';
+                this._savedRunData = null;
+                localStorage.removeItem('curtainCallUsername');
+                localStorage.removeItem('curtainCallRunId');
+                this.metaState = { tickets: 0, unlocks: {}, achievements: [], history: [] };
+                this.showTitleScreen();
+            };
+        }
+    },
+
+    continuePerformance() {
+        if (!this._savedRunData) return;
+
+        // Hide title screen
+        if (this.elements.titleScreen) {
+            this.elements.titleScreen.style.display = 'none';
+        }
+
+        // Restore state from payload
+        this.restoreFromPayload(this._savedRunData);
+        this._savedRunData = null;
+
+        // M7: Apply difficulty energy cap for continued runs
+        const diffDef = DIFFICULTY_DEFINITIONS[this.difficulty] || DIFFICULTY_DEFINITIONS[0];
+        this.energy.max = diffDef.maxEnergy;
+
+        // Show game UI behind closed curtains
+        this.elements.container.classList.remove('game-ui-hidden');
+
+        // Initialize animations and voice lines
+        this.initializeAnimations();
+        this.initVoiceLines();
+
+        // Update progress indicator and combat state display
+        this.updateProgressIndicator();
+        this.renderCombatState();
+        this.renderStageProps();
+        this.renderGoldDisplay();
+
+        // Route to the current node
+        this.routeToNode(NODE_SEQUENCE[this.runState.currentScene]);
     },
 
     showCharacterSelect() {
@@ -614,6 +907,9 @@ Object.assign(CurtainCallGame.prototype, {
         if (this.elements.characterSelect) {
             this.elements.characterSelect.style.display = 'flex';
         }
+
+        // M7: Render dynamic basic options from BASIC_OPTIONS
+        this._renderDynamicBasics();
 
         // Bind basic card selection (radio-style per protagonist)
         const attackOptions = document.querySelectorAll('.cs-attack-option');
@@ -629,9 +925,86 @@ Object.assign(CurtainCallGame.prototype, {
             };
         });
 
+        // M7: Render MacGuffin variant picker
+        this._renderMacGuffinPicker();
+
+        // M7: Show difficulty badge
+        this._renderDifficultyBadge();
+
         // Bind button
         if (this.elements.raiseCurtainBtn) {
             this.elements.raiseCurtainBtn.onclick = () => this.startPerformance();
+        }
+    },
+
+    _renderDynamicBasics() {
+        for (const protagonist of ['aldric', 'pip']) {
+            const card = document.querySelector(`.cs-card[data-protagonist="${protagonist}"]`);
+            if (!card) continue;
+            const attacksContainer = card.querySelector('.cs-attacks');
+            if (!attacksContainer) continue;
+
+            const options = BASIC_OPTIONS[protagonist] || [];
+            // Keep the label, rebuild options
+            const label = attacksContainer.querySelector('.cs-attack-label');
+            attacksContainer.innerHTML = '';
+            if (label) attacksContainer.appendChild(label);
+
+            options.forEach((cardId, index) => {
+                const cardDef = CARD_DEFINITIONS[cardId];
+                if (!cardDef) return;
+
+                const el = document.createElement('div');
+                el.className = 'cs-attack-option' + (index === 0 ? ' selected' : '');
+                el.dataset.card = cardId;
+                el.textContent = `${cardDef.name} (${cardDef.description})`;
+                attacksContainer.appendChild(el);
+            });
+        }
+    },
+
+    _renderMacGuffinPicker() {
+        const container = document.getElementById('cs-macguffin-options');
+        if (!container) return;
+
+        const unlocked = this.getUnlockedMacGuffins();
+        container.innerHTML = '';
+
+        for (const variantId of unlocked) {
+            const variant = MACGUFFIN_VARIANTS[variantId];
+            if (!variant) continue;
+
+            const el = document.createElement('div');
+            el.className = 'cs-macguffin-option' + (variantId === 'treasure-chest' ? ' selected' : '');
+            el.dataset.macguffin = variantId;
+            el.title = `${variant.name}: ${variant.description} (${variant.hp} HP)`;
+            el.innerHTML = `<span class="cs-macguffin-icon">${variant.icon}</span><span class="cs-macguffin-name">${variant.name}</span>`;
+
+            el.addEventListener('click', () => {
+                container.querySelectorAll('.cs-macguffin-option').forEach(o => o.classList.remove('selected'));
+                el.classList.add('selected');
+            });
+
+            container.appendChild(el);
+        }
+
+        // Hide section if only default available
+        const section = document.getElementById('cs-macguffin-section');
+        if (section) {
+            section.style.display = unlocked.length > 1 ? '' : 'none';
+        }
+    },
+
+    _renderDifficultyBadge() {
+        const badge = document.getElementById('cs-difficulty-badge');
+        if (!badge) return;
+
+        const diffDef = DIFFICULTY_DEFINITIONS[this.difficulty] || DIFFICULTY_DEFINITIONS[0];
+        if (this.difficulty > 0) {
+            badge.textContent = `${diffDef.icon} ${diffDef.name}`;
+            badge.style.display = '';
+        } else {
+            badge.style.display = 'none';
         }
     },
 
@@ -643,10 +1016,33 @@ Object.assign(CurtainCallGame.prototype, {
         this.selectedAldricBasic = aldricOption?.dataset.card || 'galvanize';
         this.selectedPipBasic = pipOption?.dataset.card || 'quick-jab';
 
-        console.log(`Starting deck: ${this.selectedAldricBasic} + ${this.selectedPipBasic}`);
+        // M7: Read selected MacGuffin variant
+        const macguffinOption = document.querySelector('.cs-macguffin-option.selected');
+        this.selectedMacGuffin = macguffinOption?.dataset.macguffin || 'treasure-chest';
+        const variant = MACGUFFIN_VARIANTS[this.selectedMacGuffin] || MACGUFFIN_VARIANTS['treasure-chest'];
 
-        // Rebuild deck with selections
-        this.initializeDeck();
+        console.log(`Starting deck: ${this.selectedAldricBasic} + ${this.selectedPipBasic}, MacGuffin: ${variant.name}`);
+
+        // Start new persistence run
+        this.startNewRun();
+
+        // M7: Apply MacGuffin variant HP
+        this.combatState.macguffin.maxHP = variant.hp;
+        this.combatState.macguffin.currentHP = variant.hp;
+
+        // M7: Build starting deck with variant starting cards
+        const deckIds = [
+            this.selectedAldricBasic, this.selectedAldricBasic, this.selectedAldricBasic,
+            this.selectedPipBasic, this.selectedPipBasic, this.selectedPipBasic,
+            ...variant.startingCards
+        ];
+        this.deck = deckIds.map((cardId, index) => ({
+            ...CARD_DEFINITIONS[cardId],
+            instanceId: `${cardId}-${index}`
+        }));
+        this.shuffleDeck();
+        this.hand = [];
+        this.discardPile = [];
 
         // Reset run state to Act 1 scene 0
         this.runState = {
@@ -654,6 +1050,32 @@ Object.assign(CurtainCallGame.prototype, {
             currentScene: 0,
             phase: 'scene-select'
         };
+
+        // Reset M6 state
+        this.gold = 0;
+        this.eventHistory = [];
+        this.nextCombatModifiers = {};
+        this.merchantPurchases = [];
+
+        // M7: Reset run stats
+        this.runStats = {
+            actsCompleted: 0,
+            bossesDefeated: [],
+            maxOvationReached: 0,
+            maxEnemyDebuffTypes: 0,
+            flawlessBoss: false,
+            finalGold: 0,
+            result: 'defeat',
+            macguffinId: this.selectedMacGuffin,
+            difficulty: this.difficulty || 0,
+            aldricBasic: this.selectedAldricBasic,
+            pipBasic: this.selectedPipBasic
+        };
+
+        // M7: Apply difficulty energy cap
+        const diffDef = DIFFICULTY_DEFINITIONS[this.difficulty] || DIFFICULTY_DEFINITIONS[0];
+        this.energy.max = diffDef.maxEnergy;
+        this.energy.current = diffDef.maxEnergy;
 
         // Hide character select
         if (this.elements.characterSelect) {

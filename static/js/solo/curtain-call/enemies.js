@@ -486,6 +486,9 @@ const ENEMY_DEFINITIONS = {
     }
 };
 
+// === Node Sequence (per act) ===
+const NODE_SEQUENCE = ['combat-0', 'event', 'combat-1', 'merchant', 'boss'];
+
 // === Act Structure ===
 const ACT_STRUCTURE = {
     1: {

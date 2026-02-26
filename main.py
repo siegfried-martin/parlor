@@ -18,6 +18,7 @@ from games.base import BaseGame, Player
 from games.rps import RockPaperScissors
 from games.image_reveal import ImageReveal
 from games.event_dash import EventDash
+from persistence import init_db, close_db, router as persistence_router
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -47,14 +48,17 @@ cleanup_tasks: dict[str, asyncio.Task] = {}
 async def lifespan(app: FastAPI):
     """Application lifespan handler."""
     logger.info("Parlor starting up...")
+    init_db()
     yield
     logger.info("Parlor shutting down...")
+    close_db()
     # Cancel any pending cleanup tasks
     for task in cleanup_tasks.values():
         task.cancel()
 
 
 app = FastAPI(title="Parlor", lifespan=lifespan)
+app.include_router(persistence_router)
 
 # Mount static files
 app.mount("/static", StaticFiles(directory="static"), name="static")

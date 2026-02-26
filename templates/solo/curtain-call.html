@@ -186,7 +186,20 @@
                 <h1 class="title-name">Curtain Call</h1>
                 <div class="title-subtitle">A Shadow Puppet Deck-Builder</div>
             </div>
-            <button class="title-btn" id="new-performance-btn">New Performance</button>
+            <!-- Username input (shown first, hides after login) -->
+            <div class="title-login" id="title-login">
+                <input type="text" class="title-username-input" id="title-username" placeholder="Enter your name..." maxlength="20" autocomplete="off">
+                <button class="title-btn" id="title-login-btn">Enter</button>
+            </div>
+            <!-- Game buttons (shown after username entered) -->
+            <div class="title-actions" id="title-actions" style="display: none;">
+                <div class="title-welcome" id="title-welcome"></div>
+                <div class="title-tickets" id="title-tickets"><span class="ticket-icon">🎫</span> <span id="title-ticket-count">0</span></div>
+                <button class="title-btn" id="continue-performance-btn" style="display: none;">Continue Performance</button>
+                <button class="title-btn" id="new-performance-btn">New Performance</button>
+                <button class="title-btn title-btn-secondary" id="backstage-btn">Backstage</button>
+                <button class="title-btn title-btn-tertiary" id="title-logout-btn">Switch User</button>
+            </div>
         </div>
     </div>
 
@@ -225,6 +238,17 @@
                 </div>
             </div>
 
+            <!-- MacGuffin Variant Picker -->
+            <div class="cs-macguffin-section" id="cs-macguffin-section">
+                <div class="cs-macguffin-label">MacGuffin</div>
+                <div class="cs-macguffin-options" id="cs-macguffin-options">
+                    <!-- Rendered dynamically -->
+                </div>
+            </div>
+
+            <!-- Difficulty Badge -->
+            <div class="cs-difficulty-badge" id="cs-difficulty-badge"></div>
+
             <button class="title-btn" id="raise-curtain-btn">Raise the Curtain</button>
         </div>
     </div>
@@ -253,6 +277,7 @@
             <div class="rewards-buttons">
                 <button class="rewards-btn confirm-btn" id="confirm-reward-btn" disabled>Add to Deck</button>
                 <button class="rewards-btn skip-btn" id="skip-reward-btn">Skip</button>
+                <button class="rewards-btn refresh-btn" id="refresh-reward-btn">Refresh</button>
             </div>
             <div class="rewards-cards" id="rewards-cards">
                 <!-- Reward cards rendered here -->
@@ -274,24 +299,79 @@
         </div>
     </div>
 
+    <!-- Event Stage Title (positioned over enemy area during events) -->
+    <div class="event-stage-title" id="event-stage-title" style="display: none;"></div>
+
+    <!-- Run Summary Overlay (end-of-run) -->
+    <div class="run-summary-overlay" id="run-summary-overlay" style="display: none;">
+        <div class="run-summary-content">
+            <h2 class="run-summary-title">Performance Complete!</h2>
+            <div class="run-summary-stats"></div>
+            <div class="run-summary-tickets"></div>
+            <div class="run-summary-achievements"></div>
+            <button class="title-btn run-summary-btn" onclick="game.hideEndOfRunSummary()">Return to Title</button>
+        </div>
+    </div>
+
+    <!-- Backstage Overlay -->
+    <div class="backstage-overlay" id="backstage-overlay" style="display: none;">
+        <div class="backstage-content">
+            <div class="backstage-header">
+                <h2 class="backstage-title">Backstage</h2>
+                <div class="backstage-tickets"><span class="ticket-icon">🎫</span> <span id="backstage-ticket-count">0</span></div>
+                <button class="backstage-close" id="backstage-close">&times;</button>
+            </div>
+            <div class="backstage-tabs">
+                <button class="backstage-tab active" data-tab="unlocks">Unlocks</button>
+                <button class="backstage-tab" data-tab="achievements">Achievements</button>
+                <button class="backstage-tab" data-tab="history">History</button>
+                <button class="backstage-tab" data-tab="difficulty">Difficulty</button>
+            </div>
+            <div class="backstage-body" id="backstage-body"></div>
+        </div>
+    </div>
+
+    <!-- Merchant Overlay -->
+    <div class="merchant-overlay" id="merchant-overlay" style="display: none;">
+        <div class="merchant-content">
+            <h2 class="merchant-title">Gertie's Grip Shop</h2>
+            <p class="merchant-greeting" id="merchant-greeting">Need somethin' before the next scene, dearies?</p>
+            <div class="merchant-gold">
+                <span class="gold-icon">&#x1FA99;</span>
+                <span class="merchant-gold-value" id="merchant-gold-value">0</span>
+            </div>
+            <div class="merchant-items" id="merchant-items"></div>
+            <button class="title-btn merchant-leave-btn" id="merchant-leave-btn">Leave Shop</button>
+        </div>
+    </div>
+
     <!-- Enemy Area (~25% of screen) -->
     <div class="enemy-area">
-        <div class="enemy-sidebar enemy-sidebar-left">
-            <div class="enemy-intent intent-attack">
-                <img src="/static/svg/intent-attack.svg" alt="Attack" class="intent-icon" id="intent-icon">
-                <span class="intent-value intent-attack">7</span>
+        <!-- Left edge: Stage Props -->
+        <div class="enemy-sidebar enemy-sidebar-left" id="stage-prop-strip"></div>
+
+        <!-- Center group: Enemy + status modifiers -->
+        <div class="enemy-main">
+            <div class="enemy-center">
+                <div class="enemy-intent intent-attack">
+                    <img src="/static/svg/intent-attack.svg" alt="Attack" class="intent-icon" id="intent-icon">
+                    <span class="intent-value intent-attack">7</span>
+                </div>
+                <div class="enemy-puppet enemy-idle" id="enemy-puppet">
+                    <img src="/static/svg/enemy-placeholder.svg" alt="Enemy" class="puppet-svg enemy-svg">
+                </div>
+                <div class="enemy-hp-bar">
+                    <div class="hp-fill" style="width: 100%;"></div>
+                    <span class="hp-text">28/28</span>
+                </div>
             </div>
+            <div id="enemy-modifiers"></div>
         </div>
-        <div class="enemy-center">
-            <div class="enemy-puppet enemy-idle" id="enemy-puppet">
-                <img src="/static/svg/enemy-placeholder.svg" alt="Enemy" class="puppet-svg enemy-svg">
-            </div>
-            <div class="enemy-hp-bar">
-                <div class="hp-fill" style="width: 100%;"></div>
-                <span class="hp-text">28/28</span>
-            </div>
+
+        <!-- Right edge: Enchantments -->
+        <div class="enemy-sidebar enemy-sidebar-right">
+            <div class="enchantment-strip" id="enchantment-strip" style="display: none;"></div>
         </div>
-        <div class="enemy-sidebar enemy-sidebar-right" id="enemy-modifiers"></div>
     </div>
 
     <!-- Stage Area (~30% of screen) -->
@@ -342,6 +422,7 @@
         <div class="hand-cards" id="hand-cards">
             <!-- Cards are rendered dynamically by game.js -->
         </div>
+        <div class="event-stage-choices" id="event-stage-choices" style="display: none;"></div>
     </div>
 
     <!-- Stage Edge (divider) -->
@@ -355,6 +436,10 @@
         <!-- Energy, Deck Count, and End Turn -->
         <div class="controls-right">
             <div class="controls-top-row">
+                <div class="gold-indicator" id="gold-indicator" style="display: none;">
+                    <span class="gold-icon">&#x1FA99;</span>
+                    <span class="gold-value" id="gold-value">0</span>
+                </div>
                 <div class="energy-indicator">
                     <span class="energy-icon">&#x26A1;</span>
                     <span class="energy-value">3</span>
@@ -378,6 +463,8 @@
 <script src="/static/js/solo/curtain-call/config/enemy-speech.js"></script>
 <script src="/static/js/solo/curtain-call/config/protagonist-speech.js"></script>
 <script src="/static/js/solo/curtain-call/config/crowd-speech.js"></script>
+<!-- Event bus (no dependencies) -->
+<script src="/static/js/solo/curtain-call/event-bus.js"></script>
 <!-- Data files (no dependencies) -->
 <script src="/static/js/solo/curtain-call/cards.js"></script>
 <script src="/static/js/solo/curtain-call/enemies.js"></script>
@@ -387,6 +474,7 @@
 <script src="/static/js/solo/curtain-call/combat-turns.js"></script>
 <script src="/static/js/solo/curtain-call/combat-enemy.js"></script>
 <script src="/static/js/solo/curtain-call/combat-cards.js"></script>
+<script src="/static/js/solo/curtain-call/combat-enchantments.js"></script>
 <script src="/static/js/solo/curtain-call/combat-keywords.js"></script>
 <!-- Rendering -->
 <script src="/static/js/solo/curtain-call/renderer-cards.js"></script>
@@ -398,6 +486,17 @@
 <!-- Audience: data + animations + speech -->
 <script src="/static/js/solo/curtain-call/audience.js"></script>
 <script src="/static/js/solo/curtain-call/audience-speech.js"></script>
+<!-- Stage Props -->
+<script src="/static/js/solo/curtain-call/stage-props.js"></script>
+<!-- Narrative Events & Merchant -->
+<script src="/static/js/solo/curtain-call/narrative-events.js"></script>
+<script src="/static/js/solo/curtain-call/merchant.js"></script>
+<!-- Persistence -->
+<script src="/static/js/solo/curtain-call/persistence.js"></script>
+<!-- M7 Meta-Progression -->
+<script src="/static/js/solo/curtain-call/meta-data.js"></script>
+<script src="/static/js/solo/curtain-call/meta-progression.js"></script>
+<script src="/static/js/solo/curtain-call/ui-backstage.js"></script>
 <!-- Instantiate after all extensions are loaded -->
 <script>const game = new CurtainCallGame();</script>
 {% endblock %}

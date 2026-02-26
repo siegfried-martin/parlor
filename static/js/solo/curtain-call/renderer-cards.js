@@ -225,6 +225,8 @@ Object.assign(CurtainCallGame.prototype, {
                 return { icon: '\u2694', label: 'ATTACK', lowercase: 'attack' };
             case 'defense':
                 return { icon: '\uD83D\uDEE1', label: 'DEFENSE', lowercase: 'defense' };
+            case 'enchantment':
+                return { icon: '\u2727', label: 'ENCHANTMENT', lowercase: 'enchantment' };
             case 'action':
             default:
                 return { icon: '\u2726', label: 'ACTION', lowercase: 'action' };

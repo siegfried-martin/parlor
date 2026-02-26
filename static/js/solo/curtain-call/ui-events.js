@@ -177,12 +177,22 @@ Object.assign(CurtainCallGame.prototype, {
         // Rewards screen buttons
         if (this.elements.confirmRewardBtn) {
             this.elements.confirmRewardBtn.addEventListener('click', () => {
-                this.confirmReward();
+                if (this._propChoices) {
+                    this.confirmPropSelection();
+                } else {
+                    this.confirmReward();
+                }
             });
         }
         if (this.elements.skipRewardBtn) {
             this.elements.skipRewardBtn.addEventListener('click', () => {
                 this.skipReward();
+            });
+        }
+        // Reward refresh button
+        if (this.elements.refreshRewardBtn) {
+            this.elements.refreshRewardBtn.addEventListener('click', () => {
+                this.refreshRewards();
             });
         }
         // Reward card selection (event delegation)
@@ -208,14 +218,7 @@ Object.assign(CurtainCallGame.prototype, {
         // Deck list close button
         if (this.elements.deckListClose) {
             this.elements.deckListClose.addEventListener('click', () => {
-                // If removal was in progress from rewards, re-show rewards
-                if (this._removalFromRewards) {
-                    this._removalFromRewards = false;
-                    if (this.elements.rewardsOverlay) {
-                        this.elements.rewardsOverlay.style.display = 'flex';
-                    }
-                }
-                this.hideDeckList();
+                this._handleDeckListClose();
             });
         }
 
@@ -223,15 +226,15 @@ Object.assign(CurtainCallGame.prototype, {
         if (this.elements.deckListOverlay) {
             this.elements.deckListOverlay.addEventListener('click', (e) => {
                 if (e.target === this.elements.deckListOverlay) {
-                    // Same logic as close button
-                    if (this._removalFromRewards) {
-                        this._removalFromRewards = false;
-                        if (this.elements.rewardsOverlay) {
-                            this.elements.rewardsOverlay.style.display = 'flex';
-                        }
-                    }
-                    this.hideDeckList();
+                    this._handleDeckListClose();
                 }
+            });
+        }
+
+        // Merchant leave button
+        if (this.elements.merchantLeaveBtn) {
+            this.elements.merchantLeaveBtn.addEventListener('click', () => {
+                this.leaveMerchant();
             });
         }
     },

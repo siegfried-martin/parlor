@@ -19,6 +19,7 @@
 class CurtainCallGame {
     constructor() {
         this.initialized = false;
+        this.events = new EventBus();
         this.deck = [];
         this.hand = [];
         this.discardPile = [];
@@ -93,6 +94,43 @@ class CurtainCallGame {
 
             // Turn tracking
             cardsPlayedThisTurn: 0
+        };
+
+        // Active enchantments (cleared each combat)
+        this.activeEnchantments = [];
+
+        // Collected stage props (persist across combats within a run)
+        this.stageProps = [];
+
+        // Gold currency (earned in combat, spent at merchant)
+        this.gold = 0;
+
+        // Event history (tracks which narrative events have been seen this run)
+        this.eventHistory = [];
+
+        // Modifiers to apply at the start of the next combat
+        this.nextCombatModifiers = {};
+
+        // Merchant purchases (tracks which slots have been bought per act)
+        this.merchantPurchases = [];
+
+        // M7 Meta-progression state (loaded from server in setup)
+        this.metaState = { tickets: 0, unlocks: {}, achievements: [], history: [] };
+        this.difficulty = 0;
+        this.selectedMacGuffin = 'treasure-chest';
+        this.username = '';
+        this.runStats = {
+            actsCompleted: 0,
+            bossesDefeated: [],
+            maxOvationReached: 0,
+            maxEnemyDebuffTypes: 0,
+            flawlessBoss: false,
+            finalGold: 0,
+            result: 'defeat',
+            macguffinId: 'treasure-chest',
+            difficulty: 0,
+            aldricBasic: 'galvanize',
+            pipBasic: 'quick-jab'
         };
 
         // Card zoom / keyword explanation state
@@ -225,6 +263,22 @@ class CurtainCallGame {
             deckCountDraw: document.getElementById('deck-count-draw'),
             deckCountDiscard: document.getElementById('deck-count-discard'),
             // removeCardBtn reserved for future post-boss card removal
+            continuePerformanceBtn: document.getElementById('continue-performance-btn'),
+            refreshRewardBtn: document.getElementById('refresh-reward-btn'),
+            stagePropStrip: document.getElementById('stage-prop-strip'),
+            enchantmentStrip: document.getElementById('enchantment-strip'),
+            // Gold display
+            goldIndicator: document.getElementById('gold-indicator'),
+            goldValue: document.getElementById('gold-value'),
+            // Event (stage-based)
+            eventStageTitle: document.getElementById('event-stage-title'),
+            eventStageChoices: document.getElementById('event-stage-choices'),
+            // Merchant overlay
+            merchantOverlay: document.getElementById('merchant-overlay'),
+            merchantGreeting: document.getElementById('merchant-greeting'),
+            merchantGoldValue: document.getElementById('merchant-gold-value'),
+            merchantItems: document.getElementById('merchant-items'),
+            merchantLeaveBtn: document.getElementById('merchant-leave-btn'),
         };
 
         // Rewards state
@@ -244,11 +298,12 @@ class CurtainCallGame {
         // Expose debug API
         this.exposeDebugAPI();
 
-        // Start with curtains closed and title screen
+        // Start with curtains closed; fetch recent user then show title with login
         this.elements.container.classList.add('curtain-closed', 'game-ui-hidden');
-        this.showTitleScreen();
-
-        console.log('Curtain Call: Ready');
+        this.fetchRecentUser().then(() => {
+            this.showTitleScreen();
+            console.log('Curtain Call: Ready');
+        });
     }
 
     // === Deck Management ===
@@ -556,6 +611,9 @@ class CurtainCallGame {
     }
 
     restartCombat() {
+        // Clean up any existing event bus listeners
+        this.events.offByOwner('enemy-passive');
+
         this.combatState = {
             macguffin: { currentHP: 60, maxHP: 60 },
             aldric: { currentHP: 20, maxHP: 20, knockedOut: false, shield: 0, taunt: 0 },
@@ -582,6 +640,10 @@ class CurtainCallGame {
         this.elements.enemyPuppet.classList.add('enemy-idle');
         this.elements.heroAldric.classList.remove('knocked-out');
         this.elements.heroPip.classList.remove('knocked-out');
+
+        // Register passives for the debug enemy
+        const enemy = this.enemies[this.combatState.enemy.id];
+        if (enemy) this.registerEnemyPassives(enemy);
 
         this.initializeDeck();
         this.resetSpeechForCombat();

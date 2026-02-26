@@ -41,9 +41,6 @@ Object.assign(CurtainCallGame.prototype, {
         const canAttack = ek.stageFright <= 0;
         const canNonAttack = ek.heckled <= 0;
 
-        // Spotlight Phantom: all attacks have Accuracy
-        const hasAccuracy = this.enemyHasPassive('blinding-light');
-
         // Track first attack / first AoE for guaranteed enemy speech
         if (!this.combatState.enemy._firstAttackFired) {
             this.combatState.enemy._firstAttackFired = false;
@@ -52,7 +49,7 @@ Object.assign(CurtainCallGame.prototype, {
             this.combatState.enemy._firstAoEFired = false;
         }
 
-        // Comedy/Tragedy Mask: track state
+        // Track pattern state (e.g. Comedy/Tragedy Mask)
         if (entry.state) {
             this.combatState.enemy.passiveState.currentState = entry.state;
         }
@@ -74,9 +71,9 @@ Object.assign(CurtainCallGame.prototype, {
                     }
                     const target = action.target || entry.target;
                     if (target === 'all') {
-                        await this.enemyAttackAoE(action.value, action.hits || 1, { hasAccuracy });
+                        await this.enemyAttackAoE(action.value, action.hits || 1);
                     } else {
-                        await this.enemyAttack(action.value, action.hits || 1, { hasAccuracy });
+                        await this.enemyAttack(action.value, action.hits || 1);
                     }
                     break;
                 }
@@ -100,31 +97,15 @@ Object.assign(CurtainCallGame.prototype, {
                     if (!canAttack) break;
                     const blockDmg = ek.block;
                     if (blockDmg > 0) {
-                        await this.enemyAttack(blockDmg, 1, { hasAccuracy });
+                        await this.enemyAttack(blockDmg, 1);
                     }
                     break;
                 }
             }
         }
 
-        // Narrative Control passive (Playwright: 25% chance to clear a debuff)
-        if (this.enemyHasPassive('narrative-control')) {
-            if (Math.random() < 0.25) {
-                const debuffKeys = ['poison', 'burn', 'stageFright', 'heckled', 'forgetful',
-                    'vulnerable', 'weak', 'confused'];
-                const active = debuffKeys.filter(k => ek[k] > 0);
-                if (active.length > 0) {
-                    const toClear = active[Math.floor(Math.random() * active.length)];
-                    ek[toClear] = 0;
-                    this.showSpeechBubble('Narrative Control!', 'buff', this.elements.enemyPuppet);
-                    this.renderStatusEffects();
-                    await this.wait(300);
-                }
-            }
-        }
-
         // Check boss phase transition (player damage may have triggered it)
-        this.checkBossPhaseTransition();
+        await this.checkBossPhaseTransition();
 
         // Set next intent from (potentially new) phase
         this.setNextEnemyIntent();
@@ -148,7 +129,7 @@ Object.assign(CurtainCallGame.prototype, {
         this.renderEnemyIntent();
     },
 
-    checkBossPhaseTransition() {
+    async checkBossPhaseTransition() {
         const enemy = this.combatState.enemy;
         const enemyDef = this.enemies[enemy.id];
         if (!enemyDef.phases) return;
@@ -193,17 +174,12 @@ Object.assign(CurtainCallGame.prototype, {
             }
         }
 
-        // Casting Call passive (random debuff on all allies on phase entry)
-        if (this.enemyHasPassive('casting-call')) {
-            const options = ['burn', 'poison', 'vulnerable'];
-            const chosen = options[Math.floor(Math.random() * options.length)];
-            this.applyDebuffFromEnemy(chosen, 1, 'allAllies');
-            this.showSpeechBubble('Casting Call!', 'debuff', this.elements.enemyPuppet);
-        }
-
         enemy.currentPhase = targetPhase;
         // Reset pattern index so setNextEnemyIntent starts at 0 of new phase
         enemy.patternIndex = -1;
+
+        // Emit event for passive listeners (e.g. casting-call)
+        await this.events.emit('bossPhaseTransition', { phase: targetPhase, enemy });
 
         // Boss phase transition voice line
         this.showBossPhaseTransition(enemy.id);
@@ -215,30 +191,23 @@ Object.assign(CurtainCallGame.prototype, {
     // === Enemy Actions ========================================================
     // =========================================================================
 
-    async enemyAttack(damage, hits, options) {
+    async enemyAttack(damage, hits) {
         if (hits === undefined) hits = 1;
-        if (!options) options = {};
         const enemy = this.combatState.enemy;
 
         // Calculate base damage with enemy modifiers
         let baseDamage = damage + (this.keywords.enemy.inspire || 0);
-
-        // Tangled Strings: +3 if any protagonist has 3+ debuff stacks
-        if (this.enemyHasPassive('tangled-strings')) {
-            for (const prot of ['aldric', 'pip']) {
-                if (this.getProtagonistDebuffCount(prot) >= 3) {
-                    baseDamage += 3;
-                    break;
-                }
-            }
-        }
 
         // Enemy Forgetful: 50% damage
         if (this.keywords.enemy.forgetful > 0) {
             baseDamage = Math.floor(baseDamage * 0.5);
         }
 
-        const hasAccuracy = options.hasAccuracy || false;
+        // Allow passives to modify attack (e.g. tangled-strings, blinding-light)
+        const attackCtx = { damage: baseDamage, hasAccuracy: false };
+        await this.events.emit('beforeEnemyAttack', attackCtx);
+        baseDamage = attackCtx.damage;
+        const hasAccuracy = attackCtx.hasAccuracy;
         let shownBubble = false;
 
         for (let hit = 0; hit < hits; hit++) {
@@ -285,27 +254,21 @@ Object.assign(CurtainCallGame.prototype, {
         }
     },
 
-    async enemyAttackAoE(damage, hits, options) {
+    async enemyAttackAoE(damage, hits) {
         if (hits === undefined) hits = 1;
-        if (!options) options = {};
         const enemy = this.combatState.enemy;
 
         let baseDamage = damage + (this.keywords.enemy.inspire || 0);
-
-        if (this.enemyHasPassive('tangled-strings')) {
-            for (const prot of ['aldric', 'pip']) {
-                if (this.getProtagonistDebuffCount(prot) >= 3) {
-                    baseDamage += 3;
-                    break;
-                }
-            }
-        }
 
         if (this.keywords.enemy.forgetful > 0) {
             baseDamage = Math.floor(baseDamage * 0.5);
         }
 
-        const hasAccuracy = options.hasAccuracy || false;
+        // Allow passives to modify attack (e.g. tangled-strings, blinding-light)
+        const attackCtx = { damage: baseDamage, hasAccuracy: false };
+        await this.events.emit('beforeEnemyAttack', attackCtx);
+        baseDamage = attackCtx.damage;
+        const hasAccuracy = attackCtx.hasAccuracy;
         let shownBubble = false;
 
         for (let hit = 0; hit < hits; hit++) {
@@ -524,6 +487,13 @@ Object.assign(CurtainCallGame.prototype, {
                 // Ovation loss on unblocked MacGuffin damage
                 this.loseOvation(1);
 
+                // Emit macguffinDamaged for stage prop listeners (e.g. Trapdoor Lever)
+                await this.events.emit('macguffinDamaged', {
+                    amount: currentDamage,
+                    currentHP: this.combatState.macguffin.currentHP,
+                    maxHP: this.combatState.macguffin.maxHP
+                });
+
                 // MacGuffin big damage crowd reaction
                 if (currentDamage >= (ANIMATION_CONFIG?.hit?.bigHitThreshold || 8)) {
                     this.tryCrowdReaction('macguffinBigDamage');
@@ -548,12 +518,21 @@ Object.assign(CurtainCallGame.prototype, {
                 this.renderProtagonistHP(currentTarget);
 
                 if (protState.currentHP <= 0) {
-                    protState.knockedOut = true;
-                    this.renderKnockoutState(currentTarget);
-                    // Guaranteed cross-reaction: partner reacts to knockout
-                    this.tryProtagonistSpeech(currentTarget, 'partnerKnockout');
-                    this.tryCrowdReaction('protagonistKO');
-                    console.log(`${currentTarget} knocked out!`);
+                    // Emit beforeKnockout for stage prop listeners (e.g. Stunt Double)
+                    const koCtx = { protagonist: currentTarget, prevented: false };
+                    await this.events.emit('beforeKnockout', koCtx);
+
+                    if (koCtx.prevented) {
+                        protState.currentHP = 1;
+                        this.renderProtagonistHP(currentTarget);
+                    } else {
+                        protState.knockedOut = true;
+                        this.renderKnockoutState(currentTarget);
+                        // Guaranteed cross-reaction: partner reacts to knockout
+                        this.tryProtagonistSpeech(currentTarget, 'partnerKnockout');
+                        this.tryCrowdReaction('protagonistKO');
+                        console.log(`${currentTarget} knocked out!`);
+                    }
                 } else {
                     // Check if dropped below 50% HP this hit
                     const halfHP = protState.maxHP * 0.5;
@@ -564,6 +543,15 @@ Object.assign(CurtainCallGame.prototype, {
 
                 await this.playAnimation(heroEl, ANIMATION_CONFIG.hurt[currentTarget]);
             }
+        }
+
+        // Emit damageTaken for passive/enchantment listeners
+        if (currentDamage > 0) {
+            await this.events.emit('damageTaken', {
+                target: currentTarget,
+                amount: currentDamage,
+                originalTarget: target
+            });
         }
 
         // Step 7: RETALIATE — deal damage back to enemy
@@ -614,23 +602,169 @@ Object.assign(CurtainCallGame.prototype, {
     },
 
     // =========================================================================
-    // === Combat Start Passives ===============================================
+    // === Enemy Passive Registration ==========================================
     // =========================================================================
 
-    applyCombatStartPassives(enemy) {
+    /**
+     * Register all enemy passive abilities as event bus listeners.
+     * Called at combat start. Applies immediate effects and registers
+     * ongoing listeners for reactive/modifier passives.
+     *
+     * All listeners use owner 'enemy-passive' for bulk cleanup at combat end.
+     */
+    registerEnemyPassives(enemy) {
+        this.events.offByOwner('enemy-passive');
+
         if (!enemy.passives) return;
 
         for (const passive of enemy.passives) {
             switch (passive.id) {
+
+                // --- Combat start (immediate effects) ---
+
                 case 'rusty-armor':
-                    // Rusty Knight: starts with 3 Block
                     this.keywords.enemy.block = 3;
                     break;
+
                 case 'dramatic-ego':
-                    // Prima Donna: permanent Retaliate 2
+                    // Immediate: permanent Retaliate 2
                     this.keywords.enemy.retaliate = 2;
+                    // Ongoing: +1 Inspire each enemy turn
+                    this.events.on('enemyTurnStart', async () => {
+                        this.keywords.enemy.inspire += 1;
+                        this.showSpeechBubble('Inspire +1', 'buff', this.elements.enemyPuppet);
+                    }, { owner: 'enemy-passive' });
+                    // Modifier: keep Retaliate on defense reset
+                    this.events.on('beforeEnemyDefenseReset', (ctx) => {
+                        ctx.keepRetaliate = true;
+                    }, { owner: 'enemy-passive' });
                     break;
-                // Other passives are triggered during combat, not at start
+
+                // --- Turn-based triggers ---
+
+                case 'curtain-rigging':
+                    this.events.on('enemyTurnStart', async () => {
+                        this.keywords.enemy.inspire += 1;
+                        this.showSpeechBubble('Inspire +1', 'buff', this.elements.enemyPuppet);
+                    }, { owner: 'enemy-passive' });
+                    break;
+
+                case 'narrative-control':
+                    this.events.on('enemyTurnEnd', async () => {
+                        if (Math.random() < 0.25) {
+                            const ek = this.keywords.enemy;
+                            const debuffKeys = ['poison', 'burn', 'stageFright', 'heckled',
+                                'forgetful', 'vulnerable', 'weak', 'confused'];
+                            const active = debuffKeys.filter(k => ek[k] > 0);
+                            if (active.length > 0) {
+                                const toClear = active[Math.floor(Math.random() * active.length)];
+                                ek[toClear] = 0;
+                                this.showSpeechBubble('Narrative Control!', 'buff', this.elements.enemyPuppet);
+                                this.renderStatusEffects();
+                                await this.wait(300);
+                            }
+                        }
+                    }, { owner: 'enemy-passive' });
+                    break;
+
+                // --- Attack modifiers ---
+
+                case 'blinding-light':
+                    this.events.on('beforeEnemyAttack', (ctx) => {
+                        ctx.hasAccuracy = true;
+                    }, { owner: 'enemy-passive' });
+                    break;
+
+                case 'tangled-strings':
+                    this.events.on('beforeEnemyAttack', (ctx) => {
+                        for (const prot of ['aldric', 'pip']) {
+                            if (this.getProtagonistDebuffCount(prot) >= 3) {
+                                ctx.damage += 3;
+                                break;
+                            }
+                        }
+                    }, { owner: 'enemy-passive' });
+                    break;
+
+                // --- Player damage modifiers ---
+
+                case 'two-faces':
+                    // Comedy state: 50% reduced player damage
+                    this.events.on('beforeDamageDealt', (ctx) => {
+                        if (this.combatState.enemy.passiveState.currentState === 'comedy') {
+                            ctx.damage = Math.floor(ctx.damage * 0.5);
+                        }
+                    }, { owner: 'enemy-passive' });
+                    // Tragedy state: immune to debuffs
+                    this.events.on('beforeDebuffOnEnemy', (ctx) => {
+                        if (this.combatState.enemy.passiveState.currentState === 'tragedy') {
+                            ctx.blocked = true;
+                        }
+                    }, { owner: 'enemy-passive' });
+                    break;
+
+                case 'iron-curtain':
+                    this.events.on('beforeDebuffOnEnemy', (ctx) => {
+                        if (ctx.keyword === 'forgetful' || ctx.keyword === 'vulnerable') {
+                            ctx.blocked = true;
+                        }
+                    }, { owner: 'enemy-passive' });
+                    break;
+
+                case 'erratic':
+                    this.events.on('beforeDebuffOnEnemy', (ctx) => {
+                        if (ctx.keyword === 'fear' || ctx.keyword === 'frustration') {
+                            ctx.blocked = true;
+                        }
+                    }, { owner: 'enemy-passive' });
+                    break;
+
+                // --- Reactive triggers ---
+
+                case 'mirror-spite':
+                    this.events.on('damageDealtToEnemy', async (data) => {
+                        if (data.card && data.card.owner !== 'macguffin') {
+                            this.applyDebuffToProtagonist(data.card.owner, 'burn', 1);
+                            this.showSpeechBubble('Mirror Spite!', 'debuff', this.getTargetElement(data.card.owner));
+                            this.renderStatusEffects();
+                        }
+                    }, { owner: 'enemy-passive' });
+                    break;
+
+                case 'understudys-resilience':
+                    this.events.on('damageDealtToEnemy', async () => {
+                        if (!this.combatState.enemy.passiveState.resilienceTriggered) {
+                            const enemy = this.combatState.enemy;
+                            if (enemy.currentHP / enemy.maxHP <= 0.5) {
+                                this.keywords.enemy.regenerate += 2;
+                                this.combatState.enemy.passiveState.resilienceTriggered = true;
+                                this.showSpeechBubble('Regenerate!', 'buff', this.elements.enemyPuppet);
+                                this.renderStatusEffects();
+                            }
+                        }
+                    }, { owner: 'enemy-passive' });
+                    break;
+
+                case 'scathing-pen':
+                    this.events.on('debuffInflictedOnPlayer', async () => {
+                        await this.enemyHeal(3);
+                    }, { owner: 'enemy-passive' });
+                    break;
+
+                case 'casting-call':
+                    this.events.on('bossPhaseTransition', async () => {
+                        const options = ['burn', 'poison', 'vulnerable'];
+                        const chosen = options[Math.floor(Math.random() * options.length)];
+                        await this.applyDebuffFromEnemy(chosen, 1, 'allAllies');
+                        this.showSpeechBubble('Casting Call!', 'debuff', this.elements.enemyPuppet);
+                    }, { owner: 'enemy-passive' });
+                    break;
+
+                case 'stage-fortress':
+                    this.events.on('beforeEnemyDefenseReset', (ctx) => {
+                        ctx.halfBlock = true;
+                    }, { owner: 'enemy-passive' });
+                    break;
             }
         }
     }

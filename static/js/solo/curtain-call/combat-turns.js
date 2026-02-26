@@ -16,7 +16,7 @@ Object.assign(CurtainCallGame.prototype, {
     // === Turn Management =====================================================
     // =========================================================================
 
-    startTurn() {
+    async startTurn() {
         if (this.phase === 'gameover') return;
 
         this.turnNumber++;
@@ -27,8 +27,11 @@ Object.assign(CurtainCallGame.prototype, {
         this.energy.current = this.energy.max;
         this.renderEnergy();
 
-        // Process start-of-turn keywords (DoTs, decay, enemy passives)
-        this.processStartOfTurnKeywords();
+        // Process start-of-turn keywords (DoTs, decay)
+        await this.processStartOfTurnKeywords();
+
+        // Emit playerTurnStart for event bus listeners
+        await this.events.emit('playerTurnStart', { turn: this.turnNumber });
 
         // Draw cards up to hand size
         this.drawToHandSize();
@@ -85,16 +88,22 @@ Object.assign(CurtainCallGame.prototype, {
         // Resolve Curse damage on MacGuffin before enemy acts
         await this.processEndOfTurnCurse();
 
+        // Emit playerTurnEnd for event bus listeners
+        await this.events.emit('playerTurnEnd', { turn: this.turnNumber });
+
         await this.wait(300);
 
-        // Reset enemy per-turn defenses before their new turn
-        if (this.enemyHasPassive('stage-fortress')) {
+        // Reset enemy per-turn defenses (passives can modify via beforeEnemyDefenseReset)
+        const defenseCtx = { halfBlock: false, keepRetaliate: false };
+        await this.events.emit('beforeEnemyDefenseReset', defenseCtx);
+
+        if (defenseCtx.halfBlock) {
             this.keywords.enemy.block = Math.floor(this.keywords.enemy.block / 2);
         } else {
             this.keywords.enemy.block = 0;
         }
         this.keywords.enemy.shield = 0;
-        if (!this.enemyHasPassive('dramatic-ego')) {
+        if (!defenseCtx.keepRetaliate) {
             this.keywords.enemy.retaliate = 0;
         }
 
@@ -116,13 +125,16 @@ Object.assign(CurtainCallGame.prototype, {
             ek.regenerate--;
         }
 
-        // Enemy passive start-of-turn triggers
-        this.processEnemyTurnStartPassives();
+        // Emit enemyTurnStart for event bus listeners (replaces processEnemyTurnStartPassives)
+        await this.events.emit('enemyTurnStart', { turn: this.turnNumber });
 
         this.renderCombatState();
 
         // Enemy executes their intent
         await this.executeEnemyTurn();
+
+        // Emit enemyTurnEnd for event bus listeners (e.g. narrative-control)
+        await this.events.emit('enemyTurnEnd', { turn: this.turnNumber });
 
         // Reset player per-turn defenses
         this.combatState.block = 0;
@@ -149,14 +161,14 @@ Object.assign(CurtainCallGame.prototype, {
         }
 
         // Start next turn
-        this.startTurn();
+        await this.startTurn();
     },
 
     // =========================================================================
     // === Start-of-Turn Keyword Processing ====================================
     // =========================================================================
 
-    processStartOfTurnKeywords() {
+    async processStartOfTurnKeywords() {
         const kw = this.keywords;
 
         // --- Ovation decay ---
@@ -202,9 +214,16 @@ Object.assign(CurtainCallGame.prototype, {
                 this.renderProtagonistHP(prot);
                 debuffs.poison--;
                 if (state.currentHP <= 0) {
-                    state.knockedOut = true;
-                    this.renderKnockoutState(prot);
-                    this.showSpeechBubble('KO!', 'damage', this.getTargetElement(prot));
+                    const koCtx = { protagonist: prot, prevented: false };
+                    await this.events.emit('beforeKnockout', koCtx);
+                    if (koCtx.prevented) {
+                        state.currentHP = 1;
+                        this.renderProtagonistHP(prot);
+                    } else {
+                        state.knockedOut = true;
+                        this.renderKnockoutState(prot);
+                        this.showSpeechBubble('KO!', 'damage', this.getTargetElement(prot));
+                    }
                 }
             }
 
@@ -216,9 +235,16 @@ Object.assign(CurtainCallGame.prototype, {
                 this.renderProtagonistHP(prot);
                 debuffs.burn--;
                 if (state.currentHP <= 0) {
-                    state.knockedOut = true;
-                    this.renderKnockoutState(prot);
-                    this.showSpeechBubble('KO!', 'damage', this.getTargetElement(prot));
+                    const koCtx = { protagonist: prot, prevented: false };
+                    await this.events.emit('beforeKnockout', koCtx);
+                    if (koCtx.prevented) {
+                        state.currentHP = 1;
+                        this.renderProtagonistHP(prot);
+                    } else {
+                        state.knockedOut = true;
+                        this.renderKnockoutState(prot);
+                        this.showSpeechBubble('KO!', 'damage', this.getTargetElement(prot));
+                    }
                 }
             }
 
@@ -330,24 +356,6 @@ Object.assign(CurtainCallGame.prototype, {
     },
 
     // =========================================================================
-    // === Enemy Passive Processing ============================================
-    // =========================================================================
-
-    processEnemyTurnStartPassives() {
-        // Curtain Rigging (Stagehand): +1 Inspire each turn
-        if (this.enemyHasPassive('curtain-rigging')) {
-            this.keywords.enemy.inspire += 1;
-            this.showSpeechBubble('Inspire +1', 'buff', this.elements.enemyPuppet);
-        }
-
-        // Dramatic Ego (Prima Donna): +1 Inspire each turn (Retaliate 2 is permanent, set on combat start)
-        if (this.enemyHasPassive('dramatic-ego')) {
-            this.keywords.enemy.inspire += 1;
-            this.showSpeechBubble('Inspire +1', 'buff', this.elements.enemyPuppet);
-        }
-    },
-
-    // =========================================================================
     // === Ovation =============================================================
     // =========================================================================
 
@@ -357,6 +365,16 @@ Object.assign(CurtainCallGame.prototype, {
         this.keywords.ovation = Math.min(5, this.keywords.ovation + amount);
         this.renderStatusEffects();
         this.renderOvationMeter();
+
+        const delta = this.keywords.ovation - prevOvation;
+        if (delta !== 0) {
+            this.events.emit('ovationChanged', { ovation: this.keywords.ovation, delta });
+        }
+
+        // Track max ovation for achievements
+        if (this.keywords.ovation > this.runStats.maxOvationReached) {
+            this.runStats.maxOvationReached = this.keywords.ovation;
+        }
 
         // Protagonist speech when ovation reaches max (5)
         if (prevOvation < 5 && this.keywords.ovation >= 5) {
@@ -368,9 +386,15 @@ Object.assign(CurtainCallGame.prototype, {
 
     loseOvation(amount) {
         if (this.keywords.flourish > 0) amount *= 2;
+        const prev = this.keywords.ovation;
         this.keywords.ovation = Math.max(0, this.keywords.ovation - amount);
         this.renderStatusEffects();
         this.renderOvationMeter();
+
+        const delta = this.keywords.ovation - prev;
+        if (delta !== 0) {
+            this.events.emit('ovationChanged', { ovation: this.keywords.ovation, delta });
+        }
     },
 
     getOvationDamageBonus() {
@@ -398,13 +422,46 @@ Object.assign(CurtainCallGame.prototype, {
     // === Victory / Defeat ====================================================
     // =========================================================================
 
+    calculateGoldReward(isBoss) {
+        let base = isBoss ? 35 : 18;
+        let bonus = 0;
+        if (this.keywords.ovation >= 3) bonus += 5;
+        if (this.keywords.ovation >= 5) bonus += 5;
+        const pct = this.combatState.macguffin.currentHP / this.combatState.macguffin.maxHP;
+        if (pct >= 0.9) bonus += 5;
+        return base + bonus;
+    },
+
     onEnemyDefeated() {
         this.phase = 'reward';
         const enemy = this.combatState.enemy;
         console.log(`${enemy.name} defeated!`);
 
+        // Track boss kills and flawless boss for meta-progression
+        if (enemy.isBoss) {
+            this.runStats.bossesDefeated.push(enemy.id);
+            // Check flawless: MacGuffin at full HP
+            if (this.combatState.macguffin.currentHP >= this.combatState.macguffin.maxHP) {
+                this.runStats.flawlessBoss = true;
+            }
+        }
+
+        // Clean up enemy passive listeners, enchantments, stage props, and MacGuffin passive
+        this.events.offByOwner('enemy-passive');
+        this.clearEnchantments();
+        this.clearStageProps();
+        this._clearMacGuffinPassive();
+        this.events.emit('enemyDefeated', { enemyId: enemy.id, isBoss: enemy.isBoss });
+        this.events.emit('combatEnd', { result: 'victory', enemyId: enemy.id });
+
         this.elements.enemyPuppet.classList.remove('enemy-idle');
         this.elements.enemyPuppet.classList.add('enemy-defeat');
+
+        // Award gold
+        const goldReward = this.calculateGoldReward(enemy.isBoss);
+        this.gold += goldReward;
+        this.renderGoldDisplay();
+        this.showSpeechBubble(`+${goldReward} Gold`, 'buff', this.elements.macguffin);
 
         // Guaranteed enemy defeat speech
         this.tryEnemySpeech(enemy.id, 'defeat', { guaranteed: true });
@@ -424,7 +481,10 @@ Object.assign(CurtainCallGame.prototype, {
 
         this.updateProgressIndicator();
 
-        if (enemy.isBoss) {
+        if (enemy.isBoss && !this.actStructure[this.runState.currentAct + 1]) {
+            // Final boss — skip rewards, go straight to victory
+            setTimeout(() => this.advanceScene(), 2000);
+        } else if (enemy.isBoss) {
             setTimeout(() => this.showRewardsScreen('boss'), 2000);
         } else {
             setTimeout(() => this.showRewardsScreen('normal'), 1500);
@@ -435,11 +495,34 @@ Object.assign(CurtainCallGame.prototype, {
         this.phase = 'gameover';
         console.log('MacGuffin destroyed - Defeat!');
 
+        // Clean up enemy passive listeners, enchantments, stage props, and MacGuffin passive
+        this.events.offByOwner('enemy-passive');
+        this.clearEnchantments();
+        this.clearStageProps();
+        this._clearMacGuffinPassive();
+        this.events.emit('combatEnd', { result: 'defeat' });
+
         this.showCharacterBubble('NOOO!', this.elements.macguffin);
 
         if (this.elements.endTurnBtn) {
             this.elements.endTurnBtn.disabled = true;
             this.elements.endTurnBtn.textContent = 'Defeated';
+        }
+
+        // Clean up saved run
+        this.deleteCompletedRun();
+
+        // Show end-of-run summary after a delay
+        setTimeout(() => this.showEndOfRunSummary('defeat'), 2000);
+    },
+
+    /**
+     * Track enemy debuff types for achievements (called from combat-cards applyDebuff).
+     */
+    trackEnemyDebuffTypes() {
+        const count = this.getEnemyDebuffCount();
+        if (count > this.runStats.maxEnemyDebuffTypes) {
+            this.runStats.maxEnemyDebuffTypes = count;
         }
     }
 });

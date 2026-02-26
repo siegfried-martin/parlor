@@ -1,768 +1,690 @@
-# Curtain Call — Milestones
+# Curtain Call — Development Milestones
 
-## Progress
-
-| #   | Milestone                  | Status      |
-| --- | -------------------------- | ----------- |
-| 1   | Static Stage Layout        | ✅ Complete |
-| 2   | Card Hand Display          | ✅ Complete |
-| 3   | Combat State Display       | ✅ Complete |
-| 4   | Card Play Flow             | ✅ Complete |
-| 5   | Speech Bubbles             | ✅ Complete |
-| 6   | Puppet Animations          | ✅ Complete |
-| 7   | Basic Turn Loop            | ✅ Complete |
-| 8   | Single Combat (Stage Rat)  | ✅ Complete |
-| 9   | Enemy Intent System        | ✅ Complete |
-| 10  | Card Rewards Screen        | ✅ Complete |
-| 11  | Act I Scene Flow           | ✅ Complete |
-| 12  | Boss: The Critic           | ✅ Complete |
-| 13  | Keywords Implementation    | ✅ Complete |
-| 14  | Debuff System              | ✅ Complete |
-| 15  | Defensive Keywords         | ✅ Complete |
-| 16  | Starting Menu & Scene Flow | ✅ Complete |
-| 16b | JS File Refactor           | ✅ Complete |
-| 16c | Second JS Refactor         | ✅ Complete |
-| 17  | v2 Health System           | ✅ Complete |
-| 18  | v2 Damage Resolution       | ✅ Complete |
-| 19  | v2 Keyword Engine          | ✅ Complete |
-| 20  | v2 Card & Deck Overhaul    | ✅ Complete |
-| 21  | v2 Enemy Data Overhaul     | ✅ Complete |
-| 22  | v2 Ovation Rework          | ✅ Complete |
-| 23  | Act I Playable (v2)        | ✅ Complete |
-| 24  | Damage Preview UI          | Deferred    |
-| 25  | Starting Deck Selection    | ✅ Complete |
-| 26  | Act II Enemies & Boss      | ✅ Complete |
-| 27  | Act II Playable            | ✅ Complete |
-| 28  | Act III Enemies & Boss     | ✅ Complete |
-| 29  | Act III & Full Run         | ✅ Complete |
-| 30  | Drag-to-Play & UX Polish   | ✅ Complete |
-| 31  | Deck List & Card Removal   | Pending     |
-| 32  | Attack Animations          | Pending     |
-| 33  | Voice Lines & Dialogue     | Pending     |
-| 34  | Enemy SVG Art              | Pending     |
-| 35  | Game Rebalancing           | Pending     |
-| 36  | V1 Playtest Release        | Pending     |
-| 37  | Card Upgrade Rewards       | Pending     |
-| 38  | Curtain Transitions Polish | Pending     |
-| 39  | Persistence & Run History  | Pending     |
-| 40  | Narrative Events           | Pending     |
-| 41  | Shop & Reward System       | Pending     |
-| 42  | Unlocks & Meta-Progression | Pending     |
+_Created: February 25, 2026_
 
 ---
 
-## Execution Plan
+## Milestone Overview
 
-The v2 rules redesign 4 core systems: health, damage resolution, keywords, and enemies. The milestones below are ordered so each builds on the last. Every milestone should be testable independently — no milestone requires forward-referencing code that doesn't exist yet.
+| #     | Name                                  | Dependencies | Status | Summary                                                 |
+| ----- | ------------------------------------- | ------------ | ------ | ------------------------------------------------------- |
+| M1    | Run Persistence                       | —            | Done   | Save/restore active run state via SQLite                |
+| M2    | Event Bus                             | —            | Done   | Hook system for reactive triggers                       |
+| M3    | Enchantment Cards                     | M2           | Done   | Persistent combat-duration effects                      |
+| M4    | Expanded Card Pools + Reward Refresh  | M2           | Done   | More cards, synergy depth, reward UX                    |
+| M5    | Stage Props                           | M2           | Done   | Permanent run-duration passives                         |
+| M6    | Currency, Merchant & Narrative Events | M1, M5       | Done   | Between-combat economy and story beats                  |
+| M7    | Meta-Progression                      | M1, M6       |        | Cross-run unlocks via Ticket currency and unlock tracks |
+| Spike | Card Balance & Additions              | Any          |        | Inserted as needed from playtesting                     |
 
-### Dependency Graph
+---
+
+## Persistence: SQLite
+
+SQLite is the right call for Parlor. Reasoning:
+
+- Parlor's philosophy is intentionally simple — no external dependencies, single server, two users. SQLite fits this perfectly.
+- Zero configuration. File lives on the droplet, no network calls, no auth tokens.
+- Python's built-in `sqlite3` module — no additional packages needed.
+- WAL mode handles concurrent reads from two players without issue.
+- Keeps everything self-contained on the DigitalOcean box. No Supabase account dependency, no external service that could go down or change pricing.
+- Fun to experiment with.
+
+---
+
+## M1 — Run Persistence
+
+### Goal
+
+Save and restore active Curtain Call run state so that refreshing the page or disconnecting doesn't lose progress. Also establishes the persistence layer that M6 (currency/merchant) and M7 (meta-progression) will build on.
+
+### Design Notes
+
+- SQLite database file stored on the server (e.g., `/root/parlor/data/curtain-call.db`)
+- Backend API endpoints for save/load — the client sends state snapshots, the server persists them
+- A run is identified by some token (could be a simple UUID stored in localStorage on the client, or a short code the player enters)
+- Since there's no auth, the simplest approach: generate a run ID on game start, store it in the client, use it to save/load. If the player clears their browser, the run is lost — acceptable for v1.
+- Save triggers: after each combat (win), after card reward selection, after any between-combat choice. NOT mid-combat — combat state is complex and transient. If the player refreshes mid-combat, they restart that combat with their pre-combat deck state.
+- The save payload is a JSON blob of run state: current act/scene, deck contents, protagonist HP, collected Stage Props (M5), currency (M6), etc.
+- Meta-progression (M7) uses a separate table — unlocks, run history, stats.
+
+### Definition of Done
+
+- [x] SQLite database created on first run, stored in a persistent location on the server
+- [x] Backend endpoints: `POST /api/curtain-call/save` (save run state), `GET /api/curtain-call/load/{run_id}` (load run state), `DELETE /api/curtain-call/run/{run_id}` (abandon run)
+- [x] Client generates a run ID on new game start, stores in localStorage
+- [x] On page load, client checks for existing run ID and attempts to load — if found, offers "Continue Run" vs "New Run" on title screen
+- [x] State saved automatically after: combat victory, card reward selection, any between-combat screen completion
+- [x] Save payload includes: run ID, protagonist pair, current act/scene, full deck list, MacGuffin max HP
+- [x] Loading a run restores the player to the correct between-combat screen (scene selection) — never mid-combat
+- [x] Starting a new game when a save exists abandons the old run
+- [x] Database schema is forward-compatible — state_json blob can carry Stage Props (M5), currency (M6) without schema migrations. Meta-progression (M7) uses a separate table.
+- [x] Existing gameplay works identically when no save exists (fresh run, no persistence)
+- [x] Run saves are cleaned up after completion (victory or defeat) — only active runs persist
+
+---
+
+## M2 — Event Bus
+
+### Goal
+
+Implement the hook/event system that was planned early in development but never built. This replaces hardcoded procedural calls with a composable event system that enchantments (M3), Stage Props (M5), and future reactive mechanics can register listeners against.
+
+### Design Notes
+
+The coding agent has direct access to the codebase and should make architectural decisions about implementation. The key requirements from a design perspective:
+
+- Events should be emittable from anywhere in the combat pipeline
+- Listeners should be registerable and deregisterable (enchantments register on play, deregister on combat end; Stage Props register on combat start, persist across combats)
+- The existing enemy passive system should be refactored to use the event bus as its first consumer — this validates the architecture against working code
+- Event data should carry enough context for listeners to make decisions (e.g., `cardPlayed` should include the card data, which protagonist played it, etc.)
+
+### Core Events (minimum set)
+
+**Turn lifecycle — player and enemy phases need separate events for sequencing:**
+
+- `playerTurnStart`, `playerTurnEnd`
+- `enemyTurnStart`, `enemyTurnEnd`
+
+The distinction matters because effects that trigger "at end of turn" vs "at start of enemy turn" need to resolve in a specific order. For example: an enchantment that grants 1 Inspire at `playerTurnEnd` followed by an enemy passive that doubles Inspire at `enemyTurnStart` — these must sequence correctly. Player buff decay, enemy debuff decay, and similar mechanics need clear attachment points. The coding agent should evaluate whether player/enemy debuff reduction (currently happening at turn boundaries) should be moved to align with these events, and whether additional granularity is needed.
+
+**Combat actions:**
+
+- `cardPlayed` (with card data, protagonist, cost paid)
+- `cardDrawn`
+- `damageDealt` (to enemy, with amount, source)
+- `damageTaken` (by protagonist or MacGuffin, with amount, source)
+- `keywordGained` (which keyword, stacks, target)
+- `debuffInflicted` (which debuff, stacks, target)
+- `blockGained`
+- `energySpent`, `energyGained`
+- `ovationChanged`
+
+**Combat milestones:**
+
+- `enemyDefeated`
+- `combatStart`, `combatEnd`
+
+### Definition of Done
+
+- [x] Event bus system implemented — supports `on(event, callback)`, `off(event, callback)`, `emit(event, data)`
+- [x] All core events listed above are emitted at the appropriate points in the combat pipeline
+- [x] Player and enemy turn phases have separate events (`playerTurnStart`/`playerTurnEnd`, `enemyTurnStart`/`enemyTurnEnd`)
+- [x] Existing enemy passive system refactored to use event bus listeners instead of hardcoded check points
+- [x] Enemy passives work identically to before the refactor (no behavioral regressions)
+- [x] Listeners can be registered with a "scope" or "owner" so that all listeners for a given owner can be bulk-deregistered (needed for enchantment cleanup)
+- [x] Event emission doesn't break existing combat flow — all current game behavior unchanged
+- [x] At least one test case: a temporary listener registered and deregistered during combat to verify cleanup works
+- [x] Performance is acceptable — event emission adds no perceptible delay to combat actions
+
+---
+
+## M3 — Enchantment Cards
+
+### Goal
+
+Introduce enchantment cards — a new card type that, when played, creates a persistent effect for the remainder of combat. These register event bus listeners that fire repeatedly until combat ends.
+
+### Design Notes
+
+- Enchantment cards are played from hand like any other card, costing energy
+- On play, the card's effect registers one or more event bus listeners (M2)
+- The card moves from hand to an "Enchantments" display area flanking the enemy (left or right side of the enemy area)
+- No cap on active enchantments — if a player wants to build around stacking multiple enchantments, that's a valid and interesting play style
+- Active enchantments are tappable — opens the card zoom overlay with crowd keyword explanations, same as tapping a hand card
+- All enchantment listeners are deregistered and enchantment cards are cleared on combat end
+- Enchantments do NOT carry between combats (that's what Stage Props do)
+- Enchantment cards appear in card reward pools alongside normal cards — they're part of the deck like any other card
+- Visual treatment: the card appears in miniature in the enchantment area, maybe slightly transparent/ghostly to suggest it's an ongoing effect rather than a physical presence
+
+### Example Enchantment Cards
+
+**"Dramatic Lighting"** — Aldric, Uncommon, Enchantment, 1 energy
+_"At end of turn, double your Retaliate stacks."_
+Synergy: Bulwark gives 1 Retaliate. With this active, that 1 becomes 2, then 4, then 8. Suddenly Retaliate is a real win condition. The player starts actively looking for more Retaliate sources. Rewards a player who invested early in Aldric's defensive identity.
+
+**"Comic Relief"** — Pip, Uncommon, Enchantment, 1 energy
+_"Whenever you inflict a debuff, gain 1 Luck."_
+Synergy: Quick Jab inflicts 2 random debuffs → now also gives 2 Luck. Every debuff card Pip plays fuels his Luck engine. Connects Pip's two core themes (debuffs and Luck) into a permanent feedback loop. Makes cards like Pip's Cocktail, Annoying Poke, and Best Explanation all generate Luck as a side effect.
+
+**"Fortress Scene"** — Aldric, Uncommon, Enchantment, 2 energy
+_"At end of turn, gain Shield equal to your Taunt stacks."_
+Synergy: Galvanize gives 1 Taunt per play. With this active, accumulated Taunt generates passive Shield every turn. Since Taunt redirects damage to the protagonist, Shield is the correct defense — it protects the protagonist absorbing those redirected hits. Creates a self-sustaining tank.
+
+**"Plot Twist"** — Pip, Rare, Enchantment, 2 energy
+_"When the enemy attacks, they take damage equal to their Frustrated stacks."_
+Synergy: Annoying Poke and Vex inflict Frustration. This converts Frustration into a direct damage source. Enemies that attack multiple times per turn take this damage for each attack. Rewards heavy debuff investment.
+
+### Definition of Done
+
+- [x] New card type "enchantment" added to card data model (alongside attack, defense, action)
+- [x] Enchantment cards can be defined in `cards.js` with an `onPlay` event registration spec (what events to listen to, what effects to trigger)
+- [x] Playing an enchantment card: deducts energy, removes from hand, registers event listeners via M2's event bus, moves card to enchantment display area
+- [x] Enchantment display area: enchantment strip between stage and hand, showing tokens for active enchantments
+- [x] No cap on simultaneous active enchantments — display area wraps via flex layout
+- [x] Tapping an enchantment card in the display area opens card zoom overlay with crowd keyword explanations
+- [x] All enchantment listeners deregistered on combat end (victory or defeat)
+- [x] Enchantment cards cleared from display on combat end
+- [x] Enchantment cards appear in card reward pools with appropriate rarity weighting
+- [x] 8 enchantment cards implemented and playable (4 Aldric, 4 Pip)
+- [x] Enchantment cards rendered with a distinct visual treatment — unique type badge (teal gradient with border) and ✧ icon
+- [x] Inspire does NOT boost enchantment effects — enchantments register event bus listeners, not card effects. Inspire adds to damage on card play, which is orthogonal to enchantment triggers.
+- [x] Save/load (M1) correctly persists enchantments as part of the deck between combats (activeEnchantments serialized in save payload)
+
+---
+
+## M4 — Expanded Card Pools + Reward Refresh
+
+### Goal
+
+Deepen the card pool with cards that create meaningful synergy branches, and add a reward refresh mechanic so that expanding the pool doesn't make finding synergies feel like a lottery.
+
+### Reward Refresh Design
+
+- After combat, the player sees 3 card reward options (existing behavior)
+- New: a "Refresh" button that rerolls all 3 options
+- Start with 1 free refresh per reward screen — no currency cost (avoids M6 dependency)
+- Later (M6): additional refreshes cost Gold
+- Visual: the refresh button could be styled as a stagehand swapping out the card display — fits the theater theme
+
+### New Card Suggestions
+
+These are designed around the basic character-specific cards as natural starting points. The goal is cards where the player sees the synergy and gets excited. Avoid using keyword names in card names.
+
+#### Cards That Synergize With Quick Jab (Pip — debuff diversity)
+
+Quick Jab inflicts 2 random debuffs and deals 2 per unique debuff on enemy. These cards reward building debuff variety.
+
+**"Read the Room"** — Pip, Uncommon, Action, 1 energy
+_"Gain 1 Distract per unique debuff type on enemy. Draw 1 card."_
+Quick Jab seeds debuff diversity. This converts that diversity into defense (Distract) plus card draw. Becomes a 1-cost "gain 3-4 Distract, draw 1" in a debuff-heavy deck.
+
+**"Catalogue of Woes"** — Pip, Uncommon, Action, 1 energy
+_"Gain 1 Luck per unique debuff type on enemy."_
+Connects Pip's debuff theme directly to his Luck theme. Quick Jab gives debuff diversity, this converts it into Luck, then Luck cards scale. The bridge card between Pip's two identities.
+
+**"Unraveling"** — Pip, Rare, Attack, 2 energy
+_"Deal 3 damage per unique debuff type on enemy. Inflict 1 random debuff."_
+The premium Quick Jab payoff. With 5 unique debuffs (achievable in a Pip-heavy deck), this deals 15 damage and adds another debuff type. Debuff diversity's big finisher.
+
+#### Cards That Synergize With Lucky Shot (Pip — Luck accumulation)
+
+Lucky Shot deals 3 damage and gains 2 Luck. These cards give Luck a purpose beyond its passive bonus.
+
+**"Charmed Life"** — Pip, Uncommon, Defense, 1 energy
+_"Gain Shield equal to your Luck."_
+Player has been playing Lucky Shots, sitting on 4-6 Luck. This converts that stockpile into protagonist Shield. Makes Luck feel like a resource, not just a passive bonus. Shield (persistent) rather than Block (one-turn) rewards the slow accumulation.
+
+**"Lucky Break"** — Pip, Rare, Action, 1 energy
+_"If you have 5+ Luck, gain 2 Energy and draw 2 cards. Lose 3 Luck."_
+The tempo explosion. Spend 1 energy + 3 Luck to net +1 energy and +2 cards. Sets up a big turn. But you have to rebuild the Luck afterwards — creates a satisfying spend/rebuild rhythm.
+
+**"All In"** — Pip, Rare, Attack, 2 energy
+_"Spend all Luck. Deal damage equal to Luck spent x3."_
+The Luck finisher. Stack Luck to 8+, cash it all in for 24+ damage. Dramatic, rewards patience. The player feels clever for building up to this moment.
+
+#### Cards That Synergize With Galvanize (Aldric — Taunt accumulation)
+
+Galvanize deals 3 damage and gains 1 Taunt. These cards make Taunt stacks generate ongoing value.
+
+**"Defiant Roar"** — Aldric, Uncommon, Action, 1 energy
+_"Gain 1 Ovation per Taunt stack. Gain 1 Retaliate."_
+Three basic cards now interconnect: Galvanize builds Taunt → this converts Taunt to Ovation (audience loves the bravery) + gives Retaliate (connecting to Bulwark's theme). Ovation then feeds Ovation-scaling cards like Coup de Grace, Protective Stance, Captivating Strike.
+
+**"Immovable"** — Aldric, Uncommon, Defense, 1 energy
+_"Gain Shield equal to double your Taunt stacks."_
+Galvanize has been building Taunt to 3-4. This card gives 6-8 Shield on the protagonist. Since Taunt redirects damage to the protagonist, Shield is the correct defense layer — it protects the hero absorbing those hits.
+
+**"Unyielding"** — Aldric, Rare, Defense, 1 energy
+_"Gain 2 Taunt. Until next turn, damage absorbed by Taunt generates equal Ovation."_
+The hero card. Aldric steps forward, takes the hits, and the crowd goes wild. Every point of damage he absorbs fills the Ovation meter. Rewards intentionally tanking damage — counterintuitive and exciting.
+
+#### Cards That Synergize With Bulwark (Aldric — Block + Retaliate)
+
+Bulwark gives 5 Block and 1 Retaliate. These cards expand the Retaliate archetype and reward defensive play.
+
+**"Rousing Recital"** — Aldric, Uncommon, Action, 1 energy
+_"Convert all Block into Ovation (up to max). Gain 1 Fortify."_
+Play Bulwark for 5 Block, then this converts it to Ovation. Ovation-scaling cards are now stronger. The Fortify ensures you're not defenseless after converting. Creates a rhythm: build Block → convert to Ovation → play Ovation payoff cards.
+
+**"Spiked Barricade"** — Aldric, Uncommon, Defense, 2 energy
+_"Gain 6 Block and 4 Retaliate."_
+A bigger Bulwark. Stacks with the basic in a turn for 5 total Retaliate. With the "Dramatic Lighting" enchantment active, that doubles at end of turn. Now Retaliate is a real damage engine.
+
+**"Sworn Protector"** — Aldric, Rare, Action, 0 energy
+_"Gain Retaliate equal to your Fortify. Gain 2 Block."_
+Late-game payoff at 0 cost because the synergy is hard to assemble. If you've been collecting Fortify from Iron Wall, Stand Guard, Battle Hymn — this converts that investment into Retaliate. Your defense literally fights back. The 0 cost means it always fits into a turn.
+
+### Definition of Done
+
+- [x] 12 new cards added across Aldric (6) and Pip (6) pools, spanning uncommon/rare
+- [x] New cards defined in `cards.js` following existing data format
+- [x] New cards appear in appropriate card reward pools based on protagonist affinity and rarity
+- [x] Reward refresh button added to post-combat reward screen
+- [x] 1 free refresh per reward screen — rerolls all 3 options, respecting rarity weights and not re-offering already-seen cards
+- [x] Refresh button visually communicates remaining refreshes (greyed out after use, shows count)
+- [x] Visual: refresh animation — cards fade up, new ones slide in from below
+- [x] New cards have keyword emojis in descriptions via existing `_injectKeywordEmojis` pipeline
+- [x] All new cards playable with custom effect types in `executeCardEffects` switch
+- [x] Card zoom on new cards shows correct keyword explanations via `_extractCardKeywords` updates
+- [x] No new keywords needed — all effects use existing keyword system
+- [x] No card names reference keyword names directly
+- [ ] Balance pass: playtest each new card in at least one full run to verify it feels impactful but not broken
+
+---
+
+## M5 — Stage Props
+
+### Goal
+
+Introduce Stage Props — persistent passive items collected during a run that provide in-combat benefits for the remainder of the run. Thematically, these are props placed on the stage that affect every scene.
+
+### Design Notes
+
+- Stage Props are NOT cards — they don't go in the deck, they aren't played from hand
+- Collected between combats (initially as boss rewards or alternative combat rewards; later from events and the merchant in M6)
+- Active for all future combats in the run
+- Register event bus listeners at the start of each combat, deregister at combat end, re-register at next combat start
+- UI: displayed in a dedicated strip/area near the enemy, visually distinct from enchantments (enchantments are temporary/ghostly, Stage Props are solid/permanent)
+- Tappable: opens an overlay with the prop's name, description, and crowd explanation of what it does
+- A player might collect 3-6 Stage Props across a full run
+- Data model: each prop has an ID, name, description, trigger event, effect, and optionally a condition
+- Stage Props persist in the save file (M1) as part of run state
+
+### Example Stage Props
+
+**"Director's Megaphone"**
+_"At the start of each combat, gain 1 Inspire."_
+Simple and universally useful. Every combat starts with your first card being boosted. Early pickup that makes the player feel immediately stronger.
+
+**"Tattered Script"**
+_"At the start of each combat, draw 1 additional card."_
+Start with 6 cards instead of 5. More options on turn 1. Simple power that never feels bad.
+
+**"Applause-O-Meter"**
+_"Whenever you gain Ovation, gain 1 additional Ovation."_
+Doubles Ovation generation. Makes Ovation-scaling cards (Coup de Grace, Protective Stance, Captivating Strike, Ultimate Jeer) significantly more powerful. Potentially overpowered — test and tune if needed.
+
+**"Stunt Double"**
+_"Once per combat, when a protagonist would take lethal damage, survive with 1 HP instead."_
+Safety net. Prevents a run-ending mistake. Doesn't trigger on MacGuffin damage — only protagonist HP. Gives the player room to be aggressive with Taunt strategies.
+
+**"Trapdoor Lever"**
+_"Once per combat, when MacGuffin drops below 50% HP, gain 10 Block on MacGuffin."_
+Emergency save for the MacGuffin. Triggers automatically. Gives a buffer when things go south. Pairs with Block-conversion strategies (Rousing Recital converts that emergency Block into Ovation).
+
+**"Villain's Monologue"**
+_"Enemies start each combat with 1 Frustrated and 1 Weak."_
+Debuff-flavored prop. Every enemy starts slightly impaired. Makes early turns safer and gives Pip's debuff-counting cards (Quick Jab, Twist the Knife) a head start.
+
+**"Opening Night Jitters"**
+_"Start each combat with 2 Ovation."_
+Simple momentum. Every fight begins with Ovation already building. Feeds directly into Ovation-scaling cards from turn 1.
+
+**"Understudy's Mask"**
+_"At the start of each combat, gain 1 of a random keyword matching your protagonist pair."_
+Gives a random Aldric keyword (Taunt, Shield, Retaliate, Fortify) or Pip keyword (Luck, Distract) at combat start. Different every fight. Adds variety and occasionally creates unexpected synergies.
+
+**"Spotlight Rig"**
+_"Whenever you play a 0-cost card, gain 1 Ovation."_
+Rewards cheap card play. The 0-cost basics (Block, Inspire) now generate Ovation. Mischief, Pip's Cocktail, Protect all generate Ovation. Makes deckbuilding decisions about card cost more interesting.
+
+### Definition of Done
+
+- [x] Stage Prop data model defined — ID, name, description, trigger configuration (event bus events), effect, optional condition, rarity
+- [x] At least 6 Stage Props implemented and obtainable (9 props: Director's Megaphone, Tattered Script, Applause-O-Meter, Stunt Double, Trapdoor Lever, Villain's Monologue, Opening Night Jitters, Spotlight Rig, Understudy's Mask)
+- [x] Stage Props register event bus listeners at combat start, deregister at combat end
+- [x] Stage Props that are "once per combat" track their usage and reset on next combat (Stunt Double, Trapdoor Lever)
+- [x] UI: Stage Prop display area visible during combat, showing collected props
+- [x] Tapping a Stage Prop shows name and description via speech bubble
+- [x] Stage Props initially awarded as boss rewards (choice of 1 from 3 options) — 3-screen boss reward flow: card reward → card removal → stage prop selection
+- [x] Stage Props persist in run save data (M1 integration)
+- [ ] Stage Props listed in a viewable collection from the pause/menu screen (deferred to M6)
+- [x] Stage Props visually distinct from enchantment cards in the combat UI (circular tokens vs. pill-shaped enchantments)
+- [x] Stage Prop effects trigger correctly across multiple combats in a run (re-registration works)
+- [x] No Stage Prop creates an infinite loop or game-breaking interaction with existing mechanics (Applause-O-Meter uses lock to prevent recursion)
+
+---
+
+## M6 — Currency, Merchant & Narrative Events
+
+### Goal
+
+Reshape the between-combat experience with in-run currency (Gold), a merchant scene with a fixed inventory of 5 purchasable items, and narrative events presented as puppet show vignettes between the protagonists. The run structure becomes: Combat → Event → Combat → Merchant → Boss (per act).
+
+### Revised Act Structure
 
 ```
-17 (Health) ──→ 18 (Damage Resolution) ──→ 19 (Keywords) ──→ 20 (Cards)
-                                                  │               │
-                                                  ↓               ↓
-                                            21 (Enemies) ──→ 23 (Act I Playable)
-                                                  │
-                                            22 (Ovation) ─────────↗
-                                                                  │
-                                     24 (Preview) ────────────────↗
-                                     25 (Deck Select) ────────────↗
-                                                                  │
-                                                            26-29 (Acts II-III)
-                                                                  │
-                                                            30 (Drag-to-Play) ✅
-                                                                  │
-                                                            31-35 (Pre-V1 Polish)
-                                                                  │
-                                                            36 (V1 Playtest)
-                                                                  │
-                                                            37-42 (Post-V1)
+Act 1:  Combat 1 (choose 1 of 2) → Narrative Event → Combat 2 (choose 1 of 2) → Merchant → Boss
+Act 2:  Combat 1 (choose 1 of 2) → Narrative Event → Combat 2 (choose 1 of 2) → Merchant → Boss
+Act 3:  Combat 1 (choose 1 of 2) → Narrative Event → Combat 2 (choose 1 of 2) → Merchant → Boss
 ```
 
-### What to read per milestone
-
-Each milestone lists which files the AI session should read. Thanks to the refactor, no session needs to read more than ~800 lines of game code at a time.
+This is a linear path — no branching map. Variety comes from enemy selection, card rewards, event outcomes, and merchant spending. A branching map would add UI complexity on mobile without meaningful decision depth given the small number of nodes per act.
 
 ---
 
-## Completed Milestone Details
+### Currency: Gold
 
-*Milestones 1–16c are complete. Their acceptance criteria are preserved here for reference but collapsed for brevity.*
-
-<details>
-<summary>Milestones 1–16c (click to expand)</summary>
-
-### 1. Static Stage Layout ✅
-
-Theater stage with four vertical regions, placeholder silhouettes, and basic UI.
-
-**Acceptance Criteria:**
-
-1. Warm parchment gradient background (#F4E4C1 center → #E8D4A8 → #D4A055 edges)
-2. 4 vertical regions: enemy (~25%), stage (~30%), hand (~30%), controls (~15%)
-3. Two hero silhouettes (Aldric left, Pip right) on the stage
-4. MacGuffin centered between heroes with HP bar
-5. Enemy silhouette in enemy area with HP bar and intent icon
-6. Audience strip at bottom (6-8 head silhouettes)
-7. End Turn button visible in controls area
-8. Energy indicator showing "3"
-9. All elements visible at 375×812 with no scrolling or clipping
-10. Near-black silhouettes (#1A1A2E) with puppet sticks (#3D2B1F)
-
-### 2. Card Hand Display ✅
-
-Render playable cards in the hand region with proper styling and interaction.
-
-### 3. Combat State Display ✅
-
-HP bars, intent icons, and status effect indicators.
-
-### 4. Card Play Flow ✅
-
-Card selection, energy cost validation, and discard animation.
-
-### 5. Speech Bubbles ✅
-
-Combat feedback via themed speech bubbles with animations.
-
-### 6. Puppet Animations ✅
-
-CSS-only puppet animations for all game actions.
-
-### 7. Basic Turn Loop ✅
-
-Draw phase, play phase, enemy action, and damage resolution.
-
-### 8. Single Combat (Stage Rat) ✅
-
-First complete fight using starting deck against Stage Rat enemy.
-
-### 9. Enemy Intent System ✅
-
-Intent declaration with multi-attack display and varied patterns.
-
-### 10. Card Rewards Screen ✅
-
-Post-combat card selection (choose 1 of 3).
-
-### 11. Act I Scene Flow ✅
-
-Two scenes with enemy choice, leading to boss.
-
-### 12. Boss: The Critic ✅
-
-First boss with phase transition and signature mechanics.
-
-### 13. Keywords Implementation ✅
-
-Charged, Fortify, Encore, Persistent, Piercing.
-
-### 14. Debuff System ✅
-
-Stage Fright, Heckled, Weakness, Forgetfulness.
-
-### 15. Defensive Keywords ✅
-
-Ward, Ovation, Curtain, Deflect.
-
-### 16. Starting Menu & Scene Flow ✅
-
-Complete game entry flow from title screen through scene transitions into combat.
-
-### 16b. JS File Refactor ✅
-
-Split the 3400-line `game.js` monolith into data modules.
-
-**Result:**
-- `cards.js` (415 lines) — card definitions, pools, glossary
-- `enemies.js` (82 lines) — enemy data, act structure
-- `audience.js` (149 lines) — audience type data
-- `game.js` (2775 lines) — CurtainCallGame class
-
-### 16c. Second JS Refactor ✅
-
-Split the 2775-line `game.js` class into logical concerns using `Object.assign(prototype)`.
-
-**Result:**
-- `game.js` (369 lines) — core class, constructor, deck, debug
-- `combat.js` (799 lines) — turn loop, enemy AI, card play, effects
-- `renderer.js` (628 lines) — card/HP/speech rendering
-- `ui.js` (757 lines) — events, menus, scene flow, rewards, zoom
-- `audience.js` (429 lines) — audience data + animation methods
-
-See `architecture.md` for full file layout and method inventory.
-
-</details>
+- In-run currency used at the merchant
+- Awarded after each combat victory — base amount + optional performance bonus (low damage taken, high Ovation, etc.)
+- Displayed in the UI during between-combat screens
+- Persisted in run save data (M1)
+- Unspent Gold at end of a run converts to Tickets (M7's meta-currency) at a small ratio (e.g., 10 Gold → 1 Ticket). This is a pleasant bonus for frugal players but never worth sacrificing a merchant purchase over — run performance (winning, reaching later acts) should always generate far more Tickets than hoarding Gold would.
 
 ---
 
-## v2 Milestones
+### Merchant
 
-*Reference docs: `updated_rules/curtain_call_ruleset_v2.md`, `curtain_call_keywords_v2.md`, `curtain_call_enemies_v2.md`, `curtain_call_cards_v2.csv`*
+The merchant appears after the second combat in each act, before the boss. This placement means the player has fought two enemies, knows what their deck needs, and can make informed purchases before the boss fight.
 
----
+The merchant is a themed character — a stagehand, prop master, or costume designer — with a line or two of personality. The interaction is purely transactional: here's the table, buy and go. No dialogue trees, no bartering.
 
-### 17. v2 Health System
+**Fixed inventory — 5 items, same categories every visit:**
 
-Add protagonist HP (per-combat) alongside the existing MacGuffin HP (per-run). This is the foundation for the entire v2 combat system.
+| Slot | Item               | Description                                                                                                                                     |
+| ---- | ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1    | **Stage Prop**     | A single Stage Prop. Take it or leave it. (Future expansion: choose from 2-3 options.)                                                          |
+| 2    | **Card Rewards**   | Triggers the standard card reward flow — pick 2 cards from the normal rarity-weighted pool + 1 free refresh. Reuses existing reward UI.         |
+| 3    | **Rare Card**      | Pick 1 from 3 rare cards. Guarantees rare quality — the premium alternative to the standard card reward slot.                                   |
+| 4    | **Card Removal**   | Remove 1 card from your deck. Deck thinning for quality. Boss victories also offer card removal, so this is supplementary, not the only source. |
+| 5    | **MacGuffin Heal** | Restore a fixed amount of MacGuffin HP. Should heal enough to matter when you're behind (e.g., 8 HP) but not enough to fully reset.             |
 
-**Read:** `game.js`, `combat.js`, `renderer.js`, `curtain-call.html` (stage area only)
+**Pricing:** Fixed prices across the entire game — no scaling by act, no escalating costs for repeat purchases. The player earns enough Gold per act for roughly 2-3 items, so every merchant visit forces prioritization. "I need the heal and the prop, so no new cards this time." Same five items, different decisions every run.
 
-**Acceptance Criteria:**
-
-1. **MacGuffin HP** is now the run-level resource:
-   - Starting HP: 50 (exact value TBD during balance)
-   - Cannot be healed — display with no heal indicators
-   - MacGuffin at 0 HP = run over (game defeat)
-2. **Protagonist HP** is per-combat:
-   - Aldric: 20 HP, Pip: 10 HP
-   - Fully resets after each combat encounter
-   - Protagonist at 0 HP = **knockout** (cannot play that protagonist's cards for rest of combat)
-   - Protagonists CAN be healed during combat
-3. **UI changes:**
-   - HP bars displayed below each protagonist silhouette (Aldric and Pip)
-   - MacGuffin HP bar visually distinct (different color/style to signal "permanent")
-   - Knockout state visually shown (dimmed puppet, "KO" indicator)
-   - Knocked-out protagonist's cards in hand are dimmed/unplayable
-4. **State tracking:**
-   - `combatState.aldric = { currentHP, maxHP }` and `combatState.pip = { currentHP, maxHP }`
-   - `combatState.macguffin` remains but `block` moves to a global pool (see milestone 18)
-   - Knockout flag per protagonist
-5. **No behavioral changes to existing enemies yet** — enemy attacks still target MacGuffin only
+**Design rationale for fixed structure:** No browsing, no pagination, no overwhelming choice. Five items on a table. The player learns the format once and every future visit is fast — scan, decide, buy, go. Perfect for mobile.
 
 ---
 
-### 18. v2 Damage Resolution
+### Narrative Events
 
-Implement the 5-step damage resolution order: Taunt → Distract → Shield → Block → Retaliate. This replaces the current simple block-then-damage logic.
+Narrative events appear after the first combat in each act. They are presented as short puppet show vignettes — the protagonists have a brief conversation using the existing speech bubble system, then the player makes a choice.
 
-**Read:** `combat.js`, `renderer.js`
+#### Presentation Format
 
-**Acceptance Criteria:**
+The event plays out on the stage using the existing puppet and speech bubble infrastructure:
 
-1. **Damage resolution pipeline** (per hit):
-   - Step 1: **Taunt** — If active, redirect hit to taunting protagonist. Decrement Taunt by 1.
-   - Step 2: **Distract** — If target has Distract, negate entire hit. Decrement by 1. Stop.
-   - Step 3: **Shield** — Protagonist-specific. Reduce remaining damage. Shield reduced by absorbed amount.
-   - Step 4: **Block** — Global pool. Reduce remaining damage. Block reduced by absorbed amount.
-   - Step 5: **Retaliate** — Deal Retaliate amount back to attacker.
-2. **Multi-hit attacks** resolve each hit through the full pipeline independently
-3. **Block is a global pool** (shared across MacGuffin and all protagonists)
-4. **Shield is protagonist-specific** (only reduces damage to that protagonist)
-5. **Turn reset behavior:**
-   - Block resets to 0 at start of enemy turn (after player plays cards)
-   - Shield resets to 0 at start of enemy turn
-   - Distract resets to 0 at start of enemy turn
-   - Taunt resets to 0 at start of enemy turn
-   - Retaliate resets to 0 at start of enemy turn
-6. **AoE attacks** hit MacGuffin + both protagonists. Each target resolves damage independently.
-7. All existing speech bubbles work with the new pipeline (show blocked amounts, redirects, etc.)
-8. Refactor `enemyAttack()` in `combat.js` to use the new pipeline
+1. **Protagonist A's speech bubble** appears over their puppet, holds for a beat, fades
+2. **Protagonist B's speech bubble** appears, holds, fades
+3. **Two choice buttons** appear at the bottom — "Side with [Protagonist A]" / "Side with [Protagonist B]"
+4. Player taps one
+5. **Winner gets a final reaction line** — a speech bubble with their response to having won the argument
+6. Rewards/consequences apply, transition to next scene
 
----
+Total interaction time: ~8-10 seconds of dialogue plus a single tap. No scrolling, no text walls, no new UI paradigm. It's just the puppet show doing what puppet shows do — the characters disagree and the audience decides.
 
-### 19. v2 Keyword Engine
+#### Example Event
 
-Replace the current ad-hoc keyword system with the full v2 keyword set. This is the largest single milestone.
+> _Pip:_ "I'm hungry, I think I'll grab a snack from the MacGuffin."
+> _Aldric:_ "Don't you dare, we must always protect the MacGuffin!"
 
-**Read:** `combat.js`, `cards.js` (for KEYWORD_GLOSSARY structure), `updated_rules/curtain_call_keywords_v2.md`
+**Side with Pip:** Gain a random Pip card, but lose 5 MacGuffin HP.
+→ Pip's reaction: _"Tastes even better than I thought. I'm gonna have to sneak some more later."_
 
-**Acceptance Criteria:**
+**Side with Aldric:** Heal the MacGuffin by 5 HP, start the next combat with 5 Block.
+→ Aldric's reaction: _"My duty is fulfilled today."_
 
-#### Positive Keywords (13)
-1. **Block** — global damage reduction pool, resets at turn start
-2. **Distract** — negate one entire hit per stack, resets at turn start
-3. **Taunt** — redirect hit to protagonist, resets at turn start
-4. **Shield** — protagonist-specific damage reduction, resets at turn start
-5. **Regenerate** — heal at start of turn, decays by 1 each turn
-6. **Retaliate** — deal damage back to attacker per hit, resets at turn start
-7. **Inspire** — permanent +1 damage per stack on all attacks
-8. **Fortify** — +1 bonus Block per Fortify when gaining Block, decays by 1
-9. **Piercing** — attacks bypass Block and Shield, decays by 1
-10. **Accuracy** — attacks bypass Taunt/Distract, ignore Retaliate, decays by 1
-11. **Ward** — negate one debuff application, permanent until consumed
-12. **Luck** — 10% per stack chance for 1.5× damage, decays by 1 (player-only)
-13. **Flourish** — double all Ovation gains and losses, resets at turn start
+#### Design Principles
 
-#### Negative Keywords (11)
-1. **Poison** — 1 damage per stack at turn start + suppresses healing, decays by 1
-2. **Burn** — 1 damage per stack at turn start, decays by 1
-3. **Stage Fright** — cannot play attack cards, decays by 1
-4. **Heckled** — cannot play non-attack cards, decays by 1
-5. **Forgetful** — 50% reduced damage dealt, decays by 1
-6. **Vulnerable** — 50% increased damage taken, decays by 1
-7. **Weak** — 50% reduced Block/Shield generation, decays by 1
-8. **Confused** — 50% chance Distract/Taunt/Retaliate doesn't trigger, decays by 1
-9. **Curse** — deal Curse damage at end of turn (through Shield→Block), consumed on trigger
-10. **Fear** — permanent, converts to Stage Fright 1 at 5 stacks, resets to 0
-11. **Frustration** — permanent, converts to Heckled 1 at 5 stacks, resets to 0
+**Every choice has a "clean" option and a "greedy" option.** The clean option is low-risk, modest reward — gain some Gold, heal a bit, nothing bad happens. The greedy option is high-reward with a real cost — gain a Stage Prop but the next enemy starts buffed, gain a card but lose MacGuffin HP. The clean option is never exciting but never punishing. The greedy option is where the memorable run stories come from.
 
-#### Implementation Requirements
-12. Keywords stored as structured state: `{ stacks: N, target: 'aldric'|'pip'|'global'|'enemy' }`
-13. **Ward intercepts** debuff application — check Ward before applying any negative keyword
-14. **Keyword interaction matrix** implemented (Piercing vs Block/Shield, Accuracy vs Taunt/Distract/Retaliate, Poison vs Regenerate)
-15. Update `KEYWORD_GLOSSARY` in `cards.js` with all 24 keywords
-16. Status effect display (`renderStatusEffects`) updated for all keywords with proper icons
-17. Old v1 keywords removed: Charged, Encore, Curtain (as defensive keyword), Deflect, Ovation (as keyword — becomes meter), old Ward/Weakness/Heckled/Stage Fright semantics replaced
+**Consequences should be things the player can play around.** "Next enemy starts with 3 Inspire" is good because the player can account for it — bring Block-heavy cards, play defensively early. "Next enemy starts with 2 Weak on both protagonists" makes you think about whether your deck can afford a slow start. Flat resource losses (lose 10 Gold) are less interesting because there's no counterplay. The best consequences change how you approach the next fight.
+
+**"Side with X" framing reinforces character identity.** Over many runs the player develops a sense of each protagonist's personality — Pip is the risky one, Aldric is the cautious one. Sometimes events subvert this expectation, which keeps things interesting.
+
+**Static events, learned over time.** Events and their outcomes are fixed, not randomized. The player "learns" scenarios across runs — first encounter is narrative surprise, subsequent encounters are informed strategic decisions. Dawncaster does this well.
+
+**Protagonist-pair-specific dialogue.** Every event needs custom dialogue for each protagonist combination. With just Aldric and Pip this is manageable; as new protagonist pairs are added (M7), each new pair will need its own dialogue for every event. This is a significant content investment per new pair, but it's what makes the characters feel alive rather than interchangeable. The data structure should support this from the start — events keyed by protagonist pair, with dialogue and choices per pair.
+
+#### Outcome Types
+
+Event choices can produce any combination of:
+
+- Gain a random card (from a specific protagonist's pool)
+- Gain a card reward (standard pick-from-3 flow)
+- Remove a random card from deck
+- Remove a card of your choice from deck
+- Gain a Stage Prop
+- Gain Gold
+- Lose Gold
+- Heal MacGuffin HP
+- Damage MacGuffin HP
+- Buff/debuff protagonists for next combat
+- Buff/debuff next enemy for next combat
+
+#### Event Pool Size
+
+Start with 6-8 events. With 1 event per act and 3 acts per run, the player sees 3 events per run. At 6-8 total, it takes a few runs before everything is seen, and most runs include at least one fresh event. More events can be added over time — including through meta-progression (M7) unlock tracks.
+
+#### Data Format
+
+Events are defined as config objects — scenario ID, protagonist pair key, dialogue sequence (speaker + text), choice labels, outcome definitions, reaction lines. Fully data-driven, no hardcoded event logic.
 
 ---
 
-### 20. v2 Card & Deck Overhaul
+### Definition of Done
 
-Replace all card definitions with v2 cards. Update the card effect system to support all new keywords.
+**Currency:**
 
-**Read:** `cards.js`, `combat.js` (executeCardEffects), `updated_rules/curtain_call_cards_v2.csv`
+- [ ] Gold system implemented — earned after combat, displayed in UI, persisted in save
+- [ ] Combat rewards include Gold amount with optional performance bonus
+- [ ] Reward refresh (M4) optionally costs Gold for additional refreshes beyond the free one
+- [ ] Unspent Gold converts to Tickets (M7) at end of run at a small fixed ratio
 
-**Acceptance Criteria:**
+**Merchant:**
 
-1. **Card definitions** rewritten to v2 spec (34 cards):
-   - Aldric Basics (2): Galvanize, Bulwark
-   - Pip Basics (2): Quick Jab, Lucky Shot
-   - MacGuffin (2): Block, Inspire
-   - Aldric pool (12): Aegis, Burning Devotion, Enabling Strike, Protective Stance, Protect, Iron Wall, True Strike, Inspirational Shout, Cleanse, Aggressive Strike, Captivating Strike, Stoic Resistance
-   - Pip pool (12): Good Fortune, Create Opportunity, Loaded Insult, Coup de Grace, Pip's Cocktail, Annoying Poke, Stylish Dance, Hit Where It Hurts, Vex, Best Explanation, Ultimate Jeer, Flirtatious Jeer
-2. **Rarity system:** Basic, Uncommon, Rare — affects card pool selection
-3. **Card type system:** Attack, Defense, Action — affects Stage Fright/Heckled card filtering
-4. **Effect types** expanded to cover all v2 actions:
-   - `damage`, `block`, `shield`, `taunt`, `distract`, `retaliate`
-   - `heal` (protagonist-targeted), `draw`, `energy`
-   - `inspire`, `fortify`, `piercing`, `accuracy`, `ward`, `luck`, `flourish`, `regenerate`
-   - `inflict` (any debuff: poison, burn, fear, frustration, vulnerable, weak, confused, forgetful, curse, stageFright, heckled)
-   - `cleanse` (remove specific debuffs from target)
-   - Dynamic effects: `damagePerDebuff`, `damageFromOvation`, `convertOvation`, `reduceCost`, `blockOnDraw`
-5. **Starting deck** updated: 3× chosen Aldric Basic + 3× chosen Pip Basic + 3× Block + 1× Inspire = 10 cards
-6. `CARD_POOLS` organized by protagonist + rarity
-7. `executeCardEffects()` in `combat.js` handles all new effect types
-8. Card descriptions use v2 language conventions ("Gain", "Inflict", "Deal", "Draw")
-9. Cost 0 cards work correctly (Protect)
+- [ ] Merchant screen appears after Combat 2 in each act, before the boss
+- [ ] Merchant character with 1-2 lines of personality (themed as backstage crew)
+- [ ] 5 fixed inventory slots displayed: Stage Prop, Card Rewards (2 picks + refresh), Rare Card (pick 1 of 3), Card Removal, MacGuffin Heal
+- [ ] Fixed prices per item — no act scaling, no escalation
+- [ ] Purchasing an item greys it out / marks it as sold
+- [ ] Card Rewards slot reuses existing reward UI flow (pick from 3, refresh available)
+- [ ] Rare Card slot shows 3 rare cards, player picks 1
+- [ ] Card Removal opens deck list, player selects 1 card to remove
+- [ ] MacGuffin Heal restores a fixed HP amount, with clear feedback
+- [ ] Player can leave without buying anything
+- [ ] Merchant purchases persist in run save data (M1)
 
----
+**Narrative Events:**
 
-### 21. v2 Enemy Data Overhaul
+- [ ] Narrative event screen appears after Combat 1 in each act
+- [ ] Events presented as timed speech bubble sequences over the protagonist puppets on stage
+- [ ] Speech bubbles appear and fade in sequence using existing speech bubble infrastructure
+- [ ] After dialogue, two choice buttons appear: "Side with [Protagonist A]" / "Side with [Protagonist B]"
+- [ ] After player chooses, the chosen protagonist shows a reaction speech bubble
+- [ ] Outcomes apply immediately (Gold, HP, cards, buffs/debuffs, etc.)
+- [ ] At least 6 narrative events implemented with protagonist-pair-specific dialogue for Aldric + Pip
+- [ ] Events are fully data-driven — defined in config files, not hardcoded
+- [ ] Event data structure supports multiple protagonist pairs (keyed by pair, with dialogue and choices per pair)
+- [ ] Event outcomes persist in run save data (M1) — including any "next combat" modifiers
+- [ ] Events and merchant integrated into the revised act structure: Combat → Event → Combat → Merchant → Boss
 
-Rewrite all enemy definitions to v2 spec. Implement enemy passives and phase transitions.
+**Integration:**
 
-**Read:** `enemies.js`, `combat.js` (executeEnemyTurn, setNextEnemyIntent), `updated_rules/curtain_call_enemies_v2.md`
-
-**Acceptance Criteria:**
-
-1. **Act I enemies** redefined (v2 stats):
-   - Stage Rat: 25 HP, pattern [Atk 5, Atk 5, AoE 2]
-   - Rusty Knight: 30 HP, passive *Rusty Armor* (starts with 3 Block), pattern [Block 5, Atk 7, AoE 3]
-   - Moth Swarm: 20 HP, passive *Erratic* (immune Fear/Frustration), pattern [Atk 2×3, AoE 1×2, Atk 2×3]
-   - Stagehand: 25 HP, passive *Curtain Rigging* (+1 Inspire end of turn), pattern [Atk 4, Atk 4, AoE 2]
-2. **The Critic** redefined:
-   - 45 HP, passive *Scathing Pen* (heal 3 on debuff inflict)
-   - Phase 1: [Atk 6, Inflict Forgetful 2, AoE 3]
-   - Phase 2 (<50% HP): [Atk 8, Inflict Vulnerable 2 all, Atk 5×2], gains 5 Block on transition
-3. **Enemy passive system:**
-   - Passives stored in enemy definition data
-   - Passive effects triggered at appropriate times (start of fight, end of turn, on damage, on debuff, etc.)
-   - Passive icon/text displayed in enemy info area
-4. **AoE attack type:**
-   - `{ type: 'attack', value: N, target: 'all' }` hits MacGuffin + both protagonists
-   - Each target resolves through damage pipeline independently
-5. **Phase transition system:**
-   - Boss enemies have `phases` array with HP thresholds
-   - On crossing threshold: change pattern, optionally trigger transition effects (gain Block, clear debuffs, etc.)
-   - Visual indicator for phase change (speech bubble, flash)
-6. **Enemy keyword usage:**
-   - Enemies can gain/use: Block, Shield, Regenerate, Inspire, Retaliate, Accuracy
-   - Enemy Block/Shield resets same as player (start of their turn)
-   - Enemy Regenerate heals at start of enemy turn
-7. Only Act I enemies need to be fully playable for this milestone. Acts II–III data can be defined but untested.
+- [ ] Between-combat navigation shows the player where they are in the act (progress indicator updated for new structure)
+- [ ] All new screens (event, merchant) use curtain transitions consistent with existing scene transitions
+- [ ] The event and merchant text fits the shadow puppet theater tone — backstage vignettes, not generic fantasy
 
 ---
 
-### 22. v2 Ovation Rework
+## M7 — Meta-Progression
 
-Replace the current Ovation system with the v2 crowd meter (range 0–5, per-hit gain, turn decay, damage bonus tiers).
+### Goal
 
-**Read:** `combat.js` (dealDamageToEnemy, enemyAttack, startTurn), `renderer.js`
+Give players long-term goals across runs through a Ticket currency and a set of unlock tracks. Players earn Tickets based on run performance and spend them to advance sequential unlock paths that expand the game's content — new cards, Stage Props, MacGuffin variants, alternative basic cards, and eventually new protagonist pairs.
 
-**Acceptance Criteria:**
+### Currency: Tickets
 
-1. **Ovation range:** 0–5 (hard cap)
-2. **Gain:** +1 per individual hit dealt to an enemy (not per card — multi-hit cards gain multiple)
-3. **Decay:** −1 at start of each player turn
-4. **Loss:** −1 on each instance of unblocked damage to MacGuffin (damage that gets through all defenses)
-5. **Damage bonus tiers:**
-   - Ovation 0–1: No bonus
-   - Ovation 2–4: +1 damage on all attacks
-   - Ovation 5: +2 damage on all attacks
-6. **Resets between encounters** — starts at 0 each fight
-7. **Flourish interaction:** When Flourish is active, all gains and losses are doubled
-8. **UI:** Ovation meter displayed prominently (5 segments/stars/pips). Current level clearly visible.
-9. **Audience visual reaction** tied to Ovation level (existing audience system reacts to changes)
-10. Remove old Ovation behavior (was a decaying shield)
+**Tickets** are the meta-progression currency, earned across runs and spent between runs on permanent unlocks.
 
----
+#### Earning Tickets
 
-### 23. Act I Playable (v2)
+The primary driver is run performance — how far you get matters most.
 
-Integrate all v2 systems into a complete, playable Act I run. This is the first integration checkpoint.
+- **Acts completed:** The main source. Completing Act 1 pays X, Act 2 pays more, Act 3 (full clear) pays the most. Failed runs still earn Tickets for acts completed — every run generates progress.
+- **Bosses defeated:** Small bonus per boss kill.
+- **First-time achievements:** One-time Ticket bursts that frontload progression for new players. Examples: "First time defeating [specific boss]," "First time reaching 10 Ovation," "First time having 5+ unique debuffs on an enemy," "First time winning a run." These make early runs feel rewarding even when the player is still learning.
+- **Gold conversion:** Unspent Gold at end of run converts to Tickets at a small ratio (e.g., 10:1). A pleasant bonus, never worth hoarding Gold over spending at the merchant.
 
-**Read:** `ui.js` (scene flow), `combat.js`, `enemies.js`
+#### Spending Tickets
 
-**Acceptance Criteria:**
-
-1. Complete Act I flow: Scene 1 → reward → Scene 2 → reward → Boss (Critic) → act complete
-2. All 4 Act I enemies work with v2 damage resolution, keywords, and Ovation
-3. v2 starting deck (10 cards) deals appropriate damage against v2 enemy HP values
-4. Card rewards offer 1 Aldric pool, 1 Pip pool, 1 neutral — **player must pick 1 (no skip)**
-5. Protagonist HP resets between combats; MacGuffin HP carries across
-6. Protagonist knockout works (cards dimmed, puppet dimmed)
-7. Boss phase transition works (Critic changes pattern at <50% HP)
-8. Ovation meter visible and functional throughout
-9. **Playtest:** Act I should be completable in ~5 minutes with reasonable play
-10. Balance pass: adjust enemy HP/damage if needed (all values marked "preliminary" in v2 docs)
+Tickets are spent on **unlock tracks** from a dedicated "Backstage" menu accessible from the title screen. This is the meta-progression hub where the player views their progress, sees what's available, and makes purchases.
 
 ---
 
-### 24. Damage Preview UI
+### Unlock Tracks
 
-Real-time forecast of incoming damage, updated as player plays defense cards.
+Progression is structured as a set of sequential tracks — one per content category. Each track has multiple tiers, purchased one at a time with escalating Ticket costs. The player's strategic choice is which track to invest in, not which specific item to buy.
 
-**Read:** `renderer.js`, `combat.js` (damage pipeline)
+Within each track, the unlock order is curated during design. The player sees the next unlock before purchasing — no mystery, no randomness. Early tiers fill gaps and add variety. Later tiers are splashier and more build-defining.
 
-**Acceptance Criteria:**
+#### Track List
 
-1. At turn start, display predicted damage per target based on enemy intent:
-   - Red number above each target that will be hit (e.g., `▼10` on MacGuffin)
-   - For AoE, show numbers on MacGuffin AND each protagonist
-2. **Real-time updates** as player plays cards:
-   - Playing Block reduces MacGuffin's forecast number
-   - Playing Taunt moves damage from MacGuffin forecast to protagonist forecast
-   - Playing Shield reduces protagonist's forecast number
-   - Playing Distract removes one hit worth of damage from forecast
-3. When a target's forecast reaches 0, replace red number with green indicator (checkmark or shield icon)
-4. Multi-hit attacks show total post-mitigation damage, not per-hit breakdown
-5. Preview runs a **simulation** of the damage pipeline without actually applying it
-6. Preview updates immediately (no delay or animation — this is informational)
+| Track                   | Tiers | What Unlocks                                    | Approximate Cost Range   |
+| ----------------------- | ----- | ----------------------------------------------- | ------------------------ |
+| **Aldric's Repertoire** | 5     | New Aldric cards added to reward pools          | 20 → 60 Tickets per tier |
+| **Pip's Repertoire**    | 5     | New Pip cards added to reward pools             | 20 → 60 Tickets per tier |
+| **Neutral Cards**       | 3     | Neutral cards that work with either protagonist | 25 → 45 Tickets per tier |
+| **Stage Props**         | 4-5   | New Stage Props entering the boss/merchant pool | 25 → 50 Tickets per tier |
+| **MacGuffin Variants**  | 3-4   | New MacGuffin types selectable at run start     | 80 → 100 Tickets each    |
+| **Alternative Basics**  | 2-4   | Variant starting cards per protagonist          | 30 Tickets each          |
+| **New Cast Members**    | 1+    | New protagonist pairs                           | 150+ Tickets each        |
 
----
+#### Track Details
 
-### 25. Starting Deck Selection
+**Aldric's Repertoire / Pip's Repertoire**
+Each tier adds 1-2 cards to that protagonist's reward pool. Early tiers fill identified gaps (Taunt payoffs for Aldric, Luck payoffs for Pip). Later tiers add rares with powerful synergies. The order is designed so each unlock feels like it opens a new strategic angle. Five tiers at escalating cost means this track is a steady investment across many runs.
 
-Update character select screen to support v2 starting deck configuration.
+**Neutral Cards**
+A shorter track that adds cards usable by either protagonist. Gating these behind progression solves the "neutral cards feel generic" problem — they don't need to be generic if they're earned. The player has enough context by the time they unlock neutrals to appreciate what they enable.
 
-**Read:** `ui.js` (showCharacterSelect, startPerformance), `cards.js`, `curtain-call.html`
+**Stage Props**
+Each tier unlocks 1-2 new Stage Props entering the randomized boss reward and merchant pools. More props = more variety per run, not guaranteed access to specific props. The player is expanding the possibility space.
 
-**Acceptance Criteria:**
+**MacGuffin Variants**
+The signature unlock track. Each tier unlocks a new MacGuffin type that can be selected at run start alongside the protagonist pair. This is the most mechanically distinctive thing about Curtain Call — a third strategic axis that no other deckbuilder offers.
 
-1. Character select shows 2 Basic card options per protagonist:
-   - Aldric: Galvanize vs Bulwark (shown as selectable cards with full descriptions)
-   - Pip: Quick Jab vs Lucky Shot
-2. Player selects 1 Basic per protagonist (radio-style selection within each protagonist panel)
-3. Starting deck assembled: 3× chosen Aldric Basic + 3× chosen Pip Basic + 3× Block + 1× Inspire = 10 cards
-4. Deck composition shown to player before confirming
-5. "Raise the Curtain" button starts run with selected deck
-6. Both protagonists always selected (no protagonist deselection — team is always Aldric + Pip)
+MacGuffin variants come with different starting cards and a passive ability that changes how you evaluate every card in the reward pool:
 
----
+- **Treasure Chest** (default, always available): Standard Block + Inspire starting cards. No passive. The clean baseline.
+- **Ancient Tome**: Starting cards grant card draw and energy instead of Block and Inspire. Passive: "After playing 5 cards in a single turn, draw 1 card." Pushes tempo and velocity — play cheap cards fast, draw more, play more. Pairs naturally with Pip's cheap debuff cards.
+- **Crown**: Starting cards grant Ovation directly and Block. Passive: "Ovation cannot decay below 2." Makes Ovation a reliable baseline resource rather than something that builds and decays. Changes how you value every Ovation-scaling card.
+- **Cursed Idol**: Higher MacGuffin HP (roughly +50%), but one starting card is a Curse — costs 1 energy, does nothing, cannot be removed. Trading deck consistency for durability. The interesting question: build around the clog or minimize its impact? A later unlock for experienced players.
+- **Fragile Heirloom**: Lower MacGuffin HP, but starts with a stronger card (e.g., 0-cost "gain 2 Inspire"). Glass cannon — fragile but your cards hit harder from the start. Rewards tight play.
 
-### 26. Act II Enemies & Boss
+The combination of protagonist pair + MacGuffin variant creates the real replayability. Aldric + Pip + Treasure Chest plays completely differently from Aldric + Pip + Ancient Tome. When new protagonist pairs are added, the combinatorial space explodes.
 
-Implement all Act II enemies and The Director boss.
+**Alternative Basics**
+Each unlock replaces one of a protagonist's two basic cards with a variant that redirects their synergy tree. For example, Aldric's Galvanize (deal 3, gain 1 Taunt) could have an alternative like "deal 2, gain 2 Shield" — same character, completely different build identity. The player selects their basic variant during character select. Cheaper to implement than a new character, nearly as impactful on run identity.
 
-**Read:** `enemies.js`, `combat.js`, `updated_rules/curtain_call_enemies_v2.md` (Act II section)
-
-**Acceptance Criteria:**
-
-1. **Phantom Understudy** (35 HP): Regenerate pattern, passive *Understudy's Resilience* (Regen 2 on first drop below 50% HP)
-2. **Prop Master** (40 HP): Heavy Block, passive *Stage Fortress* (Block halves instead of full reset), Weak infliction
-3. **Shadow Mimic** (30 HP): AoE-heavy (67%), passive *Mirror Spite* (inflict 1 Burn on attacker)
-4. **Spotlight Phantom** (35 HP): Fear/Frustration/Burn, passive *Blinding Light* (all attacks have Accuracy)
-5. **The Director** (60 HP): Two phases, passive *Casting Call* (random debuff on all at phase start)
-   - Phase 1: Forgetful/Fear pressure on one protagonist
-   - Phase 2: Confused, Regenerate, Frustration on the other protagonist
-   - Transition: clear self debuffs, gain 8 Block
-6. Act structure updated: `ACT_STRUCTURE[2]` with scenes and boss
-7. All enemy passives trigger correctly at their documented times
-8. All enemies use v2 keywords (Block, Regenerate, Inspire, Accuracy, etc.)
+**New Cast Members**
+The most expensive and aspirational track. A new protagonist pair with unique silhouettes, card pools, basic cards, voice lines, and narrative event dialogue. The silhouette appears on the character select screen, locked, creating a visible goal. Each new pair also requires custom dialogue for every narrative event — this is a significant content investment per pair (see M6 narrative event notes).
 
 ---
 
-### 27. Act II Playable
+### Difficulty Modifiers
 
-Full Act I → Act II run with act transition.
+Difficulty modifiers are **achievement-gated, not currency-gated**. They're challenges you earn the right to attempt, not content you buy.
 
-**Read:** `ui.js` (advanceScene, onActComplete), `enemies.js`
+- **Difficulty 1:** Default. Always available.
+- **Difficulty 2:** Unlocked by beating the game once. Enemies have increased HP.
+- **Difficulty 3:** Unlocked by beating the game on Difficulty 2. Enemies start with a buff, reduced starting energy.
+- **Further levels:** Each unlocked by clearing the previous. Each adds a stacking constraint — more enemy HP, less starting resources, harsher enemy patterns, fewer card rewards, etc.
 
-**Acceptance Criteria:**
+Difficulty modifiers are clearly communicated on the title screen before run start. They're the long-term mastery challenge that keeps the game interesting after all content is unlocked.
 
-1. After Act I boss defeat, transition to Act II (curtain close → act title → scene select)
-2. Act II scene selection works (choose 1 of 2 enemies per scene)
-3. MacGuffin HP carries from Act I to Act II
-4. Protagonist HP resets for each Act II combat
-5. Card rewards use full pools (Uncommon + Rare cards available)
-6. Director boss fight works with all phase mechanics
-7. Act II difficulty is a clear step up from Act I
-8. Playtest: Act I + Act II should be completable in ~10 minutes
+Difficulty scaling also addresses the "game gets easier as you unlock more" dynamic that all roguelikes with meta-progression face. Unlocks add new toys and options; difficulty modifiers add new challenges. Both give the player a reason to start another run.
 
 ---
 
-### 28. Act III Enemies & Boss
+### Backstage Menu (UI)
 
-Implement all Act III enemies and The Playwright final boss.
+The meta-progression hub, accessible from the title screen. Shows:
 
-**Read:** `enemies.js`, `combat.js`, `updated_rules/curtain_call_enemies_v2.md` (Act III section)
+- **Unlock tracks** with current progress, next available tier, cost, and a preview of what the next unlock adds
+- **Run history** — recent runs with protagonist pair, MacGuffin, result (win/loss), act reached
+- **Achievements** — first-time milestones with their Ticket bonuses (completed and remaining)
+- **Difficulty selection** — available difficulty levels with descriptions of their modifiers
+- **Ticket balance** — current Tickets with a sense of what they can afford
 
-**Acceptance Criteria:**
-
-1. **Prima Donna** (45 HP): passive *Dramatic Ego* (permanent Retaliate 2, +1 Inspire/turn)
-2. **Comedy/Tragedy Mask** (50 HP): alternating states, passive *Two Faces* (Comedy: 50% damage reduction; Tragedy: debuff immune)
-3. **Puppeteer's Hand** (40 HP): AoE-heavy (75%), passive *Tangled Strings* (+3 dmg if any protagonist has 3+ debuff stacks)
-4. **Fallen Curtain** (50 HP): Block stacking + Curse, passive *Iron Curtain* (immune to Forgetful/Vulnerable)
-5. **The Playwright** (80 HP): Three phases, passive *Narrative Control* (25% chance to clear a debuff/turn)
-   - Phase 1 "Act One": Forgetful + Regenerate
-   - Phase 2 "Plot Twist": Retaliate, Fear/Frustration, Burn — transition clears debuffs, gains 10 Block + permanent Retaliate 2
-   - Phase 3 "Final Page": Inspire stacking, Vulnerable + AoE, Burn + Poison, Heal — transition clears debuffs, gains 3 permanent Inspire, loses Retaliate
-6. `ACT_STRUCTURE[3]` defined with scenes and boss
+The visual design should feel like going backstage at the theater — warmer, more intimate than the stage itself. Maybe a corkboard with pinned unlock cards, or a dressing room mirror with achievements reflected in it.
 
 ---
 
-### 29. Act III & Full Run
+### Definition of Done
 
-Complete 3-act run from menu to victory/defeat.
+**Ticket Currency:**
 
-**Read:** `ui.js`, `enemies.js`
+- [ ] Tickets earned at end of each run based on acts completed, bosses defeated, and first-time achievements
+- [ ] Gold-to-Ticket conversion applied at end of run
+- [ ] Ticket balance stored in SQLite meta-progression table (separate from run saves)
+- [ ] Ticket balance displayed on title screen and in Backstage menu
 
-**Acceptance Criteria:**
+**Unlock Tracks:**
 
-1. Act III scene selection and combat works
-2. Full run flow: Menu → Deck Select → Act I → Act II → Act III → Victory
-3. Defeat at any point shows defeat screen with "Try Again" returning to menu
-4. Victory screen after Playwright defeat shows run summary (turns, damage dealt, cards collected)
-5. MacGuffin HP carries across all 9 encounters — cannot be healed
-6. Full run takes ~15–20 minutes
+- [ ] At least 5 unlock tracks implemented with sequential tiers and escalating costs
+- [ ] Each track shows: current progress, next tier preview, cost
+- [ ] Purchasing a tier deducts Tickets and immediately adds content to the game (cards enter reward pools, props enter boss/merchant pools, MacGuffins appear on character select, etc.)
+- [ ] Aldric's Repertoire and Pip's Repertoire tracks with at least 3 tiers each
+- [ ] At least 1 MacGuffin variant unlockable and selectable at run start
+- [ ] At least 1 alternative basic card unlockable and selectable at character select
+- [ ] Unlock data persisted in SQLite — survives across runs and page refreshes
 
----
+**Backstage Menu:**
 
-### 30. Drag-to-Play & UX Polish ✅
+- [ ] Accessible from title screen
+- [ ] Displays all unlock tracks with progress and purchasing UI
+- [ ] Displays run history (last 10+ runs with key stats)
+- [ ] Displays achievements with Ticket values (completed and remaining)
+- [ ] Displays difficulty selection with modifier descriptions
 
-Replaced tap-to-select card interaction with drag-to-play using Pointer Events. Added card targeting, tap-to-zoom, and rapid play support.
+**Difficulty Modifiers:**
 
-**Changes made:**
+- [ ] At least 3 difficulty levels implemented
+- [ ] Difficulty 2+ gated behind achievement (beat the game on previous difficulty)
+- [ ] Difficulty selection available before starting a run
+- [ ] Difficulty modifiers clearly communicated (what changes at each level)
+- [ ] Selected difficulty affects gameplay as described (enemy HP, buffs, resource constraints, etc.)
 
-1. **Drag-to-play system** — Pointer Events with ghost card, 8px threshold to distinguish tap from drag
-2. **Card targeting** — Three modes: `'none'` (any play area), `'protagonist'` (Aldric/Pip), `'ally'` (Aldric/Pip/MacGuffin). Drop zone highlighting for targeted cards only.
-3. **Tap-to-zoom** — Replaced long-press with single tap. Keyword explanations extracted from card effects and shown in a single audience bubble.
-4. **Debounced hand reflow** — Chrome tab pattern: hide played card, re-index siblings, 600ms debounce before full re-render. Drag-aware: pauses timer during drag.
-5. **Effect queue** — `playCard()` is synchronous for state changes, effects queued and processed in background. Enables rapid card play without animation blocking.
-6. **Enemy area layout** — Restructured to 3-column flex: left sidebar (intent), center (puppet + HP), right sidebar (status modifiers)
-7. **Turn timing fixes** — Symmetric timing: player-inflicted effects process at start of player turn, enemy-inflicted effects process at start of enemy turn. Fixed enemy Block, Regenerate, passives, and debuff decay timing.
-8. **Luck** made permanent (no decay)
+**Achievements:**
 
----
+- [ ] At least 8 first-time achievements defined with one-time Ticket rewards
+- [ ] Achievements tracked and awarded automatically during/after runs
+- [ ] Achievements viewable in Backstage menu
 
-## Pre-V1 Milestones
+**Integration:**
 
----
-
-### 31. Deck List & Card Removal
-
-Overlay to view the full deck, with the ability to remove cards from the deck.
-
-**Read:** `ui.js`, `combat.js` (deck/discard state), `renderer.js`, `cards.js`
-
-**Acceptance Criteria:**
-
-1. Button accessible during combat to open a full-screen deck list overlay
-2. Overlay shows all cards currently in the deck (draw pile + discard pile + hand), grouped or sortable
-3. Each card shown with name, cost, description, and owner indicator (Aldric/Pip/MacGuffin)
-4. Card removal mechanic: player can remove cards from their deck at specific opportunities (e.g., post-combat reward alternative, or dedicated removal event)
-5. Removed cards are permanently gone for the rest of the run
-6. Cannot remove below a minimum deck size (e.g., 5 cards)
-7. Overlay dismissable with tap/click outside or close button
-8. Deck count indicator visible during combat (shows draw pile / discard pile sizes)
+- [ ] Meta-progression data completely separate from run data — clearing/abandoning a run never resets progression
+- [ ] Unlocked content correctly appears in all relevant contexts (reward pools, character select, merchant, boss rewards)
+- [ ] New protagonist pairs (when added) integrate with narrative events — events require pair-specific dialogue
 
 ---
 
-### 32. Attack Animations
+## Spike Milestones — Card Balance & Additions
 
-Visual attack animations for protagonists and enemy to make combat feel more dynamic.
+### What These Are
 
-**Read:** `renderer.js` (puppet animations), `combat.js` (executeCardEffects, enemyAttack), `curtain-call.css`
+Unnumbered, insertable-anywhere milestones triggered by playtesting. When a gap is identified (e.g., "Block keyword needs more card support" or "Pip has no good late-game scaling"), a spike addresses it.
 
-**Acceptance Criteria:**
+### Process
 
-1. **Protagonist attack animation** — puppet lunges/strikes toward enemy when dealing damage
-2. **Enemy attack animation** — enemy puppet strikes toward targets when attacking
-3. **Hit feedback** — target puppet recoils/shakes on receiving damage
-4. **AoE attack animation** — enemy attack visually hits all targets (sweep or multi-strike)
-5. **Multi-hit animation** — rapid successive strikes for multi-hit attacks (e.g., 2×3)
-6. **Block/Shield absorb** — visual feedback when damage is mitigated (flash, particle, etc.)
-7. Animations are snappy (~200–400ms) and don't block rapid card play
-8. Animations work with the effect queue system (don't interfere with debounced reflow)
+1. Identify the gap through playtesting or design review
+2. Design 2-4 cards (or rebalance existing ones) targeting the gap
+3. Implement and test
+4. Brief playtest to verify the gap is addressed without creating new imbalances
 
----
+### Known Gaps (from current card analysis)
 
-### 33. Voice Lines & Dialogue
+- **Block support:** Only 3 cards directly grant Block (Bulwark, Block, Aegis). Block-based strategies need more tools — especially cards that reward having Block.
+- **Retaliate payoff:** Only Bulwark grants Retaliate. The "Dramatic Lighting" enchantment helps, but more Retaliate sources would make it a real archetype.
+- **Cross-protagonist synergy:** Few cards explicitly reward playing both protagonists' cards in a turn. Cooperative Strike is the only one that references "the other protagonist."
+- **Luck payoff:** Luck accumulates but there are limited ways to spend or cash in a large Luck pool. Lucky Shot, Quick Draw, and Good Fortune generate Luck, but the payoffs are thin.
+- **Inspire chains:** Inspire boosts one card, then it's gone. No way to build Inspire stacks for a massive single payoff.
 
-Update and expand speech bubble dialogue for all characters. Tune frequency and variety.
+### Definition of Done (per spike)
 
-**Read:** `audience.js`, `renderer.js` (showSpeechBubble, showAudienceBubble), `enemies.js`
-
-**Acceptance Criteria:**
-
-1. **Audience voice lines** — more variety in reactions, tied to Ovation level and game events (card play, damage, KO, boss phase change)
-2. **Protagonist voice lines** — Aldric and Pip react to their own card plays, taking damage, KO, buff/debuff application
-3. **Enemy voice lines** — each enemy has personality-appropriate lines for attacking, taking damage, using abilities, defeat
-4. **Boss-specific dialogue** — The Critic, Director, and Playwright have phase transition lines and signature taunts
-5. **Frequency tuning** — voice lines trigger at a natural cadence (not every action, not too rarely). Configurable cooldown between lines.
-6. **No duplicate back-to-back** — recent line tracking prevents the same line appearing twice in a row
-
----
-
-### 34. Enemy SVG Art
-
-Replace placeholder enemy silhouettes with unique, themed SVG art for all enemies.
-
-**Read:** `enemies.js`, `curtain-call.html`, `curtain-call.css` (enemy puppet styles)
-
-**Acceptance Criteria:**
-
-1. All 12 regular enemies have distinct SVG silhouettes reflecting their character theme
-2. All 3 bosses have larger, more detailed SVG silhouettes
-3. SVGs maintain the shadow puppet aesthetic (near-black silhouettes with puppet sticks)
-4. Eye/mouth cutouts on characters with expression states (idle, attacking, hurt, defeated)
-5. Enemy passive ability icon or visual indicator displayed
-6. SVGs render crisply at mobile and desktop sizes
-7. Protagonist knockout animation (fade/collapse puppet)
-
----
-
-### 35. Game Rebalancing
-
-Tune the game to allow player synergies to emerge sooner and provide more strategic depth.
-
-**Read:** `cards.js`, `enemies.js`, `combat.js`
-
-**Acceptance Criteria:**
-
-1. **Faster player ramping** — earlier access to synergy cards through improved card reward pools and/or more frequent card rewards
-2. **Less punishing enemy scaling** — tune enemy HP/damage curves so early-game feels manageable and late-game is challenging but fair
-3. **More card choices** — expand card pools with new cards that enable additional strategies and synergies
-4. **Card removal integration** — card removal available as a reward alternative (from M31), enabling deck thinning as a strategy
-5. **Better card addition options** — more meaningful choices at card reward screens (consider showing cards that complement existing deck)
-6. **Synergy acceleration** — ensure keyword combos (Inspire + multi-hit, Fortify + Block, Luck + Pip attacks, etc.) come online by mid Act I
-7. **Balance testing** — full run should feel progressively challenging but winnable with good play. Act I teaches, Act II challenges, Act III tests mastery
-8. **Starting deck variety** — review starting card options to ensure both Aldric and Pip basics feel distinct and viable
-
----
-
-### 36. V1 Playtest Release
-
-Checkpoint milestone: the game is ready for external playtesting.
-
-**Acceptance Criteria:**
-
-1. Complete 3-act run playable from start to finish without crashes or softlocks
-2. All combat mechanics working correctly (drag-to-play, targeting, damage resolution, keywords)
-3. Deck list viewable, card removal functional
-4. Attack animations provide satisfying combat feedback
-5. Voice lines add personality without being annoying
-6. Enemy art is finalized (no placeholder SVGs)
-7. Game balance allows a skilled player to complete a full run in ~15–20 minutes
-8. Mobile touch experience is smooth (drag-to-play, zoom, scrolling)
-9. Basic onboarding: first combat is easy enough to learn mechanics without a tutorial
-10. Share with playtesters, collect feedback
-
----
-
-## Post-V1 Milestones
-
----
-
-### 37. Card Upgrade Rewards
-
-Boss rewards allow upgrading an existing card instead of adding a new card.
-
-**Read:** `ui.js` (showRewardsScreen), `cards.js`
-
-**Acceptance Criteria:**
-
-1. After boss defeat, show upgrade UI (not card selection)
-2. Player selects one card from their deck
-3. Upgrade improves the card (enhanced version defined in card data)
-4. Upgraded card replaces the original in the deck
-5. Upgrade paths defined per card (e.g., Block 3 → Block 5, or add a keyword)
-6. Visual indication that card has been upgraded (border glow or "+" indicator)
-
----
-
-### 38. Curtain Transitions Polish
-
-Themed scene and act transitions with audience reactions.
-
-**Read:** `ui.js` (curtain helpers), `audience.js`
-
-**Acceptance Criteria:**
-
-1. Act title card displayed during act transitions ("Act II — Rising Action")
-2. Victory: curtain call with audience standing ovation animation
-3. Defeat: curtain falls with audience worried/boo reaction
-4. Boss entrance: dramatic curtain open with audience gasp
-5. Transitions are smooth (~1–2s), no jank
-6. Audience reactions tied to Ovation level during transitions
-
----
-
-### 39. Persistence & Run History
-
-SQLite storage for run history and stats.
-
-**Acceptance Criteria:**
-
-1. SQLite database stores completed runs
-2. Run history: starting cards chosen, outcome, duration, cards collected, enemies defeated
-3. Stats screen accessible from main menu showing run history
-4. API endpoints for save/load
-5. Data survives server restart
-6. Graceful degradation if database unavailable
-
----
-
-### 40. Narrative Events
-
-Random narrative encounters between combats that add variety and story.
-
-**Acceptance Criteria:**
-
-1. Event system: between-combat screens with story text, choices, and consequences
-2. Events can grant cards, remove cards, heal/damage MacGuffin, apply keywords
-3. Multiple event types: merchant, mysterious stranger, backstage, rehearsal, etc.
-4. Events selected randomly from a pool, weighted by act and run progress
-5. Player choices matter — different options lead to different rewards/consequences
-6. Events fit the theater/performance theme
-
----
-
-### 41. Shop & Reward System
-
-In-run currency and shop for purchasing cards, upgrades, and items.
-
-**Acceptance Criteria:**
-
-1. Currency earned from combat (gold/applause/tips — thematically appropriate)
-2. Shop accessible between combats (or as a narrative event)
-3. Shop sells cards from the card pool, card removals, and possibly consumable items
-4. Prices scale with act progression
-5. Shop inventory randomized per visit
-6. Currency carries across the full run
-
----
-
-### 42. Unlocks & Meta-Progression
-
-Persistent progression that carries across runs.
-
-**Acceptance Criteria:**
-
-1. Unlock system tracks achievements across runs (e.g., beat Act I, defeat each boss, win a full run)
-2. Unlocks gate new content: additional starting card options, new cards in pools, cosmetics
-3. Meta-progression visible from main menu
-4. Unlocks stored in persistence layer (M39)
-5. Progressive difficulty options unlocked after first win (e.g., harder modifiers)
-6. Achievement/unlock notifications during gameplay
+- [ ] Gap clearly identified and documented
+- [ ] 2-4 cards designed, reviewed, and implemented (or existing cards rebalanced)
+- [ ] Cards added to appropriate pools in `cards.js`
+- [ ] At least one playtest run using the new/changed cards
+- [ ] No regressions in existing card interactions

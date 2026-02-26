@@ -1,6 +1,6 @@
 # Curtain Call — Code Architecture
 
-*Last updated: February 21, 2026. Post-refactor file layout (11 prototype extension files).*
+*Last updated: February 25, 2026. Post-M2 event bus (15 prototype extension files, ~8,100 lines).*
 
 ---
 
@@ -9,7 +9,7 @@
 All game files live under two directories:
 
 ```
-static/js/solo/curtain-call/         <- JavaScript (14 files + 5 config)
+static/js/solo/curtain-call/         <- JavaScript (15 files + 5 config)
 static/js/solo/curtain-call/config/  <- Speech & animation config (5 files)
 templates/solo/curtain-call.html     <- HTML template (Jinja2)
 ```
@@ -20,30 +20,31 @@ templates/solo/curtain-call.html     <- HTML template (Jinja2)
 |------|------:|------|
 | **Config** | | |
 | `config/speech-config.js` | 51 | Priority levels, cooldown, diminishing-returns curves |
-| `config/animation-config.js` | 57 | Animation timing constants |
+| `config/animation-config.js` | 179 | Animation timing constants, Web Animations API keyframes |
 | `config/enemy-speech.js` | 153 | Per-enemy speech lines and trigger chances |
 | `config/protagonist-speech.js` | 145 | Per-protagonist speech lines and trigger chances |
 | `config/crowd-speech.js` | 81 | Crowd ambient dialogue, response pairs, game-event reactions |
 | **Data** | | |
-| `cards.js` | 862 | Card definitions, card pools, starting deck, keyword glossary |
+| `cards.js` | 897 | Card definitions, card pools, starting deck, keyword glossary |
 | `enemies.js` | 515 | Enemy definitions, act structure, passives |
 | **Core** | | |
-| `game.js` | 569 | Class constructor, init, setup, deck management, keywords, debug API |
+| `event-bus.js` | 94 | EventBus class — composable event system for reactive triggers |
+| `game.js` | 600 | Class constructor, init, setup, deck management, keywords, animations, debug API |
 | **Combat** | | |
-| `combat-turns.js` | 445 | Turn lifecycle, keyword processing, ovation, victory/defeat |
-| `combat-enemy.js` | 670 | Enemy AI, actions, damage pipeline (enemy -> player), combat-start passives |
-| `combat-cards.js` | 370 | Card playability, card play pipeline, effect queue, executeCardEffects |
-| `combat-keywords.js` | 608 | Player -> enemy damage, keyword gains, debuffs, Fear/Frustration |
+| `combat-turns.js` | 460 | Turn lifecycle, keyword processing, ovation, victory/defeat |
+| `combat-enemy.js` | 747 | Enemy AI, actions, damage pipeline (enemy -> player), passive registration |
+| `combat-cards.js` | 386 | Card playability, card play pipeline, effect queue, executeCardEffects |
+| `combat-keywords.js` | 604 | Player -> enemy damage, keyword gains, debuffs, Fear/Frustration |
 | **Rendering** | | |
-| `renderer-cards.js` | 271 | Shared `_buildCardDOM` helper, hand/reward/zoomed card rendering |
+| `renderer-cards.js` | 311 | Shared `_buildCardDOM` helper, keyword emoji injection, hand/reward/zoomed card rendering |
 | `renderer.js` | 511 | Combat state display (HP, intent, status), energy, speech bubbles |
 | **UI** | | |
-| `ui-events.js` | 410 | Event binding, drag-to-play system, end-turn handler |
-| `ui-screens.js` | 736 | Card zoom, keyword explanations, rewards, deck list, menus, curtain transitions |
+| `ui-events.js` | 403 | Event binding, drag-to-play system, end-turn handler |
+| `ui-screens.js` | 749 | Card zoom, keyword explanations, rewards, deck list, menus, curtain transitions |
 | `ui-scenes.js` | 269 | Scene selection, enemy selection, combat setup, act progression |
 | **Audience** | | |
 | `audience.js` | 560 | Audience type data, generation, animations, reactions |
-| `audience-speech.js` | 393 | Speech priority engine, enemy/protagonist/crowd speech triggers |
+| `audience-speech.js` | 400 | Speech priority engine, overlay suppression, enemy/protagonist/crowd speech triggers |
 
 ### Load Order
 
@@ -55,33 +56,36 @@ templates/solo/curtain-call.html     <- HTML template (Jinja2)
 <script src="config/protagonist-speech.js"></script>
 <script src="config/crowd-speech.js"></script>
 
-<!-- 2. Data files (global constants, no dependencies) -->
+<!-- 2. Event bus (no dependencies) -->
+<script src="event-bus.js"></script>
+
+<!-- 3. Data files (global constants, no dependencies) -->
 <script src="cards.js"></script>
 <script src="enemies.js"></script>
 
-<!-- 3. Core class definition -->
+<!-- 4. Core class definition (depends on EventBus) -->
 <script src="game.js"></script>
 
-<!-- 4. Combat system (extends prototype) -->
+<!-- 5. Combat system (extends prototype) -->
 <script src="combat-turns.js"></script>
 <script src="combat-enemy.js"></script>
 <script src="combat-cards.js"></script>
 <script src="combat-keywords.js"></script>
 
-<!-- 5. Rendering (extends prototype) -->
+<!-- 6. Rendering (extends prototype) -->
 <script src="renderer-cards.js"></script>
 <script src="renderer.js"></script>
 
-<!-- 6. UI (extends prototype) -->
+<!-- 7. UI (extends prototype) -->
 <script src="ui-events.js"></script>
 <script src="ui-screens.js"></script>
 <script src="ui-scenes.js"></script>
 
-<!-- 7. Audience (extends prototype) -->
+<!-- 8. Audience (extends prototype) -->
 <script src="audience.js"></script>
 <script src="audience-speech.js"></script>
 
-<!-- 8. Instantiate after everything is loaded -->
+<!-- 9. Instantiate after everything is loaded -->
 <script>const game = new CurtainCallGame();</script>
 ```
 
@@ -117,6 +121,54 @@ This lets us split a large class across files without ES modules. All methods sh
 
 The constructor references these via `this.enemies = ENEMY_DEFINITIONS` etc.
 
+### Event Bus (M2)
+
+`event-bus.js` defines the `EventBus` class — a composable event system for reactive triggers. The game constructor creates `this.events = new EventBus()`.
+
+**API:**
+
+- `on(event, callback, { owner, priority })` — register listener. Higher priority fires first. Owner enables bulk cleanup.
+- `off(event, callback)` — remove specific listener
+- `offByOwner(owner)` — remove all listeners for an owner (e.g., `'enemy-passive'`)
+- `emit(event, data)` — async, fires listeners in priority order, awaits each
+- `has(event)` — check if listeners exist
+
+**Event patterns:**
+
+- **Notification events** (`cardPlayed`, `enemyDefeated`, `combatStart`) — fire-and-forget, data is read-only context
+- **Modifier events** (`beforeDamageDealt`, `beforeDebuffOnEnemy`, `beforeEnemyAttack`, `beforeEnemyDefenseReset`) — pass a mutable context object that listeners can modify (e.g., `ctx.damage *= 0.5`, `ctx.blocked = true`)
+
+**Core events emitted:**
+
+| Event | Where | Data |
+|-------|-------|------|
+| `playerTurnStart` | combat-turns | `{ turn }` |
+| `playerTurnEnd` | combat-turns | `{ turn }` |
+| `enemyTurnStart` | combat-turns | `{ turn }` |
+| `enemyTurnEnd` | combat-turns | `{ turn }` |
+| `cardPlayed` | combat-cards | `{ card, target, cardsPlayedThisTurn }` |
+| `cardDrawn` | combat-keywords | `{ card }` |
+| `energySpent` | combat-cards | `{ amount }` |
+| `energyGained` | combat-keywords | `{ amount }` |
+| `blockGained` | combat-keywords | `{ amount }` |
+| `keywordGained` | combat-keywords | `{ keyword, amount, target }` |
+| `ovationChanged` | combat-turns | `{ ovation, delta }` |
+| `beforeDamageDealt` | combat-keywords | `{ damage, card }` (mutable) |
+| `damageDealtToEnemy` | combat-keywords | `{ amount, card, enemyHPRatio }` |
+| `damageTaken` | combat-enemy | `{ target, amount, originalTarget }` |
+| `beforeDebuffOnEnemy` | combat-keywords | `{ keyword, value, card, blocked }` (mutable) |
+| `debuffInflictedOnPlayer` | combat-keywords | `{ keyword, value, target/targets }` |
+| `beforeEnemyAttack` | combat-enemy | `{ damage, hasAccuracy }` (mutable) |
+| `beforeEnemyDefenseReset` | combat-turns | `{ halfBlock, keepRetaliate }` (mutable) |
+| `bossPhaseTransition` | combat-enemy | `{ phase, enemy }` |
+| `combatStart` | ui-scenes | `{ enemyId, isBoss }` |
+| `combatEnd` | combat-turns | `{ result, enemyId? }` |
+| `enemyDefeated` | combat-turns | `{ enemyId, isBoss }` |
+
+**Owner-based cleanup:**
+
+Enemy passives register with `owner: 'enemy-passive'`. At combat end, `this.events.offByOwner('enemy-passive')` cleans them all up. Future systems use their own owners: `'enchantment'` (M3), `'stage-prop'` (M5).
+
 ### Shared Card DOM Helper
 
 `renderer-cards.js` provides `_buildCardDOM(card, options)` — a shared helper that builds the full card DOM structure (rarity borders, energy blips, perforation, name, description, type badge, Aldric rivets). Three thin wrappers call it:
@@ -129,12 +181,14 @@ The constructor references these via `this.enemies = ENEMY_DEFINITIONS` etc.
 
 ## Method Inventory
 
-### game.js — Core lifecycle & deck management
+### game.js — Core lifecycle, deck management & animations
 
 - `constructor`, `init`, `setup`
 - `initializeDeck`, `shuffleDeck`, `drawCard`
 - `resetKeywords`, `renderKeywords`
 - `wait` (Promise-based delay utility)
+- `playAnimation` (Web Animations API helper — returns Promise on `anim.finished`)
+- `getEnemyDebuffCount`, `getEnemyTotalDebuffStacks`
 - `exposeDebugAPI`, `restartCombat`
 - Debug setters: `setMacGuffinHP`, `setEnemyHP`, `setBlock`, `setIntent`, `setEnergy`, `resetEnergy`
 
@@ -142,7 +196,6 @@ The constructor references these via `this.enemies = ENEMY_DEFINITIONS` etc.
 
 - `startTurn`, `drawToHandSize`, `endTurn`
 - `processStartOfTurnKeywords`, `_decayPlayerDebuffs`, `processEndOfTurnCurse`
-- `processEnemyTurnStartPassives`
 - `gainOvation`, `loseOvation`, `getOvationDamageBonus`, `renderOvationMeter`
 - `onEnemyDefeated`, `onDefeat`
 
@@ -152,7 +205,7 @@ The constructor references these via `this.enemies = ENEMY_DEFINITIONS` etc.
 - `checkBossPhaseTransition`
 - `enemyAttack`, `enemyAttackAoE`, `enemyBlock`, `enemyHeal`, `enemyGainKeyword`
 - `resolveDamageHit`, `getTargetElement`, `triggerAbsorbAnimation`
-- `applyCombatStartPassives`, `renderEnemyPassive`
+- `registerEnemyPassives`, `renderEnemyPassive`
 
 ### combat-cards.js — Card play & effect execution
 
@@ -171,7 +224,8 @@ The constructor references these via `this.enemies = ENEMY_DEFINITIONS` etc.
 ### renderer-cards.js — Card DOM construction
 
 - `_buildCardDOM` (shared helper)
-- `renderHand`, `createCardElement`, `getCardType`, `createZoomedCardElement`
+- `_injectKeywordEmojis` (prepends keyword emoji icons into card description text)
+- `renderHand` (two-column layout with fewest-first distribution), `createCardElement`, `getCardType`, `createZoomedCardElement`
 - `renderRewardCards`, `renderEnemyChoices`
 - `updateCardPlayability`
 
@@ -232,6 +286,7 @@ Each task below lists the minimum files an AI needs in context (plus `game.js` w
 
 | Task | Files to read |
 |------|--------------|
+| Add event bus listeners (enchantments, props) | `event-bus.js`, relevant combat file |
 | Change turn flow, ovation, or win/loss conditions | `combat-turns.js` |
 | Change enemy AI, attack patterns, or boss phases | `combat-enemy.js`, `enemies.js` |
 | Change card play logic or add new effect types | `combat-cards.js` |

@@ -574,6 +574,625 @@ const CARD_DEFINITIONS = {
         effects: [
             { type: 'damagePerTotalDebuff', perStack: 1 }
         ]
+    },
+
+    // =============================
+    // === M4 Expanded Cards ===
+    // =============================
+
+    // --- Quick Jab Synergies (Pip — debuff diversity) ---
+    'read-the-room': {
+        id: 'read-the-room',
+        name: 'Read the Room',
+        cost: 1,
+        type: 'action',
+        rarity: 'uncommon',
+        description: 'Gain 1 Distract per unique debuff type on enemy. Draw 1 card.',
+        owner: 'pip',
+        speechBubble: 'I SEE YOU!',
+        effects: [
+            { type: 'distractPerDebuffType' },
+            { type: 'draw', value: 1 }
+        ]
+    },
+    'catalogue-of-woes': {
+        id: 'catalogue-of-woes',
+        name: 'Catalogue of Woes',
+        cost: 1,
+        type: 'action',
+        rarity: 'uncommon',
+        description: 'Gain 1 Luck per unique debuff type on enemy.',
+        owner: 'pip',
+        speechBubble: 'LET ME COUNT!',
+        effects: [
+            { type: 'luckPerDebuffType' }
+        ]
+    },
+    'unraveling': {
+        id: 'unraveling',
+        name: 'Unraveling',
+        cost: 2,
+        type: 'attack',
+        rarity: 'rare',
+        description: 'Deal 3 damage per unique debuff type on enemy. Inflict 1 random debuff.',
+        owner: 'pip',
+        speechBubble: 'FALL APART!',
+        effects: [
+            { type: 'damagePerDebuffType', perType: 3 },
+            { type: 'inflictRandomDebuff', value: 1 }
+        ]
+    },
+
+    // --- Lucky Shot Synergies (Pip — Luck accumulation) ---
+    'charmed-life': {
+        id: 'charmed-life',
+        name: 'Charmed Life',
+        cost: 1,
+        type: 'defense',
+        rarity: 'uncommon',
+        description: 'Gain Shield equal to your Luck.',
+        owner: 'pip',
+        targeting: 'protagonist',
+        speechBubble: 'LUCKY ME!',
+        effects: [
+            { type: 'shieldFromLuck' }
+        ]
+    },
+    'lucky-break': {
+        id: 'lucky-break',
+        name: 'Lucky Break',
+        cost: 1,
+        type: 'action',
+        rarity: 'rare',
+        description: 'If you have 5+ Luck, gain 2 Energy and draw 2 cards. Lose 3 Luck.',
+        owner: 'pip',
+        speechBubble: 'JACKPOT!',
+        effects: [
+            { type: 'luckyBreak' }
+        ]
+    },
+    'all-in': {
+        id: 'all-in',
+        name: 'All In',
+        cost: 2,
+        type: 'attack',
+        rarity: 'rare',
+        description: 'Spend all Luck. Deal damage equal to Luck spent x3.',
+        owner: 'pip',
+        speechBubble: 'ALL OR NOTHING!',
+        effects: [
+            { type: 'allInLuck', multiplier: 3 }
+        ]
+    },
+
+    // --- Galvanize Synergies (Aldric — Taunt accumulation) ---
+    'defiant-roar': {
+        id: 'defiant-roar',
+        name: 'Defiant Roar',
+        cost: 1,
+        type: 'action',
+        rarity: 'uncommon',
+        description: 'Gain 1 Ovation per Taunt stack. Gain 1 Retaliate.',
+        owner: 'aldric',
+        speechBubble: 'COME AT ME!',
+        effects: [
+            { type: 'ovationFromTaunt' },
+            { type: 'retaliate', value: 1 }
+        ]
+    },
+    'immovable': {
+        id: 'immovable',
+        name: 'Immovable',
+        cost: 1,
+        type: 'defense',
+        rarity: 'uncommon',
+        description: 'Gain Shield equal to double your Taunt stacks.',
+        owner: 'aldric',
+        targeting: 'protagonist',
+        speechBubble: 'NOTHING MOVES ME!',
+        effects: [
+            { type: 'shieldFromTaunt', multiplier: 2 }
+        ]
+    },
+    'unyielding': {
+        id: 'unyielding',
+        name: 'Unyielding',
+        cost: 1,
+        type: 'defense',
+        rarity: 'rare',
+        description: 'Gain 2 Taunt and 2 Shield. Gain 1 Ovation per Taunt stack.',
+        owner: 'aldric',
+        speechBubble: 'I WILL NOT FALL!',
+        effects: [
+            { type: 'taunt', value: 2 },
+            { type: 'shield', value: 2 },
+            { type: 'ovationFromTaunt' }
+        ]
+    },
+
+    // --- Bulwark Synergies (Aldric — Block + Retaliate) ---
+    'rousing-recital': {
+        id: 'rousing-recital',
+        name: 'Rousing Recital',
+        cost: 1,
+        type: 'action',
+        rarity: 'uncommon',
+        description: 'Convert all Block into Ovation (up to max). Gain 1 Fortify.',
+        owner: 'aldric',
+        speechBubble: 'THE SHOW MUST GO ON!',
+        effects: [
+            { type: 'convertBlockToOvation' },
+            { type: 'fortify', value: 1 }
+        ]
+    },
+    'spiked-barricade': {
+        id: 'spiked-barricade',
+        name: 'Spiked Barricade',
+        cost: 2,
+        type: 'defense',
+        rarity: 'uncommon',
+        description: 'Gain 6 Block and 4 Retaliate.',
+        owner: 'aldric',
+        speechBubble: 'TOUCH IT AND HURT!',
+        effects: [
+            { type: 'block', value: 6 },
+            { type: 'retaliate', value: 4 }
+        ]
+    },
+    'sworn-protector': {
+        id: 'sworn-protector',
+        name: 'Sworn Protector',
+        cost: 0,
+        type: 'action',
+        rarity: 'rare',
+        description: 'Gain Retaliate equal to your Fortify. Gain 2 Block.',
+        owner: 'aldric',
+        speechBubble: 'MY OATH STANDS!',
+        effects: [
+            { type: 'retaliateFromFortify' },
+            { type: 'block', value: 2 }
+        ]
+    },
+
+    // =============================
+    // === Enchantment Cards ===
+    // =============================
+
+    // --- Aldric Enchantments ---
+    'dramatic-lighting': {
+        id: 'dramatic-lighting',
+        name: 'Dramatic Lighting',
+        cost: 1,
+        type: 'enchantment',
+        rarity: 'uncommon',
+        description: 'At end of turn, double your Retaliate stacks.',
+        owner: 'aldric',
+        speechBubble: 'SET THE SCENE!',
+        effects: []
+    },
+    'fortress-scene': {
+        id: 'fortress-scene',
+        name: 'Fortress Scene',
+        cost: 2,
+        type: 'enchantment',
+        rarity: 'uncommon',
+        description: 'At end of turn, gain Shield equal to your Taunt stacks.',
+        owner: 'aldric',
+        speechBubble: 'HOLD FAST!',
+        effects: []
+    },
+    'curtain-of-iron': {
+        id: 'curtain-of-iron',
+        name: 'Curtain of Iron',
+        cost: 1,
+        type: 'enchantment',
+        rarity: 'uncommon',
+        description: 'Whenever you gain Block, gain 1 Ovation.',
+        owner: 'aldric',
+        speechBubble: 'THE CROWD ROARS!',
+        effects: []
+    },
+    'war-drums': {
+        id: 'war-drums',
+        name: 'War Drums',
+        cost: 2,
+        type: 'enchantment',
+        rarity: 'rare',
+        description: 'At the start of your turn, gain 1 Fortify and 1 Retaliate.',
+        owner: 'aldric',
+        speechBubble: 'THE BEAT RISES!',
+        effects: []
+    },
+
+    // --- Pip Enchantments ---
+    'comic-relief': {
+        id: 'comic-relief',
+        name: 'Comic Relief',
+        cost: 1,
+        type: 'enchantment',
+        rarity: 'uncommon',
+        description: 'Whenever you inflict a debuff on the enemy, gain 1 Luck.',
+        owner: 'pip',
+        speechBubble: 'HA HA HA!',
+        effects: []
+    },
+    'plot-twist': {
+        id: 'plot-twist',
+        name: 'Plot Twist',
+        cost: 2,
+        type: 'enchantment',
+        rarity: 'rare',
+        description: 'At the end of the enemy\'s turn, deal damage equal to their Frustrated stacks.',
+        owner: 'pip',
+        speechBubble: 'DIDN\'T SEE THAT COMING!',
+        effects: []
+    },
+    'encore': {
+        id: 'encore',
+        name: 'Encore',
+        cost: 1,
+        type: 'enchantment',
+        rarity: 'uncommon',
+        description: 'Whenever you play your 3rd card in a turn, gain 1 Ovation and draw 1 card.',
+        owner: 'pip',
+        speechBubble: 'ONE MORE TIME!',
+        effects: []
+    },
+    'smoke-and-mirrors': {
+        id: 'smoke-and-mirrors',
+        name: 'Smoke and Mirrors',
+        cost: 1,
+        type: 'enchantment',
+        rarity: 'rare',
+        description: 'At the end of your turn, gain Distract equal to unique debuff types on the enemy.',
+        owner: 'pip',
+        speechBubble: 'NOW YOU SEE ME...',
+        effects: []
+    },
+
+    // =========================================
+    // === M7 MacGuffin Variant Starting Cards ===
+    // =========================================
+
+    'crown-decree': {
+        id: 'crown-decree',
+        name: 'Crown Decree',
+        cost: 0,
+        type: 'defense',
+        rarity: 'basic',
+        description: 'Gain 2 Block. Gain 1 Ovation.',
+        owner: 'macguffin',
+        speechBubble: 'BY DECREE!',
+        effects: [
+            { type: 'block', value: 2 },
+            { type: 'ovation', value: 1 }
+        ]
+    },
+    'crown-rally': {
+        id: 'crown-rally',
+        name: 'Crown Rally',
+        cost: 0,
+        type: 'action',
+        rarity: 'basic',
+        description: 'Gain 1 Inspire. Gain 1 Ovation.',
+        owner: 'macguffin',
+        speechBubble: 'RALLY!',
+        effects: [
+            { type: 'inspire', value: 1 },
+            { type: 'ovation', value: 1 }
+        ]
+    },
+    'tome-study': {
+        id: 'tome-study',
+        name: 'Tome Study',
+        cost: 0,
+        type: 'defense',
+        rarity: 'basic',
+        description: 'Gain 3 Block. Draw 1 card.',
+        owner: 'macguffin',
+        speechBubble: 'KNOWLEDGE!',
+        effects: [
+            { type: 'block', value: 3 },
+            { type: 'draw', value: 1 }
+        ]
+    },
+    'tome-insight': {
+        id: 'tome-insight',
+        name: 'Tome Insight',
+        cost: 0,
+        type: 'action',
+        rarity: 'basic',
+        description: 'Gain 1 Inspire. Draw 1 card.',
+        owner: 'macguffin',
+        speechBubble: 'I SEE!',
+        effects: [
+            { type: 'inspire', value: 1 },
+            { type: 'draw', value: 1 }
+        ]
+    },
+    'heirloom-radiance': {
+        id: 'heirloom-radiance',
+        name: 'Heirloom Radiance',
+        cost: 0,
+        type: 'action',
+        rarity: 'basic',
+        description: 'Gain 2 Inspire. Gain 1 Flourish.',
+        owner: 'macguffin',
+        speechBubble: 'SHINE!',
+        effects: [
+            { type: 'inspire', value: 2 },
+            { type: 'flourish', value: 1 }
+        ]
+    },
+    'idol-curse': {
+        id: 'idol-curse',
+        name: 'Idol Curse',
+        cost: 0,
+        type: 'action',
+        rarity: 'basic',
+        description: 'Gain 1 Curse. Unremovable.',
+        owner: 'macguffin',
+        speechBubble: 'CURSED!',
+        unremovable: true,
+        effects: [
+            { type: 'selfCurse', value: 1 }
+        ]
+    },
+
+    // ====================================
+    // === M7 Aldric Repertoire Cards ===
+    // ====================================
+
+    'heroic-charge': {
+        id: 'heroic-charge',
+        name: 'Heroic Charge',
+        cost: 2,
+        type: 'attack',
+        rarity: 'uncommon',
+        description: 'Deal 10 damage. Gain 2 Taunt.',
+        owner: 'aldric',
+        speechBubble: 'CHARGE!',
+        effects: [
+            { type: 'damage', value: 10 },
+            { type: 'taunt', value: 2 }
+        ]
+    },
+    'rallying-banner': {
+        id: 'rallying-banner',
+        name: 'Rallying Banner',
+        cost: 1,
+        type: 'action',
+        rarity: 'uncommon',
+        description: 'Gain 1 Inspire and 1 Ward. Draw 1 card.',
+        owner: 'aldric',
+        speechBubble: 'TO ME!',
+        effects: [
+            { type: 'inspire', value: 1 },
+            { type: 'ward', value: 1 },
+            { type: 'draw', value: 1 }
+        ]
+    },
+    'divine-intervention': {
+        id: 'divine-intervention',
+        name: 'Divine Intervention',
+        cost: 2,
+        type: 'defense',
+        rarity: 'rare',
+        description: 'Gain 8 Block. Heal target protagonist 5 HP.',
+        owner: 'aldric',
+        speechBubble: 'BY THE LIGHT!',
+        targeting: 'protagonist',
+        effects: [
+            { type: 'block', value: 8 },
+            { type: 'heal', value: 5 }
+        ]
+    },
+    'phalanx-formation': {
+        id: 'phalanx-formation',
+        name: 'Phalanx Formation',
+        cost: 2,
+        type: 'defense',
+        rarity: 'uncommon',
+        description: 'Gain 6 Block. Gain 2 Fortify and 1 Retaliate.',
+        owner: 'aldric',
+        speechBubble: 'HOLD FORMATION!',
+        effects: [
+            { type: 'block', value: 6 },
+            { type: 'fortify', value: 2 },
+            { type: 'retaliate', value: 1 }
+        ]
+    },
+    'commanders-presence': {
+        id: 'commanders-presence',
+        name: "Commander's Presence",
+        cost: 3,
+        type: 'enchantment',
+        rarity: 'rare',
+        description: 'At the start of your turn, gain 1 Inspire and 1 Taunt.',
+        owner: 'aldric',
+        speechBubble: 'I LEAD!',
+        effects: []
+    },
+
+    // ================================
+    // === M7 Pip Repertoire Cards ===
+    // ================================
+
+    'sleight-of-hand': {
+        id: 'sleight-of-hand',
+        name: 'Sleight of Hand',
+        cost: 1,
+        type: 'action',
+        rarity: 'uncommon',
+        description: 'Draw 2 cards. Reduce the cost of 1 random card in hand by 1.',
+        owner: 'pip',
+        speechBubble: 'WATCH CLOSELY!',
+        effects: [
+            { type: 'draw', value: 2 },
+            { type: 'reduceCostRandom', amount: 1 }
+        ]
+    },
+    'dirty-tricks': {
+        id: 'dirty-tricks',
+        name: 'Dirty Tricks',
+        cost: 1,
+        type: 'attack',
+        rarity: 'uncommon',
+        description: 'Deal 4 damage. Inflict 1 Vulnerable and 1 Weak.',
+        owner: 'pip',
+        speechBubble: 'NO RULES!',
+        effects: [
+            { type: 'damage', value: 4 },
+            { type: 'inflict', keyword: 'vulnerable', value: 1 },
+            { type: 'inflict', keyword: 'weak', value: 1 }
+        ]
+    },
+    'calculated-gamble': {
+        id: 'calculated-gamble',
+        name: 'Calculated Gamble',
+        cost: 1,
+        type: 'attack',
+        rarity: 'uncommon',
+        description: 'Deal 3 damage. Gain 3 Luck.',
+        owner: 'pip',
+        speechBubble: 'RISKY!',
+        effects: [
+            { type: 'damage', value: 3 },
+            { type: 'luck', value: 3 }
+        ]
+    },
+    'double-cross': {
+        id: 'double-cross',
+        name: 'Double Cross',
+        cost: 2,
+        type: 'attack',
+        rarity: 'rare',
+        description: 'Deal 5 damage twice. Inflict 1 Confused.',
+        owner: 'pip',
+        speechBubble: 'SURPRISE!',
+        effects: [
+            { type: 'damage', value: 5 },
+            { type: 'damage', value: 5 },
+            { type: 'inflict', keyword: 'confused', value: 1 }
+        ]
+    },
+    'grand-finale': {
+        id: 'grand-finale',
+        name: 'Grand Finale',
+        cost: 3,
+        type: 'enchantment',
+        rarity: 'rare',
+        description: 'Whenever you play your 5th card in a turn, deal 10 damage.',
+        owner: 'pip',
+        speechBubble: 'THE GRAND FINALE!',
+        effects: []
+    },
+
+    // =============================
+    // === M7 Neutral Cards ===
+    // =============================
+
+    'stage-whisper': {
+        id: 'stage-whisper',
+        name: 'Stage Whisper',
+        cost: 0,
+        type: 'action',
+        rarity: 'uncommon',
+        description: 'Draw 2 cards.',
+        owner: 'macguffin',
+        speechBubble: '*whisper*',
+        effects: [
+            { type: 'draw', value: 2 }
+        ]
+    },
+    'standing-ovation': {
+        id: 'standing-ovation',
+        name: 'Standing Ovation',
+        cost: 1,
+        type: 'action',
+        rarity: 'rare',
+        description: 'Set Ovation to 5.',
+        owner: 'macguffin',
+        speechBubble: 'BRAVO!',
+        effects: [
+            { type: 'setOvation', value: 5 }
+        ]
+    },
+    'dramatic-pause': {
+        id: 'dramatic-pause',
+        name: 'Dramatic Pause',
+        cost: 0,
+        type: 'defense',
+        rarity: 'uncommon',
+        description: 'Gain 4 Block. Gain 1 Flourish.',
+        owner: 'macguffin',
+        speechBubble: '...',
+        effects: [
+            { type: 'block', value: 4 },
+            { type: 'flourish', value: 1 }
+        ]
+    },
+
+    // =====================================
+    // === M7 Alternative Basic Cards ===
+    // =====================================
+
+    'shield-slam': {
+        id: 'shield-slam',
+        name: 'Shield Slam',
+        cost: 1,
+        type: 'attack',
+        rarity: 'basic',
+        description: 'Deal 2 damage. Gain 3 Block.',
+        owner: 'aldric',
+        speechBubble: 'SLAM!',
+        effects: [
+            { type: 'damage', value: 2 },
+            { type: 'block', value: 3 }
+        ]
+    },
+    'rallying-cry': {
+        id: 'rallying-cry',
+        name: 'Rallying Cry',
+        cost: 1,
+        type: 'action',
+        rarity: 'basic',
+        description: 'Gain 1 Inspire. Gain 2 Taunt.',
+        owner: 'aldric',
+        speechBubble: 'TO ARMS!',
+        effects: [
+            { type: 'inspire', value: 1 },
+            { type: 'taunt', value: 2 }
+        ]
+    },
+    'smoke-bomb': {
+        id: 'smoke-bomb',
+        name: 'Smoke Bomb',
+        cost: 1,
+        type: 'defense',
+        rarity: 'basic',
+        description: 'Gain 1 Distract. Inflict 1 Confused.',
+        owner: 'pip',
+        speechBubble: 'POOF!',
+        effects: [
+            { type: 'distract', value: 1 },
+            { type: 'inflict', keyword: 'confused', value: 1 }
+        ]
+    },
+    'trick-shot': {
+        id: 'trick-shot',
+        name: 'Trick Shot',
+        cost: 1,
+        type: 'attack',
+        rarity: 'basic',
+        description: 'Deal 2 damage. Gain 1 Luck. Draw 1 card.',
+        owner: 'pip',
+        speechBubble: 'WATCH THIS!',
+        effects: [
+            { type: 'damage', value: 2 },
+            { type: 'luck', value: 1 },
+            { type: 'draw', value: 1 }
+        ]
     }
 };
 
@@ -583,13 +1202,19 @@ const CARD_POOLS = {
         'aegis', 'burning-devotion', 'cooperative-strike', 'protective-stance',
         'protect', 'iron-wall', 'true-strike', 'inspirational-shout',
         'cleanse', 'aggressive-strike', 'captivating-strike', 'heated-resistance',
-        'battle-hymn', 'shield-bash', 'stand-guard', 'stalwart'
+        'battle-hymn', 'shield-bash', 'stand-guard', 'stalwart',
+        'dramatic-lighting', 'fortress-scene', 'curtain-of-iron', 'war-drums',
+        'defiant-roar', 'immovable', 'unyielding',
+        'rousing-recital', 'spiked-barricade', 'sworn-protector'
     ],
     pip: [
         'good-fortune', 'create-opportunity', 'loaded-insult', 'coup-de-grace',
         'pips-cocktail', 'annoying-poke', 'stylish-dance', 'hit-where-it-hurts',
         'vex', 'best-explanation', 'ultimate-jeer', 'flirtatious-jeer',
-        'quick-draw', 'pepper-spray', 'mischief', 'twist-the-knife'
+        'quick-draw', 'pepper-spray', 'mischief', 'twist-the-knife',
+        'comic-relief', 'plot-twist', 'encore', 'smoke-and-mirrors',
+        'read-the-room', 'catalogue-of-woes', 'unraveling',
+        'charmed-life', 'lucky-break', 'all-in'
     ]
 };
 
@@ -600,18 +1225,24 @@ const CARD_POOLS_BY_RARITY = {
             'aegis', 'burning-devotion', 'cooperative-strike', 'protective-stance',
             'protect', 'iron-wall', 'true-strike', 'inspirational-shout',
             'cleanse', 'aggressive-strike',
-            'battle-hymn', 'shield-bash', 'stand-guard', 'stalwart'
+            'battle-hymn', 'shield-bash', 'stand-guard', 'stalwart',
+            'dramatic-lighting', 'fortress-scene', 'curtain-of-iron',
+            'defiant-roar', 'immovable', 'rousing-recital', 'spiked-barricade'
         ],
-        rare: ['captivating-strike', 'heated-resistance']
+        rare: ['captivating-strike', 'heated-resistance', 'war-drums',
+               'unyielding', 'sworn-protector']
     },
     pip: {
         uncommon: [
             'good-fortune', 'create-opportunity', 'loaded-insult', 'coup-de-grace',
             'pips-cocktail', 'annoying-poke', 'stylish-dance', 'hit-where-it-hurts',
             'vex', 'best-explanation',
-            'quick-draw', 'pepper-spray', 'mischief', 'twist-the-knife'
+            'quick-draw', 'pepper-spray', 'mischief', 'twist-the-knife',
+            'comic-relief', 'encore',
+            'read-the-room', 'catalogue-of-woes', 'charmed-life'
         ],
-        rare: ['ultimate-jeer', 'flirtatious-jeer']
+        rare: ['ultimate-jeer', 'flirtatious-jeer', 'plot-twist', 'smoke-and-mirrors',
+               'unraveling', 'lucky-break', 'all-in']
     }
 };
 
@@ -892,6 +1523,18 @@ const KEYWORD_GLOSSARY = {
             "Frustration builds toward Heckled!",
             "At 5 Frustration, get 1 turn of Heckled!",
             "Pip's signature pressure mechanic!"
+        ]
+    },
+
+    // Card type keywords
+    enchantment: {
+        name: 'Enchantment',
+        icon: '✧',
+        explanation: 'Persistent effect that lasts the entire combat. Removed when combat ends.',
+        hints: [
+            "Enchantments stay active all combat!",
+            "Play them early for maximum value!",
+            "They don't go to the discard pile!"
         ]
     }
 };
